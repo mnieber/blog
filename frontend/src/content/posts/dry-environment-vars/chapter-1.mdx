@@ -1,0 +1,23 @@
+# Goals
+
+I will discuss an approach for managing environment variable files. The characteristics of this approach are:
+
+- it's DRY: values are sourced from one location rather than repeated in different files;
+- it's modular: values are grouped by theme;
+- it's minimal: service only consume the variables they need;
+- it can handle secrets;
+- it requires a compilation step.
+
+In addition, I will explain how to use these files in the dev, deploy and prod environments.
+
+# Caveats
+
+I will mention the handling of secrets but I will not focus too much on security. I'm not an expert
+on this topic, and it would distract from the main goals of this article.
+
+# Overview
+
+I will first discuss three different environments in which environment variables can be
+used: dev, prod and deploy. This explanation is not strictly necessary to understand the approach, but
+I think it adds an interesting context. Then, I will explain how the compile-env tool can be used
+to generate .env files for these environments from a single source of truth.

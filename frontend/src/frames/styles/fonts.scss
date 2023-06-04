@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/open-sans-font-family/static/OpenSans/OpenSans-Regular.ttf')
+    format('truetype');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/open-sans-font-family/static/OpenSans/OpenSans-Bold.ttf')
+    format('truetype');
+}
+
+* {
+  font-family: Open Sans;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  src: url('../fonts/inter-font-family/static/Inter-Bold.ttf')
+    format('truetype');
+}
+
+* {
+  font-family: Open Sans;
+}
+
+// @font-face {
+//   font-family: 'Karla';
+//   src: url('../fonts/Karla-VariableFont_wght.ttf') format('truetype');
+//   font-weight: 125 950;
+//   font-stretch: 75% 125%;
+//   font-style: normal;
+// }
+
+@font-face {
+  font-family: 'Karla';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/karla-font-family/static/Karla-Regular.ttf')
+    format('truetype');
+}
+
+@font-face {
+  font-family: 'Karla';
+  font-style: medium;
+  font-weight: 500;
+  src: url('../fonts/karla-font-family/static/Karla-Medium.ttf')
+    format('truetype');
+}
+
+@font-face {
+  font-family: 'Karla';
+  font-style: bold;
+  font-weight: 700;
+  src: url('../fonts/karla-font-family/static/Karla-Bold.ttf')
+    format('truetype');
+}

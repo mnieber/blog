@@ -1,0 +1,39 @@
+---
+slug: 'chapter-1'
+title: 'Introduction'
+type: 'chapter'
+---
+
+# Goals
+
+I will explain a hybrid approach - based on inline styles and SCSS - for writing style-related code that is compact,
+flexible and maintainable.
+
+# Assumptions
+
+You are familiar with the basics of SCSS and inline styles.
+
+# Caveats
+
+First, this article describes an experimental approach. I think it contains interesting ideas, and can be of practical
+value, but it's not a proven approach. Second, although I've used CSS a lot, I'm not an expert.
+I will discuss some of my experiences with inline styles, SCSS and CSS-in-JS but I can't make a strong case for
+which approaches should be preferred.
+
+# Conventions
+
+I will sometimes use the terms HTML and JSX interchangeably (since JSX is a way to write HTML inside Typescript).
+
+# Why do we need a style system?
+
+A large fraction of the code is related to styling the application. To make this code maintainable, it needs to be
+well structured and predictable. A style system can help us to achieve that. It tells us how styles are defined,
+how styles are applied to elements, and how they are adapted to different contexts (e.g. the current theme). Without a system,
+it's very likely that different solutions will be used in different places, which will make it harder
+to understand and maintain the code.
+
+# Overview
+
+In this article I will share my thoughts on writing style code. I will start by discussing various approaches for creating
+UIs: TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI. I will discuss what I like and dislike about these approaches,
+and explain what qualities I aim for in a style system. Then, I will introduce my own hybrid approach for implementing styles.

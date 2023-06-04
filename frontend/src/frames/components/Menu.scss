@@ -1,0 +1,9 @@
+.Menu__Item {
+  @apply cursor-pointer;
+  @apply text-primaryPurple;
+  font-size: 24px;
+}
+
+.Menu__Item--active {
+  @apply text-primaryBlue;
+}

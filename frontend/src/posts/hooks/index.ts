@@ -1,0 +1,1 @@
+export { usePostsState } from './usePostsState';

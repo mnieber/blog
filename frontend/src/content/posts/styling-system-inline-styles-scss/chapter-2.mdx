@@ -1,0 +1,146 @@
+---
+slug: 'chapter-2'
+title: 'Thoughts on TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI'
+type: 'chapter'
+---
+
+# Introduction
+
+This small review of different approaches for creating UIs was inspired by a [video by Theo from T3](https://www.youtube.com/watch?v=CQuTF-bkOgc).
+I highly recommend watching this video, as I'll be building on his advice to employ inline styles and create a
+custom component library for your application.
+
+# TailwindUI
+
+TailwindUI offers a collection of UI components, not in the traditional sense (as software components) but as a set of HTML code snippets.
+To utilize a component, simply copy the snippet to your source file and modify it as required. Note that the same snippet can appear
+in different places in your code. Here's an example of a snippet for an email form field:
+
+<CodeSnippet
+  lang="html"
+  addMb={true}
+  code={`
+<div class="mb-6">
+  <label
+    for="email"
+    class="mb-2 block text-sm font-medium leading-6 text-gray-900"
+    >Email address</label
+  >
+  <div>
+    <input
+      id="email"
+      name="email"
+      type="email"
+      class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+    />
+  </div>
+</div>
+`}
+/>
+
+There are many advantages to this approach:
+
+- **Isolation**: you can tweak every component instance to suit its specific context, without the risk of breaking the code elsewhere;
+- **Explicitness**: it's easy to inspect the styles of an element in the code, as they are directly embedded in the JSX;
+- **Naming**: there is no need to devise suitable CSS class names;
+- **Consistency**: while copying from an HTML snippet does not enforce consistency,
+  it tends towards it since all form fields originate from the same template.
+
+When it comes to the drawbacks, I would include:
+
+- **Consistency**: maintaining consistency when locally changing inline styles requires discipline from the developer.
+- **Maintenance**: when you update a component's appearance throughout the application, you may need to modify inline styles in multiple locations.
+- **Readability**: inline styles can appear cluttered and may not convey an intended purpose to the code reader. This can make it hard to spot mistakes.
+- **Naming**: because names are absent from the HTML code, it's hard to find the related code when you inspect the DOM in the browser.
+
+To mitigate the last drawback, I often add descriptive CSS class names to JSX code that uses inline styles (at least, when running in development mode).
+In most cases these names are not used to style the elements but they make it easier to find that piece of code.
+
+Overall, I think the inline styling approach that is offered by TailwindUI is compelling.
+As we shall see later, it's the starting point for my hybrid approach.
+
+## Custom components ≠ third party components
+
+Before we continue I would like to point out that can still be a good idea to create custom components based on TailwindUI snippets. You can do this
+on a case-by-case basis, and when doing so, you trade some flexibility for increased consistency and reusability. However, it may seem counter-intuitive
+to start with TailwindUI and then go into the direction of components. Shouldn't we just use MaterialUI then? The answer is no, because building custom
+components is a very different approach from using third party components. These custom components are already shaped to meet the needs of the application.
+Therefore, there will usually be no need to "break into" them. On the other hand, when using MaterialUI, it can be very challenging to
+get the component to do exactly what you want.
+
+# UIkit
+
+UIkit is a Javascript framework that offers a collection of UI components. It takes a very interesting approach:
+
+- you can create a custom style by setting SCSS variables. UIkit comes with a very large set of variables,
+  so you can tweak almost every aspect of the style.
+- you can add both style and behaviour to your JSX elements by adding CSS class names and attributes. Instead of attributes, you can also use
+  small snippets of Typescript.
+
+Here is an example of creating a drop-down. Note that the button is followed by a div that has the `uk-dropdown` attribute. This tells UIkit
+that the button must be converted into a drop-down button.
+
+<CodeSnippet
+  lang="jsx"
+  code={`
+<div class="uk-inline">
+    <button class="uk-button uk-button-default" type="button">Hover</button>
+    <div uk-dropdown>I'm a dropdown.</div>
+</div>
+  `}
+/>
+
+Interestingly, there is no separate drop-down component in this code snippet. Instead, you turn the button into a drop-down by
+mixing in the `uk-dropdown` attribute. This is somewhat analogous to using inline styles, so I will call it an "inline components" approach.
+It suggests a more loose concept of what a component is. Instead of an object or function, it can also be a collection of utilities
+that add styles and behaviours to some JSX structure. This is a very flexible approach. For example, if you want to add an icon to
+the drop-down button, then instead of having to extend a DropDownButton component function you can just add the icon
+directly in the "inline component" code. In my hybrid approach, I will build on this idea.
+
+Advantages of UIkit:
+
+- **Consistency**: the style of the JSX elements is based on global SCSS variables;
+- **Flexibility**: there is no need to break into components, as behaviour is added to the JSX elements inline using CSS classes and attributes.
+
+Disadvantages are:
+
+- **Isolation**: if you change an SCSS variable, it will have a global effect;
+- **Explicitness**: since the SCSS variables basically replace the CSS class names, it adds another layer of indirection to the code;
+- **Maintenance**: the addition of behaviour based on attributes is magical. I'm expecting problems when you want to tweak the behaviour.
+
+Initially, I was a fan of UIkit, because I was impressed by the philosophy behind it. In practice, I have found it annoying to work with the
+large set of SCSS variables. Still, the idea of creating components as sets of utilities has been an inspiration to me.
+
+# SCSS
+
+Since we all know what SCSS looks like, let's go straight to the advantages and disadvantages. Here, I should add that much depends on how
+SCSS is used. Some of its features are an advantage if used in the right way, and a disadvantage if used wrongly.
+
+- **Flexibility**: since SCSS is a powerful language for styling elements, we can cover a lot of use-cases with it;
+- **Flexibility**: we can use CSS variables to make the effect of the SCSS code depend on the context (e.g. the current theme);
+- **Readability**: when we move styles to an SCSS file, the remaining source code usually becomes more readable;
+- **Performance**: I'm not an expert on this but the consensus seems to be that using SCSS gives very good performance;
+- **Maintenance**: when inspecting the DOM, it's usually easy to find out where the styles are defined in the code.
+
+Disadvantages are:
+
+- **Isolation**: if you define SCSS rules that have a global scope then it can become very hard to understand the combined effect of different SCSS files.
+  Changing an SCSS file can become very risky;
+- **Maintenance**: because SCSS is very flexible, it can easily lead to complex solutions that are hard to understand and maintain;
+- **Explicitness**: if multiple SCSS rules are responsible for styling an element, then it can be hard to figure out which rules apply;
+- **Explicitness**: even when you co-locate JSX and SCSS, you still need to jump between these files to understand how elements are styled.
+
+I think SCSS offers a very powerful approach, that is also risky. For my own style system, I would like to use the power of SCSS, but put some
+restrictions in place to limit the risk.
+
+# CSS-in-JS
+
+I have limited experience with CSS-in-JS. In part, this is because I like SCSS and have not found a compelling reason to switch.
+One could say that - apart from the isolation aspect, which is important - SCSS and CSS-in-JS are not so different when it
+comes to the developer experience. For developing my hybrid approach, the difference between SCSS and CSS-in-JS is not that relevant.
+
+# MaterialUI
+
+I haven't used MaterialUI much but the consensus seems to be that it offers a pleasant and efficient developer experience, as long as you are
+not trying to do things that are too far outside of what MaterialUI offers. Since my priority is nice and clean code, I will usually not
+choose MaterialUI, because I don't want to be in the situation where hacks are needed to overcome the limits of the framework.

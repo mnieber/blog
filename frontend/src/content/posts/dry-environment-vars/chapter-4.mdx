@@ -1,0 +1,6 @@
+In this article I've discussed the use of the dev, prod and deploy environments. Then, I've explained how
+the compile-env tool can be used to generate .env files for each service in each of these environments.
+The compile-env tool generates these files from a collection of source values (the single source of truth) that
+are organized in cohesive groups. The value are used in templates that supply the required values
+(and only those values) to each service in the system. Finally, I've given an example of creating .env files
+for the dynamic and static use-case in a deploy environment that uses docker-compose.

@@ -1,0 +1,100 @@
+# Properties of a technical product roadmap
+
+By a technical product roadmap I mean a document with the following properties:
+
+- it contains milestones that describe a user workflow with enough product detail to clarify the user
+  experience. In addition it contains enough technical key details to give some guidance and constraints
+  regarding the implementation.
+- each milestone typically describe a few weeks of work and fit an A4 paper. Much shorter milestones are
+  also possible. Because each milestone should be concise and easy to read, it will usually refer to
+  other documents for details.
+- it contains a glossary that explains all the key terms (this helps to keep milestone descriptions
+  compact)
+- it should be an authoritative document, in the sense that there are no parallel documents that are also
+  a source of truth for what the team will be working on.
+
+The first and last points are the most important ones, because they ensure that people will read the roadmap
+and agree on the priorities that it describes. The roadmap should therefore not try to answer every question
+related to user experience and implementation. Instead, it should have just enough information to give the reader
+an impression of what the priorities are, how the product will behave and how that behaviour will be implemented.
+
+Note that besides user workflows a milestone may also describe purely technical tasks. The intention should be
+though to direct all work in a milestone to a common goal that is summarized in the milestone title. Milestones
+that are upcoming should not have obvious gaps in explaining how the product will behave or leave important
+implementation questions unanswered. On the other hand, milestones that are further in the future will be more
+sketchy.
+
+# An example milestone
+
+I will use the example of a website that allows users to share lists of dance move videos.
+The website can be used by people who want to learn how to dance. One of the product requirements is
+that some videos should not be made available to all users. This is because some dance teachers make
+videos available to their students but do not want these videos to spread to the whole internet.
+
+## Glossary
+
+- **Move** - the combination of a description and a video that explain a dance move to a user
+- **Move Author** - the user who created the Move
+- **Private Move** - a Move that is only visible to the Move Author
+- **Public Move** - a Move that is visible to anyone. Public Moves must have a Public Video.
+- **Public Video (Url)** - a video url that has no sharing restrictions.
+- **Regular User** - a user who is not an Uploader
+- **Uploader** - a person who is allowed to add Public Videos. Uploaders will contact the Video Owner
+  to make sure that the video is indeed freely shareable.
+- **Video Owner** - the person who produced/owns the video
+
+## Milestone 3: Users can create public and private moves
+
+1. A user can log into the website.
+   - 1.1 If the user is not yet an uploader, then they can send a request to become one.
+   - 1.2 A user can log in from different computers but no more than twice (to prevent a group of
+     people from sharing one account).
+2. Uploaders and Regular Users can create a new private move.
+   - 2.1 A move will have a title, description, video url and tags.
+   - 2.2 The move will have a url that is only accessible to the logged in move author.
+3. An uploader can create a new public move.
+   - 3.1 The uploader must confirm that its associated video is indeed freely shareable.
+4. A regular user can create a new public move if they use an already public video.
+   - 4.1 If the uploader later reverts the decision to make the video public then the move
+     automatically becomes private. If the video goes back to being public, then so does the move.
+5. The backend does not use data mutation to change public videos/moves into private ones.
+   - 5.1 Instead it stores domain events from which the status (public or private) can be reconstructed.
+   - 5.2 An administrator can view an audit trail that shows how the status changed over time.
+
+# Notes on the example milestone
+
+## Glossary
+
+As you can see, the glossary already explains several things about the application. It introduces important
+concepts, and to a certain extent, the behaviour of the application follows from these concepts.
+
+## Milestone goal
+
+Ideally, every step in a milestone contributes to some overarching goal that is summed up in the milestone title.
+Usually a milestone describes a viable version of a workflow, but not the ultimate version. In future milestones
+the workflow may be updated and refined. For example, a future milestone can state that move titles are rejected
+if they contain disallowed words.
+
+## Level of detail
+
+Point 1.1 of the milestone illustrates how certain details are left out: it doesn't say how the user
+can send a request to become an uploader. Maybe there is a contact form, or maybe there is an email address.
+Since this information is left out we can conclude that this topic is apperently not important enough to be detailed
+here. Similarly, in point 2.1 it's not stated which fields are required and which are optional, because this is not
+essential information for the roadmap. If a user story is added to a Scrum sprint for this feature then it probably
+will specify this information.
+
+## No repetition
+
+In point 3 we don't repeat the fields of a move, because that is already mentioned in point 2 and we expect the
+reader to be reading the whole milestone. This is an important difference to a backlog with user stories that must be
+more self-contained.
+
+## Inclusion of implementation details
+
+Point 5 shows an example of mixing implementation details (5.1) and features (5.2). In my opinion it's important to
+add key implementation decisions to the roadmap because the whole team should be on the same page about them.
+If the decision to use immutable data and domain events is controversial then it helps to make this information visible
+in a place where people can discuss this and sign-off on it before the implementation starts. Without this information
+you cannot claim that the team is aligned on the plan. Note that it's enough to outline the technical approach,
+the details can be described in other documents.
