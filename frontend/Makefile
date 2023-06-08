@@ -6,7 +6,7 @@ install:
 	yarn install
 
 run-server:
-	yarn develop --host=0.0.0.0
+	yarn dev -H 0.0.0.0
 
 #
 # Stack

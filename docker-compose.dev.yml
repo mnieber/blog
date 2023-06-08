@@ -12,7 +12,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     image: gatsblog_frontend_dev
     ports:
-      - 8000:8000
+      - 3000:3000
     volumes:
       - ./frontend:/app/src
 

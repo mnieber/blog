@@ -1,1 +1,0 @@
-export { initPosts } from './initPosts';
