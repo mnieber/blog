@@ -3,6 +3,9 @@ import './globals.css';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
 
+// Import styles
+import './layout.scss';
+
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
@@ -18,6 +21,7 @@ const RootLayout = (props: PropsT) => {
     <html lang="en">
       <body
         className={cn(
+          'RootLayout',
           inter.className,
           //
           //

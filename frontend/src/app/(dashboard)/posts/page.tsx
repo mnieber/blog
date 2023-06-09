@@ -1,7 +1,3 @@
-export type PropsT = {};
+import { PostListView } from '/src/posts/components/PostListView';
 
-const Foo = (props: PropsT) => {
-  return <div>Foo</div>;
-};
-
-export default Foo;
+export default PostListView;
