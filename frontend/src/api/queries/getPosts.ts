@@ -17,5 +17,5 @@ export const getPosts = (args: ArgsT) => {
     });
   }
 
-  return Promise.resolve({ posts: response as PostT[] });
+  return response as PostT[];
 };

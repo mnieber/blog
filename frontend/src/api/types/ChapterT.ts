@@ -1,18 +1,13 @@
+import { PostT } from '/src/api/types/PostT';
+
 export type ChapterT = {
   id: string;
   slug: string;
   title: string;
-  component?: React.ReactNode;
 };
 
 export type ChapterByIdT = { [id: string]: ChapterT };
 
-export type GatsbyChapterT = {
-  id: string;
-  title: string;
-  mdxBody: string;
-};
-
-export function getChapterLink(chapter: any) {
-  return `/posts/${chapter.post.slug}/chapters/${chapter.slug}`;
+export function getChapterLink(post: PostT, chapter: ChapterT) {
+  return `/posts/${post.slug}/chapters/${chapter.slug}`;
 }

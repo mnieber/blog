@@ -1,4 +1,3 @@
-import React from 'react';
 import { PostT } from '/src/api/types/PostT';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
@@ -7,7 +6,6 @@ import { cn } from '/src/utils/classnames';
 import './PostListViewItem.scss';
 
 export type PropsT = {
-  onClick?: (e: React.MouseEvent) => void;
   post: PostT;
   className?: any;
 };

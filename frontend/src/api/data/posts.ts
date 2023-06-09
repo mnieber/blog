@@ -1,6 +1,6 @@
 export const posts = [
   {
-    slug: 'compile-env-based-strategy-for-managing-environment-variables',
+    slug: 'compile-env-for-managing-environment-variables',
     title: 'Using compile-env to manage environment variables',
     shortTitle: 'DRY environment variables',
     date: 'January 2023, by Maarten Nieber',

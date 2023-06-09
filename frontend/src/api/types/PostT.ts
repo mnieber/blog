@@ -8,13 +8,6 @@ export type PostT = {
   shortTitle: string;
   shortTeaser: string;
   chapters: ChapterT[];
-  component?: React.FC;
 };
 
 export type PostByIdT = { [id: string]: PostT };
-
-export type GatsbyPostT = {
-  id: string;
-  date: string;
-  title: string;
-};
