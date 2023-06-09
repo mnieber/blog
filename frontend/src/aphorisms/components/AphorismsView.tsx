@@ -9,7 +9,7 @@ export type PropsT = {
   className?: any;
 };
 
-const AphorismsView = (props: PropsT) => {
+export const AphorismsView = (props: PropsT) => {
   const divs = aphorisms.map((aphorism, idx) => {
     return (
       <div
@@ -35,5 +35,3 @@ const AphorismsView = (props: PropsT) => {
     </div>
   );
 };
-
-export default AphorismsView;
