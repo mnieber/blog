@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { getChapterLink } from '/src/api/types/ChapterT';
 import { PostT } from '/src/api/types/PostT';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
@@ -32,10 +34,13 @@ export const PostListViewItem = (props: PropsT) => {
       {
         // 🔳 Title 🔳
       }
-      <div className={cn('PostListViewItem__Title', 'sm:text-center')}>
+      <Link
+        href={getChapterLink(props.post, props.post.chapters[0])}
+        className={cn('PostListViewItem__Title', 'sm:text-center')}
+      >
         {showShortTitle && props.post.shortTitle}
         {!showShortTitle && props.post.title}
-      </div>
+      </Link>
       {
         // 🔳 Subtitle 🔳
       }

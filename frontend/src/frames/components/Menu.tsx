@@ -17,8 +17,7 @@ export type PropsT = {
 
 export const Menu = (props: PropsT) => {
   const segments = useSelectedLayoutSegments();
-  const segment: MenuItemT = segments[0];
-  console.log('segments', segments);
+  const segment: MenuItemT = segments[0] as MenuItemT;
 
   return (
     <div

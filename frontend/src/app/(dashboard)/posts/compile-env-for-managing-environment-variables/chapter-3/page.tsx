@@ -1,6 +1,6 @@
 'use client';
 
-import Component from './chapter-1.mdx';
+import Component from './chapter-3.mdx';
 
 export default function Page() {
   return <Component />;

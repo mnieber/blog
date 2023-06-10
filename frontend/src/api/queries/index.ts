@@ -1,2 +1,2 @@
-export { getPosts } from './useGetPosts';
-export type { ArgsT as GetPostsArgsT } from './useGetPosts';
+export { getPosts } from './getPosts';
+export type { ArgsT as GetPostsArgsT } from './getPosts';

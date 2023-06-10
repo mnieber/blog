@@ -9,5 +9,5 @@ export type ChapterT = {
 export type ChapterByIdT = { [id: string]: ChapterT };
 
 export function getChapterLink(post: PostT, chapter: ChapterT) {
-  return `/posts/${post.slug}/chapters/${chapter.slug}`;
+  return `/posts/${post.slug}/${chapter.slug}`;
 }

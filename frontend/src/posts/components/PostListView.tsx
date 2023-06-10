@@ -13,8 +13,7 @@ export type PropsT = {
 
 export const PostListView = async (props: PropsT) => {
   const noItems = <h2>There are no posts</h2>;
-  const postsData = await getPosts({});
-  const posts = postsData.posts;
+  const posts = getPosts({});
 
   const postDivs = posts.map((post: PostT, idx: number) => {
     return (
