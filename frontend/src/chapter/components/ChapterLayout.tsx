@@ -9,6 +9,7 @@ export type PropsT = React.PropsWithChildren<{
 
 export const ChapterLayout = (props: PropsT) => {
   const { post, chapter } = getPostAndChapterFromPathname(props.chapterSlug);
+
   return (
     <PostView post={post} chapter={chapter}>
       {props.children}
