@@ -2,7 +2,7 @@
 
 import { MDXProvider } from '@mdx-js/react';
 import React from 'react';
-import { ChapterView } from '/src/chapters/components/ChapterView';
+import { PostView } from '/src/posts/components/PostView';
 import { CodeSnippet } from '/src/snippets/components/CodeSnippet';
 import { TabView } from '/src/snippets/components/TabView';
 
@@ -16,7 +16,7 @@ const PostLayout = (props: PropsT) => {
 
   return (
     <MDXProvider components={components}>
-      <ChapterView>{props.children}</ChapterView>
+      <PostView>{props.children}</PostView>
     </MDXProvider>
   );
 };

@@ -32,7 +32,7 @@ export const ChapterListViewItem = (props: PropsT) => {
         // 🔳 Title 🔳
       }
       <Link
-        to={getChapterLink(props.post, props.chapter)}
+        href={getChapterLink(props.post, props.chapter)}
         className={cn(
           'ChapterListViewItem__Title',
           //

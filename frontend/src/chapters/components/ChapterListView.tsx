@@ -21,6 +21,7 @@ export const ChapterListView = (props: PropsT) => {
       return (
         <ChapterListViewItem
           key={`item-${chapter.id}`}
+          post={props.post}
           chapter={chapter}
           className={cn(
             idx > 0 ? 'mt-4' : '',
