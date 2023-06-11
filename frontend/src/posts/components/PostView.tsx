@@ -1,34 +1,23 @@
+'use client';
+
 import React from 'react';
-import { getPosts } from '/src/api/queries/getPosts';
 import { ChapterT } from '/src/api/types/ChapterT';
 import { PostT } from '/src/api/types/PostT';
 import { ChapterListView } from '/src/chapters/components/ChapterListView';
 import { ChapterView } from '/src/chapters/components/ChapterView';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
-import { pathname } from '/src/utils/urls';
 
 // Import styles
 import './PostView.scss';
 
 export type PropsT = React.PropsWithChildren<{
   className?: any;
+  post: PostT;
+  chapter: ChapterT;
 }>;
 
 export const PostView = (props: PropsT) => {
-  const segments = pathname().split('/');
-  const posts = getPosts({});
-
-  const post = posts.find(
-    (post) => post.slug === segments[segments.length - 2]
-  ) as PostT;
-  console.assert(post, 'post not found');
-
-  const chapter = post.chapters.find(
-    (chapter) => chapter.slug === segments[segments.length - 1]
-  ) as ChapterT;
-  console.assert(chapter, 'chapter not found');
-
   return (
     //
     // 🔳 PostView 🔳
@@ -69,9 +58,9 @@ export const PostView = (props: PropsT) => {
           {
             // 🔳 Title and meta 🔳
           }
-          <div className={cn('PostView__Title')}>{post.title}</div>
-          <div className={cn('PostView__Meta', 'mt-1')}>{post.date}</div>
-          {post.chapters.length > 1 && (
+          <div className={cn('PostView__Title')}>{props.post.title}</div>
+          <div className={cn('PostView__Meta', 'mt-1')}>{props.post.date}</div>
+          {props.post.chapters.length > 1 && (
             <div
               className={cn(
                 'PostView__IndexSeparator',
@@ -84,12 +73,16 @@ export const PostView = (props: PropsT) => {
           {
             // 🔳 Chapter list 🔳
           }
-          {post.chapters.length > 1 && (
-            <ChapterListView post={post} chapter={chapter} className={cn('')} />
+          {props.post.chapters.length > 1 && (
+            <ChapterListView
+              post={props.post}
+              chapter={props.chapter}
+              className={cn('')}
+            />
           )}
         </div>
       </div>
-      <ChapterView post={post} chapter={chapter}>
+      <ChapterView post={props.post} chapter={props.chapter}>
         {props.children}
       </ChapterView>
     </div>
