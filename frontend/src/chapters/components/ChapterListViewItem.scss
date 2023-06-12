@@ -1,8 +1,12 @@
 .ChapterListViewItem {
   @apply cursor-pointer;
+  font-size: 22px;
 }
 
 .ChapterListViewItem__Title {
   @apply font-medium;
-  font-size: 22px;
+}
+
+.ChapterListViewItem--active {
+  @apply text-primaryGreen;
 }

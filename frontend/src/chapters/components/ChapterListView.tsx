@@ -23,10 +23,8 @@ export const ChapterListView = (props: PropsT) => {
           key={`item-${chapter.id}`}
           post={props.post}
           chapter={chapter}
-          className={cn(
-            idx > 0 ? 'mt-4' : '',
-            chapter.id === props.chapter?.id ? 'text-primaryGreen' : ''
-          )}
+          isActive={chapter.id === props.chapter?.id}
+          className={cn(idx > 0 ? 'mt-4' : '')}
         />
       );
     }

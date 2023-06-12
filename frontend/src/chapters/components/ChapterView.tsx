@@ -34,7 +34,14 @@ export const ChapterView = (props: PropsT) => {
         // 🔳 Title 🔳
       }
       {props.post.chapters.length > 1 && (
-        <div className={cn('ChapterView__Title', 'mb-4')}>
+        <div
+          className={cn(
+            'ChapterView__Title',
+            //
+            //
+            'mb-4 mt-8'
+          )}
+        >
           {props.chapter.title}
         </div>
       )}

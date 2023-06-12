@@ -9,6 +9,7 @@ import './ChapterListViewItem.scss';
 
 export type PropsT = {
   className?: any;
+  isActive: boolean;
   post: PostT;
   chapter: ChapterT;
 };
@@ -22,6 +23,9 @@ export const ChapterListViewItem = (props: PropsT) => {
       tabIndex={0}
       className={cn(
         'ChapterListViewItem',
+        {
+          'ChapterListViewItem--active': props.isActive,
+        },
         //
         //
         L.col.skewer(),
