@@ -1,12 +1,10 @@
-import { Inter } from 'next/font/google';
-import './globals.css';
+import '/src/frames/styles/index.scss';
+
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
 
 // Import styles
 import './layout.scss';
-
-const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
   title: "Maarten Nieber's blog",
@@ -22,7 +20,6 @@ const RootLayout = (props: PropsT) => {
       <body
         className={cn(
           'RootLayout',
-          inter.className,
           //
           //
           L.col.banner()
