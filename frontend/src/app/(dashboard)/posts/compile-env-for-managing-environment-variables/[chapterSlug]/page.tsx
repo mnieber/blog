@@ -14,7 +14,10 @@ export type PropsT = {
 export default function Page(props: PropsT) {
   const chapterSlug = props.params.chapterSlug;
   return (
-    <ChapterLayout chapterSlug={chapterSlug}>
+    <ChapterLayout
+      postSlug="compile-env-for-managing-environment-variables"
+      chapterSlug={chapterSlug}
+    >
       {chapterSlug === 'chapter-1' && <Chapter1 />}
       {chapterSlug === 'chapter-2' && <Chapter2 />}
       {chapterSlug === 'chapter-3' && <Chapter3 />}

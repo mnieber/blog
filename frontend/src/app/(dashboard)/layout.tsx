@@ -13,8 +13,17 @@ export type PropsT = React.PropsWithChildren<{
 const DashboardLayout = (props: PropsT) => {
   return (
     <div className={cn('DashboardLayout', L.col.banner(), 'p-8')}>
-      <Banner />
-      {props.children}
+      <div
+        className={cn(
+          'DashboardLayout__Body',
+          //
+          //
+          'max-w-[800px] mx-auto'
+        )}
+      >
+        <Banner />
+        {props.children}
+      </div>
     </div>
   );
 };

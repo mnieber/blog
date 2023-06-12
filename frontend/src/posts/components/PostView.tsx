@@ -1,5 +1,3 @@
-'use client';
-
 import React from 'react';
 import { ChapterT } from '/src/api/types/ChapterT';
 import { PostT } from '/src/api/types/PostT';
@@ -27,7 +25,6 @@ export const PostView = (props: PropsT) => {
         'PostView',
         //
         //
-        'max-w-[800px]',
         L.col.banner(),
         props.className
       )}

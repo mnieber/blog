@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { ChapterT } from '/src/api/types/ChapterT';
 import { PostT } from '/src/api/types/PostT';

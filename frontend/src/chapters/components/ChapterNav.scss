@@ -1,4 +1,7 @@
 .ChapterNav {
+  a {
+    @apply text-primaryGray #{!important};
+  }
 }
 
 .ChapterNav__Item {
