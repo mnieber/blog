@@ -1,5 +1,29 @@
 export const posts = [
   {
+    slug: 'styling-system-inline-styles-scss',
+    title: 'A styling system based on inline styles and SCSS',
+    shortTitle: 'Inline styles and SCSS',
+    date: 'May 2023, by Maarten Nieber',
+    chapters: [
+      {
+        slug: 'chapter-1',
+        title: 'Introduction',
+      },
+      {
+        slug: 'chapter-2',
+        title: 'Thoughts on TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI',
+      },
+      {
+        slug: 'chapter-3',
+        title: 'Hybrid approach for managing styles',
+      },
+      {
+        slug: 'chapter-4',
+        title: 'Conclusion',
+      },
+    ],
+  },
+  {
     slug: 'compile-env-for-managing-environment-variables',
     title: 'Using compile-env to manage environment variables',
     shortTitle: 'DRY environment variables',
@@ -24,7 +48,7 @@ export const posts = [
     ],
   },
   {
-    slug: 'using-technical-product-roadmap-create-team-alignment',
+    slug: 'technical-product-roadmap',
     title: 'Using a Technical Product Roadmap to create team alignment',
     shortTitle: 'Backlogs vs Roadmaps',
     date: 'November 2020, by Maarten Nieber',
@@ -88,7 +112,7 @@ export const posts = [
     ],
   },
   {
-    slug: 'reusable-behaviours',
+    slug: 'skandha',
     title: 'Skandha: reusable interacting behaviours',
     shortTitle: 'Reusable behaviours',
     date: 'May 2020, by Maarten Nieber',
@@ -112,7 +136,7 @@ export const posts = [
     ],
   },
   {
-    slug: 'page-events',
+    slug: 'navigation-events',
     title: 'Decoupled navigation event handling',
     shortTitle: 'Url management in React',
     date: 'May 2023, by Maarten Nieber',

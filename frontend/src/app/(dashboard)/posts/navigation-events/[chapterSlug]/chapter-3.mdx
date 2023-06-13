@@ -1,0 +1,151 @@
+# Introduction
+
+In the last section we saw how to obtain a route update function and use it to change the url.
+We could use this in a React component but I prefer a more decoupled approach that is based
+on a navigation handler and navigation layers.
+
+The navigation handler is the central access point for all navigation functions.
+Given the current application url, it finds the best matching navigation layer and delegates the
+work of updating the url to that layer. A navigation layer is a combination
+of a url (that is used as described above) and a set of handler functions.
+
+Therefore, the workflow for using the navigation handler in a component is the following:
+
+1. The component calls `useNavHandler()` to get access to the navigation handler.
+2. The component calls `nav.goToPost(post)` to trigger a url change.
+3. The navigation handler finds the best matching navigation layer that implements `goToPost`.
+   It executes `goToPost` in that layer.
+4. Inside the navigation layer, the call to `goToPost` executes the appropriate route update function
+   to update the url.
+
+<TabView titles={["PostListView.tsx", "PostsNavEvents.ts"]}>
+<CodeSnippet
+  code={`
+import { PostsNavEvents, useNavHandler } from '/src/frames/pages';
+
+export type PropsT = { /* omitted for brevity */ };
+
+export const PostListView = observer((props: PropsT) => {
+  const nav = useNavHandler<typeof PostsNavEvents>();
+  const postDivs = props.posts.map((post, idx) => {
+    return (
+      <PostListViewItem
+        key={\`item-\$\{post.id\}\`}
+        post={post}
+        onClick={(e: any) => nav.goToPost(post)}
+      />
+    );
+  });
+  return (
+    <div className={cn('PostListView', props.className)}>
+      {postDivs}
+    </div>
+  );
+});
+`}
+/>
+<CodeSnippet
+  code={`
+// This file declares two navigation handler signatures. As we shall see,
+// we need to install one or more navigation layers that implement these functions.
+
+import { PostT } from '/src/api/types/PostT';
+import { UsePostsNavLayer } from '/src/frames/pages/UsePostsNavLayer';
+import { NavHandler } from '/src/navHandler';
+
+export const PostsNavEvents = {
+  goToPost(this: NavHandler, post: PostT) {},
+  goToPosts(this: NavHandler) {},
+};
+`}
+/>
+</TabView>
+
+As we shall see, the url change that happens when `nav.goToPost` is called will depend
+on the page that the user is currently on. Since `PostListView` is agnostic of that,
+it makes our approach more flexible than using route update functions directly in the
+component.
+
+# Declaring and installing navigation layers
+
+To make the above code work correctly, we need to install one or more navigation layers
+that implement the handlers that were declared in `PostsNavEvents`:
+
+- the `PostsNavLayer` class implements `goToPost` and `goToPosts`.
+- the `UsePostsNavLayer` component installs the `PostsNavLayer` navigation layer.
+- in `UrlRouter` we use the `UsePostsNavLayer` component when the user visits the `/posts` page.
+
+
+<TabView titles={["UsePostsNavLayer.ts", "UrlRouter.tsx"]}>
+<CodeSnippet
+  code={`
+export type PostsNavLayerT = typeof PostsNavEvents;
+
+class PostsNavLayer extends NavLayer implements PostsNavLayerT {
+  goToPost(this: NavHandler, post: PostT) {
+    const ufn = this.getRouteUfns<DashboardRoutesT>().post(this.history.push);
+    ufn({ postSlug: post.slug });
+  }
+  goToPosts(this: NavHandler) {
+    const ufn = this.getRouteUfns<DashboardRoutesT>().posts(this.history.push);
+    ufn();
+  }
+}
+
+export type PropsT = React.PropsWithChildren<{}>;
+
+export const UsePostsNavLayer = (props: PropsT) => {
+  // The routeMatch object gives us the current url at the time of rendering.
+  // This is a crucial piece of information that allows the NavHandler to find the
+  // navigation layer that best matches the current url.
+  const routeMatch = useRouteMatch();
+
+  useInstallNavLayer(
+    'PostsNavLayer',
+    routeMatch.path,
+    (name: string, route: string) => new PostsNavLayer(name, route)
+  );
+  return <>{props.children}</>;
+};
+`}
+/>
+<CodeSnippet
+  code={`
+// In /src/routes/components/UrlRouter.tsx we add Routes using the useRoutes hook.
+
+import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
+import { RoutesT as FramesRoutesT } from '/src/frames/routeTable';
+
+export const UrlRouter = observer(() => {
+  const routes = useRoutes<PostsRoutesT & FramesRoutesT>();
+
+  return (
+    <Route path={routes.posts()}>
+      {
+        // Use the PostsNavLayer
+      }
+      <UsePostsNavLayer />
+      <PostListView />
+      <Route path={routes.post()}>
+        <PostView />
+      </Route>
+    </Route>
+  );
+});
+`}
+/>
+</TabView>
+
+# A complete workflow for handling navigation events
+
+With this new code in mind, it's useful to analyse the complete workflow for handling navigation
+events:
+
+1. Suppose that the current url is '/posts/foo'. The `UrlRouter` will render `PostListView` and `UsePostsNavLayer`.
+2. The `UsePostsNavLayer` component will install a navigation layer that implements `goToPost` and `goToPosts`.
+   This navigation layer has the associated url '/posts'.
+3. The user clicks on a post in the `PostListView`. This click is handled by `PostListView` which calls `nav.goToPost(post)`.
+4. The navigation handler finds the navigation layer that best matches the current url.
+   In this case, the current url is `/posts/foo` and the navigation layer with url `/posts` is the best match.
+5. The navigation handler executes `goToPost` in that layer. This executes the appropriate route update
+   function to update the url.

@@ -1,0 +1,127 @@
+# The withDefaultProps function
+
+In the "default properties" approach a component declares two types which - by convention - are called PropsT and DefaultProps.
+The component receives a list of properties `props` that has been enriched by merging in the default properties:
+
+<CodeSnippet
+  title=""
+  code={`
+import { withDefaultProps, stub } from "react-default-props-context";
+
+type PropsT = {
+name: string,
+};
+
+const DefaultProps = {
+color: stub as string,
+};
+
+const MyComponent = withDefaultProps<PropsT, typeof DefaultPropsT>(
+(props: PropsT & DefaultPropsT) => {
+// The color value comes either from props.color or from a DefaultPropsProvider.
+return <text color={props.color}>Hello</text>;
+}, DefaultProps
+);
+`}
+/>
+
+The `withDefaultProps` function is a higher order function that adds the support for default properties.
+It creates a new properties object with a special lookup function that is passed into the wrapped component.
+This lookup function will first try to resolve the property using the `props` object that was passed as a
+normal argument to MyComponent. If unsuccessful it will resolve the property by looking for a getter function
+in the nearest DefaultPropsProvider. If still unsuccessful then `undefined` is returned.
+
+## Providing the default properties
+
+At this point, we need to clarify a few things:
+
+- how are the default property values provided?
+- why are default properties based on getter functions and not just on values?
+- how can we use a value other than the default value in the child component?
+
+To answer these questions, let's take a look at how default properties are provided:
+
+<CodeSnippet
+  title=""
+  code={`
+import { observer } from "mobx-react";
+import { DefaultPropsProvider } from "react-default-props-context";
+
+const MyFrame = observer(() => {
+// We will make foo.bar available as a default property
+const foo = getFoo();
+
+const defaultProps = {
+color: () => "red",
+bar: () => foo.bar,
+};
+
+return (
+<DefaultPropsProvider value={defaultProps}>
+<MyComponent name="example"/>
+<MyComponent name="example" color="green"/>
+</DefaultPropsProvider>
+)
+})
+`}
+/>
+
+The `DefaultPropsProvider` provides the dictionary of default property values to the `withDefaultProps` function.
+For example, if we don't set the `color` property on `MyComponent` then the value from the enclosing `<DefaultPropsProvider>` is
+used. To override the default `color` we can set this property explicitly on `MyComponent`.
+You will get the usual Typescript warnings if you try to set a property that does not exist
+(as a regular property or as a default property).
+
+## Getter functions
+
+Now let's talk about the getter functions in the the `defaultProps` object. Since functions are more flexible than values this adds a
+bit of additional complexity and power. The real reason though for having them has to do with MobX. If we were to copy the `foo.bar`
+value directly into `defaultProps` then MobX would notice that we are referencing it. That would mean that `MyFrame` (which is the
+component that creates the `defaultProps` object) will be re-rendered when `foo.bar` changes, even though `MyFrame` is not really
+using `foo.bar`. By using a getter function we avoid referencing `foo.bar` during the render of `MyFrame`.
+
+## What happens when a default property is overwritten?
+
+We just saw how we can set `color="green"` on a `MyComponent` instance to override the default value of `color`. What happens if this
+`MyComponent` has nested child components? Do these child components by default use `color=red` or `color=green`?
+Most likely, you would want the latter option. For this reason, when `withDefaultProps` detects that you are overriding a default property,
+then it will automatically insert a `DefaultPropsProvider` (with `extend=true`, which is explained below)
+that provides the new value as a default property to the child components.
+
+# Using nested contexts
+
+One of the features of `DefaultPropsProvider` is that it allows nesting. By adding the `extend` attribute the `DefaultPropsProvider` instance
+extends and overrides the default properties of its parent `DefaultPropsProvider` instance. In the example below, we add an additional instance
+of `MyComponent` with name "exampleInner". Because this instance is wrapped in another `<DefaultPropsProvider>` it will use "blue" as the default
+color instead of "red", and it will have access to both `bar` and `baz`.
+
+<CodeSnippet
+  title="example/MyFrame.tsx"
+  code={`
+import { observer } from "mobx-react";
+import { DefaultPropsProvider } from "react-default-props-context";
+
+const MyFrame = observer(() => {
+const foo = getFoo();
+
+const defaultProps = {
+color: () => "red",
+bar: () => foo.bar,
+};
+
+const defaultPropsInner = {
+color: () => "blue",
+baz: () => foo.baz,
+};
+
+return (
+<DefaultPropsProvider value={defaultProps}>
+<MyComponent name="example"/>
+<DefaultPropsProvider extend value={defaultPropsInner}>
+<MyComponent name="exampleInner/>
+</DefaultPropsProvider>
+</DefaultPropsProvider>
+);
+});
+`}
+/>

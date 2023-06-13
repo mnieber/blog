@@ -1,0 +1,32 @@
+# Advantages
+
+I see the following advantages in the proposed solution:
+
+- it offers a clear structure for managing UI state. This structure includes the separation of behaviours
+  into different classes (i.e. facets), the mapping of data between these facets and the implementation
+  of the facet operations using callback functions.
+- it decouples logic (the UI state) from rendering (the components that use the UI state)
+- because each facet is an abstraction of a certain type of interaction (e.g. selection, filtering, etc),
+  the approach promotes code consistency and code reuse.
+
+# Drawbacks
+
+The drawback of the approach is that it is elaborate: many parts have to come together to make it work.
+We have to create containers that group all related UI state for a particular collection of objects. Then,
+we must correctly map the data between the facets in each container, and install the callback functions
+that implement the operations. These steps involve specific details that the developer must know about
+(for example, each callback function can access the callback object and inspect the operation arguments).
+I have tried to keep the examples simple, but in practice I take an even more indirect approach in which
+containers are stored inside state-objects that are instantiated in so-called state-provider components.
+All of this can feel overwhelming.
+
+Still, I do believe that the approach is worth the effort, most of all because the alternatives usually
+become overwhelming too. For example, storing state in UI components and then making these components work
+together correctly can be very tricky. I prefer an overwhelming approach that has structure and clear benefits
+over a more ad-hoc overwhelming approach.
+
+# Conclusion
+
+I've introduced an approach for storing UI state in containers and facets. These facets can be connected
+via data-mapping and via callback-functions that implement interactions between the behaviours. The approach
+is still experimental, but it has worked well for me in practice.
