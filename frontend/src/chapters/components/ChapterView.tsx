@@ -39,7 +39,7 @@ export const ChapterView = (props: PropsT) => {
             'ChapterView__Title',
             //
             //
-            'mb-4 mt-8'
+            'mb-4 mt-8 text-primaryGreen'
           )}
         >
           {props.chapter.title}

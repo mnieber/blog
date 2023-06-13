@@ -1,5 +1,5 @@
 .Banner__SiteName {
-  font-family: 'Karla';
+  font-family: var(--font-karla);
   font-size: 20px;
   @apply font-bold;
   @apply text-primaryRed;

@@ -39,6 +39,9 @@ export const ChapterListViewItem = (props: PropsT) => {
         href={getChapterLink(props.post, props.chapter)}
         className={cn(
           'ChapterListViewItem__Title',
+          {
+            'ChapterListViewItem__Title--active': props.isActive,
+          },
           //
           'self-stretch'
         )}
