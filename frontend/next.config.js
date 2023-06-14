@@ -15,6 +15,7 @@ const withMDX = require('@next/mdx')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   experimental: {
     mdxRs: true,
   },
@@ -22,15 +23,15 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // Optionally, add any other Next.js config below
   reactStrictMode: true,
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/posts',
-        permanent: true,
-      },
-    ];
-  },
+  // async redirects() {
+  //   return [
+  //     {
+  //       source: '/',
+  //       destination: '/posts',
+  //       permanent: true,
+  //     },
+  //   ];
+  // },
 };
 
 // Merge MDX config with Next.js config
