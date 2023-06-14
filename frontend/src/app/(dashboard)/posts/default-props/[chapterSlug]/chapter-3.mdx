@@ -22,14 +22,13 @@ const fixedDefaultProps = {
 };
 
 return (
-    <DefaultPropsProvider value={defaultProps}>
-      <MyComponent name="example"/>
-      <DefaultPropsProvider extend value={defaultPropsInner} fixed={fixedDefaultProps}>
-        <MyComponent name="exampleInner/>
-      </DefaultPropsProvider>
+  <DefaultPropsProvider value={defaultProps}>
+    <MyComponent name="example"/>
+    <DefaultPropsProvider extend value={defaultPropsInner} fixed={fixedDefaultProps}>
+      <MyComponent name="exampleInner/>
     </DefaultPropsProvider>
-  );
-});
+  </DefaultPropsProvider>
+);
 `;
 
 <CodeSnippet

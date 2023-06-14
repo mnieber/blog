@@ -49,15 +49,15 @@ const MyFrame = observer(() => {
 const foo = getFoo();
 
 const defaultProps = {
-color: () => "red",
-bar: () => foo.bar,
+  color: () => "red",
+  bar: () => foo.bar,
 };
 
 return (
-<DefaultPropsProvider value={defaultProps}>
-<MyComponent name="example" />
-<MyComponent name="example" color="green" />
-</DefaultPropsProvider>
+  <DefaultPropsProvider value={defaultProps}>
+    <MyComponent name="example" />
+    <MyComponent name="example" color="green" />
+  </DefaultPropsProvider>
 )
 });`
 
@@ -100,23 +100,23 @@ const MyFrame = observer(() => {
 const foo = getFoo();
 
 const defaultProps = {
-color: () => "red",
-bar: () => foo.bar,
+  color: () => "red",
+  bar: () => foo.bar,
 };
 
 const defaultPropsInner = {
-color: () => "blue",
-baz: () => foo.baz,
+  color: () => "blue",
+  baz: () => foo.baz,
 };
 
 return (
-<DefaultPropsProvider value={defaultProps}>
-<MyComponent name="example"/>
-<DefaultPropsProvider extend value={defaultPropsInner}>
-<MyComponent name="exampleInner/>
-</DefaultPropsProvider>
+  <DefaultPropsProvider value={defaultProps}>
+    <MyComponent name="example"/>
+    <DefaultPropsProvider extend value={defaultPropsInner}>
+      <MyComponent name="exampleInner/>
+    </DefaultPropsProvider>
+  </DefaultPropsProvider>
 );
-});
 `;
 
 <CodeSnippet title="example/MyFrame.tsx" code={code3} />
