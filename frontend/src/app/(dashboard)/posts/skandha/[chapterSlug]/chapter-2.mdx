@@ -23,56 +23,52 @@ Broadly speaking, my approach is the following:
 
 Let's look at the code for `clipsCtr` and its facets, as well as the `mapClipsData` function that maps data between these facets.
 
-<TabView titles={["PlaylistsState/index.ts", "PlaylistsState/mapClipsData.ts"]}>
-<CodeSnippet
-  code={`
-  import { Addition, Deletion /* other imports omitted for brevity */ } from 'skandha-facets';
+export const code1 = `
+import { Addition, Deletion /* other imports omitted for brevity */ } from 'skandha-facets';
 
 const clipsCtr = {
-addition: new Addition<ClipT>(),
-deletion: new Deletion(),
-display: new Display<ClipT>(),
-dragAndDrop: new DragAndDrop(),
-edit: new Edit(),
-filtering: new Filtering<ClipT>(),
-highlight: new Highlight<ClipT>(),
-insertion: new Insertion<ClipT>(),
-// This facet is used to move a clip to another playlist
-move: new Move(),
-selection: new Selection<ClipT>(),
-store: new Store<ClipT>(),
+  addition: new Addition<ClipT>(),
+  deletion: new Deletion(),
+  display: new Display<ClipT>(),
+  dragAndDrop: new DragAndDrop(),
+  edit: new Edit(),
+  filtering: new Filtering<ClipT>(),
+  highlight: new Highlight<ClipT>(),
+  insertion: new Insertion<ClipT>(),
+  // This facet is used to move a clip to another playlist
+  move: new Move(),
+  selection: new Selection<ClipT>(),
+  store: new Store<ClipT>(),
 };
-}
-`}
-/>
+`;
 
-<CodeSnippet
-  code={`
-  import { mapDataToProps } from 'skandha';
+export const code2 = `
+import { mapDataToProps } from 'skandha';
 
 export function mapClipsData(clipsCtr) {
-const ctr = clipsCtr;
+  const ctr = clipsCtr;
 
-    mapDataToProps(ctr, {
-      display: { items: () => ctr.insertion.preview },
-      filtering: { inputItems: () => ctr.store.items ?? [ ] },
-      highlight: {
-        highlightableIds: () => getIds(ctr.display.items),
-        item: () => getClipById(ctr.highlight.id),
-      },
-      insertion: {
-        inputItems: () => ctr.filtering.outputItems,
-        preview: () => { /* omitted for brevity */ },
-      selection: {
-        selectableIds: () => getIds(ctr.display.items),
-        items: () => ctr.selection.ids.map(getClipById).filter((x?: ClipT) => !!x) as ClipT[],
-      },
-    });
-
+  mapDataToProps(ctr, {
+    display: { items: () => ctr.insertion.preview },
+    filtering: { inputItems: () => ctr.store.items ?? [ ] },
+    highlight: {
+      highlightableIds: () => getIds(ctr.display.items),
+      item: () => getClipById(ctr.highlight.id),
+    },
+    insertion: {
+      inputItems: () => ctr.filtering.outputItems,
+      preview: () => { /* omitted for brevity */ },
+    selection: {
+      selectableIds: () => getIds(ctr.display.items),
+      items: () => ctr.selection.ids.map(getClipById).filter((x?: ClipT) => !!x) as ClipT[],
+    },
+  });
 }
-`}
-/>
+`;
 
+<TabView titles={["PlaylistsState/index.ts", "PlaylistsState/mapClipsData.ts"]}>
+<CodeSnippet code={code1} />
+<CodeSnippet code={code2} />
 </TabView>
 
 ## Purpose of the selection facet

@@ -3,36 +3,38 @@
 In some case, it's good to allow components to use a default property, but not to override it. This can be achieved this by setting the `fixed` options object.
 Moreover, if you set a default property to undefined then it's removed from the available set of properties.
 
-<CodeSnippet
-  title="example/MyFrame.tsx"
-  code={`
+export const code1 = `
 import { observer } from "mobx-react";
 import { DefaultPropsProvider } from "react-default-props-context";
 
 const MyFrame = observer(() => {
-const defaultProps = {
-color: () => "red",
-bar: () => foo.bar,
+  const defaultProps = {
+  color: () => "red",
+  bar: () => foo.bar,
 };
 
 const defaultPropsInner = {
-bar: undefined,
+  bar: undefined,
 };
 
 const fixedDefaultProps = {
-color: true,
+  color: true,
 };
 
 return (
-<DefaultPropsProvider value={defaultProps}>
-<MyComponent name="example"/>
-<DefaultPropsProvider extend value={defaultPropsInner} fixed={fixedDefaultProps}>
-<MyComponent name="exampleInner/>
-</DefaultPropsProvider>
-</DefaultPropsProvider>
-);
+    <DefaultPropsProvider value={defaultProps}>
+      <MyComponent name="example"/>
+      <DefaultPropsProvider extend value={defaultPropsInner} fixed={fixedDefaultProps}>
+        <MyComponent name="exampleInner/>
+      </DefaultPropsProvider>
+    </DefaultPropsProvider>
+  );
 });
-`}
+`;
+
+<CodeSnippet
+  title="example/MyFrame.tsx"
+  code={code1}
 />
 
 # The default properties can be defined centrally
@@ -41,35 +43,39 @@ It makes sense to use a central location to define the names and types of the de
 This way, when using the default properties in your component, you are protected from misspelling the names, or using the wrong types.
 In the above example, we see how `color` and `size` can be defined in a global `dps.ts` file.
 
-<CodeSnippet
-  title="example/defaultProps.ts"
-  code={`
+export const code2 = `
 import { stub } from 'react-default-props-context';
 
 export const dps = {
   color: { color: stub as string };
   size: { size: stub as int };
 };
-`}
-/>
+`;
 
 <CodeSnippet
-  title="example/MyComponent.tsx"
-  code={`
+  title="example/defaultProps.ts"
+  code={code2}
+/>
+
+export const code3 = `
 import { withDefaultProps } from 'react-default-props-context';
 import { dps } from 'dps';
 
 type PropsT = { name: string };
 
 const DefaultProps = {
-...dps.color,
-...dps.size,
+  ...dps.color,
+  ...dps.size,
 };
 
 const MyComponent = withDefaultProps((props: PropsT & typeof DefaultProps) => {
-return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
+  return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
 }, DefaultProps);
-`}
+`;
+
+<CodeSnippet
+  title="example/MyComponent.tsx"
+  code={code3}
 />
 
 # Using getOriginalProps and getOriginalDefaultProps
@@ -85,24 +91,26 @@ If the parent component of `MyComponent` sets the `color` property (e.g. `color=
 overriding the `color` default property value. If you want to access the original default properties
 (without overrides from the parent component) then you can use the `getOriginalDefaultProps` function.
 
-<CodeSnippet
-  title="example/MyComponent.tsx"
-  code={`
+export const code4 = `
 import { withDefaultProps, getOriginalProps, getOriginalDefaultProps } from 'react-default-props-context';
 import { dps } from 'dps';
 
 type PropsT = { name: string };
 
 const DefaultProps = {
-...dps.color,
-...dps.size,
+  ...dps.color,
+  ...dps.size,
 };
 
 const MyComponent = withDefaultProps((props: PropsT & typeof DefaultProps) => {
-const propsReceivedFromParent = getOriginalProps(props);
-const defaultPropsWithoutOverrides = getOriginalDefaultProps(props);
+  const propsReceivedFromParent = getOriginalProps(props);
+  const defaultPropsWithoutOverrides = getOriginalDefaultProps(props);
 
-return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
+  return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
 }, DefaultProps);
-`}
+`;
+
+<CodeSnippet
+  title="example/MyComponent.tsx"
+  code={code4}
 />

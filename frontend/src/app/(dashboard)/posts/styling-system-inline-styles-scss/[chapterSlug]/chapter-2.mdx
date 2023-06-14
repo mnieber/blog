@@ -10,15 +10,14 @@ TailwindUI offers a collection of UI components, not in the traditional sense (a
 To utilize a component, simply copy the snippet to your source file and modify it as required. Note that the same snippet can appear
 in different places in your code. Here's an example of a snippet for an email form field:
 
-<CodeSnippet
-  lang="html"
-  addMb={true}
-  code={`
+export const code1 = `
 <div class="mb-6">
   <label
     for="email"
     class="mb-2 block text-sm font-medium leading-6 text-gray-900"
-    >Email address</label
+    >
+    Email address
+  </label
   >
   <div>
     <input
@@ -29,8 +28,9 @@ in different places in your code. Here's an example of a snippet for an email fo
     />
   </div>
 </div>
-`}
-/>
+`;
+
+<CodeSnippet lang="html" addMb={true} code={code1} />
 
 There are many advantages to this approach:
 
@@ -71,18 +71,17 @@ UIkit is a Javascript framework that offers a collection of UI components. It ta
 - you can add both style and behaviour to your JSX elements by adding CSS class names and attributes. Instead of attributes, you can also use
   small snippets of Typescript.
 
-Here is an example of creating a drop-down. Note that the button is followed by a div that has the `uk-dropdown` attribute. This tells UIkit
-that the button must be converted into a drop-down button.
+Here is an example of creating a drop-down. Note that the button is followed by a div that has the `uk-dropdown` attribute.
+This tells UIkit that the button must be converted into a drop-down button.
 
-<CodeSnippet
-  lang="jsx"
-  code={`
+export const code2 = `
 <div class="uk-inline">
     <button class="uk-button uk-button-default" type="button">Hover</button>
     <div uk-dropdown>I'm a dropdown.</div>
 </div>
-  `}
-/>
+`;
+
+<CodeSnippet lang="jsx" code={code2} />
 
 Interestingly, there is no separate drop-down component in this code snippet. Instead, you turn the button into a drop-down by
 mixing in the `uk-dropdown` attribute. This is somewhat analogous to using inline styles, so I will call it an "inline components" approach.

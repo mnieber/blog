@@ -18,9 +18,7 @@ Therefore, the workflow for using the navigation handler in a component is the f
 4. Inside the navigation layer, the call to `goToPost` executes the appropriate route update function
    to update the url.
 
-<TabView titles={["PostListView.tsx", "PostsNavEvents.ts"]}>
-<CodeSnippet
-  code={`
+export const code1 = `
 import { PostsNavEvents, useNavHandler } from '/src/frames/pages';
 
 export type PropsT = { /* omitted for brevity */ };
@@ -42,10 +40,9 @@ export const PostListView = observer((props: PropsT) => {
     </div>
   );
 });
-`}
-/>
-<CodeSnippet
-  code={`
+`;
+
+export const code2 = `
 // This file declares two navigation handler signatures. As we shall see,
 // we need to install one or more navigation layers that implement these functions.
 
@@ -57,8 +54,11 @@ export const PostsNavEvents = {
   goToPost(this: NavHandler, post: PostT) {},
   goToPosts(this: NavHandler) {},
 };
-`}
-/>
+`;
+
+<TabView titles={['PostListView.tsx', 'PostsNavEvents.ts']}>
+  <CodeSnippet code={code1} />
+  <CodeSnippet code={code2} />
 </TabView>
 
 As we shall see, the url change that happens when `nav.goToPost` is called will depend
@@ -75,10 +75,7 @@ that implement the handlers that were declared in `PostsNavEvents`:
 - the `UsePostsNavLayer` component installs the `PostsNavLayer` navigation layer.
 - in `UrlRouter` we use the `UsePostsNavLayer` component when the user visits the `/posts` page.
 
-
-<TabView titles={["UsePostsNavLayer.ts", "UrlRouter.tsx"]}>
-<CodeSnippet
-  code={`
+export const code3 = `
 export type PostsNavLayerT = typeof PostsNavEvents;
 
 class PostsNavLayer extends NavLayer implements PostsNavLayerT {
@@ -86,6 +83,7 @@ class PostsNavLayer extends NavLayer implements PostsNavLayerT {
     const ufn = this.getRouteUfns<DashboardRoutesT>().post(this.history.push);
     ufn({ postSlug: post.slug });
   }
+
   goToPosts(this: NavHandler) {
     const ufn = this.getRouteUfns<DashboardRoutesT>().posts(this.history.push);
     ufn();
@@ -107,10 +105,9 @@ export const UsePostsNavLayer = (props: PropsT) => {
   );
   return <>{props.children}</>;
 };
-`}
-/>
-<CodeSnippet
-  code={`
+`;
+
+export const code4 = `
 // In /src/routes/components/UrlRouter.tsx we add Routes using the useRoutes hook.
 
 import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
@@ -131,9 +128,11 @@ export const UrlRouter = observer(() => {
       </Route>
     </Route>
   );
-});
-`}
-/>
+});`;
+
+<TabView titles={["UsePostsNavLayer.ts", "UrlRouter.tsx"]}>
+<CodeSnippet code={code3} />
+<CodeSnippet code={code4} />
 </TabView>
 
 # A complete workflow for handling navigation events

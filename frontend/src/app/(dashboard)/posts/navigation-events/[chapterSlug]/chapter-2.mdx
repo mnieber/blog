@@ -14,9 +14,7 @@ can fire navigation events that update the url through the route update function
 In my approach, every application module can expose a `RouteTable` instance, together with a type that
 contains the signature of each route. Here is the route table for the `posts` module:
 
-<TabView titles={["/src/posts/RouteTable.ts", "example.ts"]}>
-<CodeSnippet
-  code={`
+export const code1 = `
 import { RouteTable } from '/src/routes/utils/RouteTable';
 
 export const getRouteTable = () => {
@@ -34,10 +32,9 @@ export type RoutesT = {
   post: (args: { postSlug: string }) => void;
   posts: () => void;
 };
-`}
-/>
-<CodeSnippet
-  code={`
+`;
+
+export const code2 = `
 import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
 
 const routeTable = getPostsRouteTable();
@@ -45,8 +42,11 @@ const routeTable = getPostsRouteTable();
 const routes = routeTable.routeFnByName;
 const routeWithoutInterpolation = routes.post();  // "/posts/:postSlug"
 const routeWithInterpolation = routes.post({ postSlug: 'foo' });  // "/posts/foo"
-`}
-/>
+`;
+
+<TabView titles={["/src/posts/RouteTable.ts", "example.ts"]}>
+<CodeSnippet code={code1} />
+<CodeSnippet code={code2} />
 </TabView>
 
 As you can see in `/src/posts/RouteTable.ts`, the information about each route is specified twice.
@@ -63,10 +63,7 @@ In `UrlRouter.tsx` we use the `useRoutes` hook to get access to these routes. We
 the routes that we want to use: `PostsRoutesT & FramesRoutesT`. This isn't perfectly
 safe as we need to trust that `RouteTableProvider` in fact provides these routes, but it's better than nothing.
 
-
-<TabView titles={["RouteTableProvider.tsx", "App.tsx", "UrlRouter.ts"]}>
-<CodeSnippet
-  code={`
+export const code3 = `
 // In /src/routes/components/RouteTableProvider.tsx we add the route tables
 // from each module into a single table.
 
@@ -92,10 +89,9 @@ export const RouteTableProvider = (props: PropsT) => {
     </RouteTableContext.Provider>
   );
 };
-`}
-/>
-<CodeSnippet
-  code={`
+`;
+
+export const code4 = `
 // In /src/app/components/App.tsx the App component wraps the UrlRouter
 // in a RouteTableProvider.
 
@@ -109,10 +105,9 @@ export const App = () => {
     </RouteTableProvider>
   );
 };
-`}
-/>
-<CodeSnippet
-  code={`
+`;
+
+export const code5 = `
 // In /src/routes/components/UrlRouter.tsx we add Routes using the useRoutes hook.
 
 import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
@@ -136,8 +131,12 @@ export const UrlRouter = observer(() => {
     </Route>
   );
 });
-`}
-/>
+`;
+
+<TabView titles={["RouteTableProvider.tsx", "App.tsx", "UrlRouter.ts"]}>
+<CodeSnippet code={code3} />
+<CodeSnippet code={code4} />
+<CodeSnippet code={code5} />
 </TabView>
 
 # Using route update functions
@@ -145,14 +144,13 @@ export const UrlRouter = observer(() => {
 A route update function is similar to a route function, but instead of returning a route, it updates the url.
 We will use these functions in the next section when we discuss navigation events.
 
-<CodeSnippet
-  title="example.ts"
-  code={`
+export const code6 = `
 import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
 
 const routeTable = getPostsRouteTable();
 
 const routeUfns = routeTable.routeFnByName;
 routeUfns.post({ postSlug: 'foo' });  // updates the url to "/posts/foo"
-`}
-/>
+`;
+
+<CodeSnippet title="example.ts" code={code6} />

@@ -24,9 +24,7 @@ we add the `FormField__Label` and `FormField__Input` classes at the appropriate 
 We can use the same CSS classes for other fields, such as the password field. This will work well as long as these fields
 have the same intrinsic styles.
 
-<TabView titles={["SignInForm.tsx", "SignInForm.scss"]}>
-<CodeSnippet
-  code={`
+export const code1 = `
 export const SignInForm = () => {
   return (
     <div className="SignInForm">
@@ -50,10 +48,9 @@ export const SignInForm = () => {
     </div>
   );
 };
-`}
-/>
+`;
 
-<CodeSnippet lang="sass" code={`
+export const code2 = `
 .FormField__Label {
   @apply block text-sm font-medium leading-6 text-gray-900;
 }
@@ -63,8 +60,11 @@ export const SignInForm = () => {
 @apply text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6;
 @apply ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600;
 }
-`}/>
+`;
 
+<TabView titles={['SignInForm.tsx', 'SignInForm.scss']}>
+  <CodeSnippet code={code1} />
+  <CodeSnippet lang="sass" code={code2} />
 </TabView>
 
 There are no rigid guidelines for determining which properties are intrinsic. For example, the padding of the
@@ -80,9 +80,7 @@ it's good for consistency to limit the variation in these properties. For instan
 it's likely that the password field in the same form should also have this padding. To address this, I extract the ad-hoc properties and
 place them in a layout object.
 
-<TabView titles={["SignInForm.tsx", "layout.ts"]}>
-<CodeSnippet
-  code={`
+export const code3 = `
 import { classnames as cn } from 'classnames';
 
 export const SignInForm = () => {
@@ -104,10 +102,9 @@ export const SignInForm = () => {
     </div>
   );
 };
-`}/>
+`;
 
-<CodeSnippet
-  code={`
+export const code4 = `
 export const L = {
   FormField: {
     // Use the root style in the top level element of the FormField
@@ -118,16 +115,17 @@ export const L = {
     input: () => 'FormField__Input py-1.5 w-full',
   },
 };
-`}
-/>
+`;
+
+<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+  <CodeSnippet code={code3} />
+  <CodeSnippet code={code4} />
 </TabView>
 
 As indicated by the comments, it's not mandatory to use all the keys in the layout object. For example, the `label` key is only
 utilized if the form-field includes a label. It's also possible to incorporate variations in the layout, as demonstrated below:
 
-<TabView titles={["SignInForm.tsx", "layout.ts"]}>
-<CodeSnippet
-  code={`
+export const code5 = `
 import { classnames as cn } from 'classnames';
 
 export const SignInForm = () => {
@@ -149,10 +147,9 @@ export const SignInForm = () => {
     </div>
   );
 };
-`}/>
+`;
 
-<CodeSnippet
-  code={`
+export const code6 = `
 export const L = {
   FormField: {
     // The container element is the top-level element that contains the entire form field
@@ -177,8 +174,11 @@ export const L = {
     input: () => 'FormField__Input py-1.5 w-full',
   },
 };
-`}
-/>
+`;
+
+<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+  <CodeSnippet code={code5} />
+  <CodeSnippet code={code6} />
 </TabView>
 
 I typically include numerous comments in the layout object to clarify the intended use of each layout.
@@ -198,37 +198,29 @@ though that we don't introduce a lot of complexity to make this happen. Ideally,
 In addition, we want to ensure that it's easy to find the intrinsic style rule for any occurrence of its associated CSS class
 in the DOM. Here is an example that illustrates how this can be achieved:
 
-<CodeSnippet
-  lang="sass"
-  title="FormFieldBase.scss"
-  code={`
+export const code7 = `
 .FormFieldBase__Label {
   font-family: 'Roboto', sans-serif;
 }
-`}
-/>
+`;
 
-<CodeSnippet
-  lang="sass"
-  title="AuthCard/FormField.scss"
-  code={`
+export const code8 = `
 .AuthCard .FormField\_\_Label {
   @apply FormFieldBase\_\_Label;
   @apply text-sm;
 }
-`}
-/>
+`;
 
-<CodeSnippet
-  lang="sass"
-  title="UserProfileCard/FormField.scss"
-  code={`
+export const code9 = `
 .UserProfileCard .FormField\_\_Label {
   @apply FormFieldBase\_\_Label;
   @apply text-base;
 }
-`}
-/>
+`;
+
+<CodeSnippet lang="sass" title="FormFieldBase.scss" code={code7} />
+<CodeSnippet lang="sass" title="AuthCard/FormField.scss" code={code8} />
+<CodeSnippet lang="sass" title="UserProfileCard/FormField.scss" code={code9} />
 
 Note that in `AuthCard/FormField.scss` and `UserProfileCard/FormField.scss`, we purposely did not use nested SCSS rules.
 Instead, we've put `.AuthCard .FormField__Label` on the same line. This will allow us to copy a selector from the browser's
