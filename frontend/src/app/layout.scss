@@ -1,4 +1,4 @@
 .RootLayout {
-  @apply h-[100vh] overflow-x-hidden;
+  @apply h-[100vh] overflow-x-hidden overflow-y-scroll;
   min-width: 320px;
 }
