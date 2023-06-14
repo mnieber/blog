@@ -20,7 +20,7 @@ export const Banner = (props: PropsT) => {
         props.className
       )}
     >
-      <div className={cn('Banner__SiteName')}>maarten nieber's blog</div>
+      <div className={cn('Banner__SiteName')}>{`maarten nieber's blog`}</div>
       <div
         className={cn(
           'Banner__MenuSeparator__',

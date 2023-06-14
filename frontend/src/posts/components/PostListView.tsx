@@ -7,11 +7,7 @@ import { cn } from '/src/utils/classnames';
 // Import styles
 import './PostListView.scss';
 
-export type PropsT = {
-  className?: any;
-};
-
-export const PostListView = async (props: PropsT) => {
+export const PostListView = () => {
   const noItems = <h2>There are no posts</h2>;
   const posts = getPosts({});
 
@@ -33,8 +29,7 @@ export const PostListView = async (props: PropsT) => {
         //
         L.col.flagPole(),
         'sm:items-center',
-        'w-full',
-        props.className
+        'w-full'
       )}
     >
       {postDivs.length > 0 && postDivs}

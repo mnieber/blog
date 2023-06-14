@@ -6,11 +6,7 @@ import { cn } from '/src/utils/classnames';
 // Import styles
 import './layout.scss';
 
-export type PropsT = React.PropsWithChildren<{
-  className?: any;
-}>;
-
-const DashboardLayout = (props: PropsT) => {
+const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className={cn('DashboardLayout', L.col.banner(), 'p-8')}>
       <div
@@ -22,7 +18,7 @@ const DashboardLayout = (props: PropsT) => {
         )}
       >
         <Banner />
-        {props.children}
+        {children}
       </div>
     </div>
   );

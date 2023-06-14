@@ -5,11 +5,7 @@ import { cn } from '/src/utils/classnames';
 // Import styles
 import './AphorismsView.scss';
 
-export type PropsT = {
-  className?: any;
-};
-
-export const AphorismsView = (props: PropsT) => {
+export const AphorismsView = () => {
   const divs = aphorisms.map((aphorism, idx) => {
     return (
       <div
@@ -27,8 +23,7 @@ export const AphorismsView = (props: PropsT) => {
         'AphorismsView',
         //
         //
-        L.col.flagPole(),
-        props.className
+        L.col.flagPole()
       )}
     >
       {divs}
