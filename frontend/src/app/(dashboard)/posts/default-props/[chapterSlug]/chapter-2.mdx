@@ -71,9 +71,10 @@ You will get the usual Typescript warnings if you try to set a property that doe
 ## Getter functions
 
 Now let's talk about the getter functions in the the `defaultProps` object. Since functions are more flexible than values this adds a
-bit of additional complexity and power. The real reason though for having them has to do with MobX. If we were to copy the `foo.bar`
-value directly into `defaultProps` then MobX would notice that `MyFrame` is referencing it. That would mean that `MyFrame` will be
-re-rendered when `foo.bar` changes, even though it's not really using `foo.bar`. By using a getter function we avoid all this.
+bit of additional complexity and power. The real reason though for having them has to do with MobX (or any other reaction library
+you might use that tracks access to variables). If we were to copy the `foo.bar` value directly into `defaultProps` then MobX would
+notice that `MyFrame` is referencing it. That would mean that `MyFrame` will be re-rendered when `foo.bar` changes, even though it's not
+really using `foo.bar`. By using a getter function we avoid all this.
 
 ## What happens when a default property is overwritten?
 
