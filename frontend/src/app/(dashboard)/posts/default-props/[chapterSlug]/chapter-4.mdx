@@ -1,3 +1,5 @@
+# Discussion
+
 The benefit of using default properties as described is that it avoids prop drilling, while still allowing you to customize the property
 values that a child component uses. By using nested `DefaultPropsContext` instances, you have a lot of flexibitily in deciding which parts
 of the render tree see which default values.
@@ -11,9 +13,11 @@ easier to refactor. In my experience, it's rare that default properties are over
 these properties is usually easy. If you do need to overwrite a value often, then this can be a sign that prop drilling is more
 appropriate for that value.
 
-We should also keep in mind that sharing data is not the only option. We can also use the same query in different components,
+We should keep in mind that sharing data is not the only option. We can use the same query in different components,
 and rely on the query cache. In this case, different components use different copies of the data. The drawback of this approach
 is that it couples components to specific queries, but depending on the use-case, this may not be much of a problem.
+
+# Conclusion
 
 Since default properties are usually not overwritten, I consider them to be an alternative to React contexts: one that avoids
 coupling components to particular contexts or queries. If you want a more traditional approach, then I would recommend to use React contexts, especially for data that is widely used in a particular branch of the component tree. Prop drilling is often the best

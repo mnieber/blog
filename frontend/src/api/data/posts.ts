@@ -89,7 +89,7 @@ export const posts = [
   },
   {
     slug: 'default-props',
-    title: 'Default props: an alternative to prop drilling and contexts',
+    title: 'Default props: a cross between prop drilling and contexts',
     shortTitle: 'Default props',
     date: 'May 2020, by Maarten Nieber',
     chapters: [
@@ -107,7 +107,7 @@ export const posts = [
       },
       {
         slug: 'chapter-4',
-        title: 'Conclusion',
+        title: 'Discussion and conclusion',
       },
     ],
   },
