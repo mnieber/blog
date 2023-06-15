@@ -58,13 +58,13 @@ export const dps = {
 `;
 
 <CodeSnippet
-  title="example/defaultProps.ts"
+  title="example/dps.ts"
   code={code2}
 />
 
 export const code3 = `
 import { withDefaultProps } from 'react-default-props-context';
-import { dps } from 'dps';
+import { dps } from './dps';
 
 type PropsT = { name: string };
 
@@ -101,7 +101,7 @@ overriding the `color` default property value. If you want to access the origina
 
 export const code4 = `
 import { withDefaultProps, getOriginalProps, getOriginalDefaultProps } from 'react-default-props-context';
-import { dps } from 'dps';
+import { dps } from './dps';
 
 type PropsT = { name: string };
 
