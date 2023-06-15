@@ -14,6 +14,12 @@ export function getPostAndChapterFromPathname(
   const chapter = post.chapters.find(
     (chapter) => chapter.slug === chapterSlug
   ) as ChapterT;
-  console.assert(chapter, 'chapter not found');
+  console.assert(
+    chapter,
+    'chapter not found:',
+    chapterSlug,
+    'in post',
+    postSlug
+  );
   return { post, chapter };
 }
