@@ -13,8 +13,8 @@ const DefaultProps = {
   color: stub as string,
 };
 
-const MyComponent = withDefaultProps<PropsT, typeof DefaultPropsT>(
-  (props: PropsT & DefaultPropsT) => {
+const MyComponent = withDefaultProps(
+  (props: PropsT & typeof DefaultProps) => {
     // The color value comes either from props.color or from a DefaultPropsProvider.
     return <text color={props.color}>Hello</text>;
   }, DefaultProps

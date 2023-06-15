@@ -73,9 +73,11 @@ const DefaultProps = {
   ...dps.size,
 };
 
-const MyComponent = withDefaultProps((props: PropsT & typeof DefaultProps) => {
-  return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
-}, DefaultProps);
+const MyComponent = withDefaultProps(
+  (props: PropsT & typeof DefaultProps) => {
+    return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
+  }, DefaultProps
+);
 `;
 
 <CodeSnippet
@@ -108,12 +110,14 @@ const DefaultProps = {
   ...dps.size,
 };
 
-const MyComponent = withDefaultProps((props: PropsT & typeof DefaultProps) => {
-  const propsReceivedFromParent = getOriginalProps(props);
-  const defaultPropsWithoutOverrides = getOriginalDefaultProps(props);
+const MyComponent = withDefaultProps(
+  (props: PropsT & typeof DefaultProps) => {
+    const propsReceivedFromParent = getOriginalProps(props);
+    const defaultPropsWithoutOverrides = getOriginalDefaultProps(props);
 
-  return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
-}, DefaultProps);
+    return <text color={props.color}>{\`Size is \$\{props.size\}\`}</text>;
+  }, DefaultProps
+);
 `;
 
 <CodeSnippet
