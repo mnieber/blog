@@ -7,7 +7,12 @@ default property, it doesn't care where this property comes from, as long as it'
 
 In my experience, the benefits of this approach outweight the drawbacks. `DefaultPropsContext` allows you to get information
 to the place where it is required, without the need to jump through hoops. This results in shorter and more readable code, that is
-easier to refactor. If you want a more traditional approach, then I would still recommend to avoid prop drilling and use React contexts
-relatively often, especially for data that is widely used in a particular branch of the component tree. Prop drilling is often the best choice
-if you want to be explicit about how information is shared between components, so in most applications a combination of approaches
-will be needed.
+easier to refactor. Fortunately, in my experience it's rare that default properties are overwritten, which means that reasoning about
+these properties is usually easy. If you do need to overwrite the value often, then it can be a signal that prop drilling is more
+appropriate for that value.
+
+Since default properties are usually not overwritten, I consider them to be an alternative to React contexts: one that avoids
+coupling components to particular contexts or queries. If you want a more traditional approach, then I would recommend to use React contexts
+relatively often, especially for data that is widely used in a particular branch of the component tree. Prop drilling is often the best
+choice if you want to be explicit about how information is shared between components, so in most applications a combination of
+approaches will be needed.
