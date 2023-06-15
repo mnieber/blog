@@ -1,10 +1,13 @@
 The benefit of using default properties as described is that it avoids prop drilling, while still allowing you to customize the property
-values that a child component uses. By using nested DefaultPropsContext instances, you have a lot of flexibitily in deciding which parts
+values that a child component uses. By using nested `DefaultPropsContext` instances, you have a lot of flexibitily in deciding which parts
 of the render tree see which default values.
-This flexibility comes at a price though: default properties can originate from _any_ DefaultPropsContext instance higher up in the tree.
+This flexibility comes at a price though: default properties can originate from _any_ `DefaultPropsContext` instance higher up in the tree.
 In this sense, it is different from most other React contexts. To put it in another way: when a component declares that it accepts a
-default property, it doesn't care where this property comes from, as long as it's provided by a DefaultPropsContext.
+default property, it doesn't care where this property comes from, as long as it's provided by a `DefaultPropsContext`.
 
-In my experience, the benefits of this approach easily outweight the drawbacks. `DefaultPropsContext` allows you to get information
+In my experience, the benefits of this approach outweight the drawbacks. `DefaultPropsContext` allows you to get information
 to the place where it is required, without the need to jump through hoops. This results in shorter and more readable code, that is
-easier to refactor. So if prop drilling in your code gets out of hand, I would recommend to give this a try.
+easier to refactor. If you want a more traditional approach, then I would still recommend to avoid prop drilling and use React contexts
+relatively often, especially for data that is widely used in a particular branch of the component tree. Prop drilling is often the best choice
+if you want to be explicit about how information is shared between components, so in most applications a combination of approaches
+will be needed.

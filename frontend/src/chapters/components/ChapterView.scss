@@ -39,6 +39,10 @@
     margin-left: 16px;
     @apply mb-4;
   }
+
+  code {
+    @apply text-primaryBlue;
+  }
 }
 
 .ChapterView__Title {

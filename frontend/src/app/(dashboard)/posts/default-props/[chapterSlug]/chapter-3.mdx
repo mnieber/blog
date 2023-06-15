@@ -1,7 +1,10 @@
-# Default properties can be declared fixed, or be removed
+# Default properties can be removed or declared fixed
 
-In some case, it's good to allow components to use a default property, but not to override it. This can be achieved this by setting the `fixed` options object.
-Moreover, if you set a default property to undefined then it's removed from the available set of properties.
+The example below shows two things:
+
+1. If you set a default property to `undefined` then it's removed from the available set of properties.
+2. By setting the `fixed` property, you can allow components to use certain default properties, but not to override them.
+
 
 export const code1 = `
 import { observer } from "mobx-react";
@@ -14,10 +17,12 @@ const MyFrame = observer(() => {
 };
 
 const defaultPropsInner = {
+  // A value of undefined means that the property is removed.
   bar: undefined,
 };
 
 const fixedDefaultProps = {
+  // A value of true means that the property is fixed.
   color: true,
 };
 
@@ -34,6 +39,7 @@ return (
 <CodeSnippet
   title="example/MyFrame.tsx"
   code={code1}
+  addMb
 />
 
 # The default properties can be defined centrally
@@ -75,6 +81,7 @@ const MyComponent = withDefaultProps((props: PropsT & typeof DefaultProps) => {
 <CodeSnippet
   title="example/MyComponent.tsx"
   code={code3}
+  addMb
 />
 
 # Using getOriginalProps and getOriginalDefaultProps
