@@ -3,14 +3,7 @@ import { AphorismT } from '/src/api/types/AphorismT';
 export const aphorisms: AphorismT[] = [
   { text: "Don't assume that better solutions are more expensive." },
   {
-    text: 'Problem solving by starting from the current solution will probably lead to a local maximum.',
-  },
-  {
     text: 'Split code by feature, not by aspect.',
-  },
-  { text: 'Pleasant syntax is tnatropmi.' },
-  {
-    text: "A file containing highly similar items (e.g. a phonebook) doesn't get more complex as it gets bigger.",
   },
   {
     text: 'An effective discussion requires more than personal taste but less than objective truth.',
@@ -40,19 +33,16 @@ export const aphorisms: AphorismT[] = [
     text: 'To solve a problem, imagine that which would be ridiculously convenient.',
   },
   {
-    text: 'A cohesive file is like a space with a single tenant and no guests.',
-  },
-  {
     text: 'The perceived need for a new concept is an opportunity to improve the existing concepts.',
   },
   {
-    text: 'Replacing an existing concept with a more suitable one usually has positive ripple effects.',
+    text: 'Replacing a concept with a more suitable one usually has positive ripple effects.',
   },
   {
     text: "Don't allow code to break a concept. Instead, fix either the concept or the code.",
   },
   { text: 'Being too careful can be a costly mistake.' },
   {
-    text: 'Having tests that make it hard to change the code are a form of technical debt.',
+    text: 'Tests that make it hard to change the code are a form of technical debt.',
   },
 ];
