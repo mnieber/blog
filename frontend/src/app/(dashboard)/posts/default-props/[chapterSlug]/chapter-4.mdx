@@ -2,7 +2,7 @@
 
 The benefit of using default properties as described is that it avoids prop drilling, while still allowing you to customize the property
 values that a child component uses. By using nested `DefaultPropsContext` instances, you have a lot of flexibitily in deciding which parts
-of the render tree see which default values.
+of the component tree see which default values.
 This flexibility comes at a price though: default properties can originate from _any_ `DefaultPropsContext` instance higher up in the tree.
 In this sense, it is different from most other React contexts. To put it in another way: when a component declares that it accepts a
 default property, it doesn't care where this property comes from, as long as it's provided by a `DefaultPropsContext`.
