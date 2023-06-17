@@ -5,9 +5,6 @@ export const aphorisms: AphorismT[] = [
   {
     text: 'Split code by feature, not by aspect.',
   },
-  {
-    text: 'An effective discussion requires more than personal taste but less than objective truth.',
-  },
   { text: 'Use functions for the heavy lifting, and objects as glue code.' },
   { text: 'Inspiration is fuel. Filling up your tank is not a waste of time.' },
   {
@@ -33,10 +30,7 @@ export const aphorisms: AphorismT[] = [
     text: 'To solve a problem, imagine that which would be ridiculously convenient.',
   },
   {
-    text: 'The perceived need for a new concept is an opportunity to improve the existing concepts.',
-  },
-  {
-    text: 'Replacing a concept with a more suitable one usually has positive ripple effects.',
+    text: 'Instead of adding new concepts, try to improve the existing ones.',
   },
   {
     text: "Don't allow code to break a concept. Instead, fix either the concept or the code.",
