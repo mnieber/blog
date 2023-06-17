@@ -11,29 +11,33 @@ import { observer } from "mobx-react";
 import { DefaultPropsProvider } from "react-default-props-context";
 
 const MyFrame = observer(() => {
-  const defaultProps = {
-  color: () => "red",
-  bar: () => foo.bar,
-};
+  const defaultPropsContext = {
+    defaultProps: {
+      color: () => "red",
+      bar: () => foo.bar,
+    }
+  };
 
-const defaultPropsInner = {
-  // A value of undefined means that the property is removed.
-  bar: undefined,
-};
+  const defaultPropsContextInner = {
+    defaultProps: {
+      // A value of undefined means that the property is removed.
+      bar: undefined,
+    },
+    fixed: {
+      // A value of true means that the property is fixed.
+      color: true,
+    }
+  };
 
-const fixedDefaultProps = {
-  // A value of true means that the property is fixed.
-  color: true,
-};
-
-return (
-  <DefaultPropsProvider value={defaultProps}>
-    <MyComponent name="example"/>
-    <DefaultPropsProvider extend value={defaultPropsInner} fixed={fixedDefaultProps}>
-      <MyComponent name="exampleInner/>
+  return (
+    <DefaultPropsProvider value={defaultPropsContext}>
+      <MyComponent name="example"/>
+      <DefaultPropsProvider extend value={defaultPropsContextInner}>
+        <MyComponent name="exampleInner/>
+      </DefaultPropsProvider>
     </DefaultPropsProvider>
-  </DefaultPropsProvider>
-);
+  );
+});
 `;
 
 <CodeSnippet

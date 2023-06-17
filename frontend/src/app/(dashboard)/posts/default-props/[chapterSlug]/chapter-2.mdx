@@ -44,20 +44,22 @@ import { observer } from "mobx-react";
 import { DefaultPropsProvider } from "react-default-props-context";
 
 const MyFrame = observer(() => {
-// We will make foo.bar available as a default property
-const foo = getFoo();
+  // We will make foo.bar available as a default property
+  const foo = getFoo();
 
-const defaultProps = {
-  color: () => "red",
-  bar: () => foo.bar,
-};
+  const defaultPropsContext = {
+    defaultProps: {
+      color: () => "red",
+      bar: () => foo.bar,
+    }
+  };
 
-return (
-  <DefaultPropsProvider value={defaultProps}>
-    <MyComponent name="example" />
-    <MyComponent name="example" color="green" />
-  </DefaultPropsProvider>
-)
+  return (
+    <DefaultPropsProvider value={defaultPropsContext}>
+      <MyComponent name="example" />
+      <MyComponent name="example" color="green" />
+    </DefaultPropsProvider>
+  );
 });`
 
 <CodeSnippet title="" code={code2} addMb />
@@ -96,26 +98,30 @@ import { observer } from "mobx-react";
 import { DefaultPropsProvider } from "react-default-props-context";
 
 const MyFrame = observer(() => {
-const foo = getFoo();
+  const foo = getFoo();
 
-const defaultProps = {
-  color: () => "red",
-  bar: () => foo.bar,
-};
+  const defaultPropsContext = {
+    defaultProps: {
+      color: () => "red",
+      bar: () => foo.bar,
+    }
+  };
 
-const defaultPropsInner = {
-  color: () => "blue",
-  baz: () => foo.baz,
-};
+  const defaultPropsContextInner = {
+    defaultProps: {
+      color: () => "blue",
+      baz: () => foo.baz,
+    }
+  };
 
-return (
-  <DefaultPropsProvider value={defaultProps}>
-    <MyComponent name="example"/>
-    <DefaultPropsProvider extend value={defaultPropsInner}>
-      <MyComponent name="exampleInner"/>
+  return (
+    <DefaultPropsProvider value={defaultPropsContext}>
+      <MyComponent name="example"/>
+      <DefaultPropsProvider extend value={defaultPropsContextInner}>
+        <MyComponent name="exampleInner"/>
+      </DefaultPropsProvider>
     </DefaultPropsProvider>
-  </DefaultPropsProvider>
-);
-`;
+  );
+});`;
 
 <CodeSnippet title="example/MyFrame.tsx" code={code3} />
