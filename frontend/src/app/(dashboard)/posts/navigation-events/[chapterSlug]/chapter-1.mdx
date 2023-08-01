@@ -10,16 +10,27 @@ I like to reflect the application state in the url, for two reasons:
 - it tells the user where they are in the application;
 - it allows the user to save the url and come back to the same page later.
 
-How should we manage updates to the url? A practical choice is to do this inside React components.
-For example, when the user presses a button, then the component responds by updating the url.
-However, I prefer a more decoupled approach in which components are wrapped in a so-called
-navigation layer. When a component fires a navigation event then the nearest navigation layer
-either processes it (this usually results in a url change) or passes it to the next layer.
-Since navigation layers are aware of the page that the user is on, they are in a better position
-to make the correct url changes.
+Reflecting the application state in the url implies that our application must do some kind of
+url management. In particular, our application needs to handle the following concerns:
+
+- we need a mechanism for changing the url in response to user actions.
+- we must update the application state in response to changes in the url, and vice versa;
+
+I will illustrate how these challenges can be tackled using two techniques: the navigation handler
+and the router effect.
+
+A navigation handler is used to decouple views from url changes. A view no longer changes the url
+directly but instead makes a request to the navigation handler. For example, imagine that our
+application has a "archived blog-posts" view and a "current blog-posts" view. Both views can use the
+same `BlogPostListView` component that makes `navigateToBlogPost` requests, and these requests can
+produce different url-changes in each context.
+
+A router effect is a render component that is inserted into the routing
+schema. Since the router effect is aware of the current view, it can respond to the application state
+changes that are generated this view and update the url accordingly.
 
 # Overview
 
-In the next section I will first explain how I manage routes in my application. This is a preparation
-for the subsequent section in which I explain how how navigation events are fired and
-how they are processed. In the final section I will discuss the pros and cons of this approach.
+In the next section I will first explain how I do (ordinary) routing in my application. This is a preparation
+for the subsequent section in which I explain how url management is tackled. In the final section I will
+discuss the pros and cons of this approach.

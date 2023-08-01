@@ -26,6 +26,7 @@ export const aphorisms: AphorismT[] = [
     text: 'To start the virtuous cycle between having time to refactor and productivity, focus on the latter.',
   },
   { text: 'Good ideas are not always easy to explain.' },
+  { text: 'Factor out the variation, so that only the pattern remains.' },
   {
     text: 'To solve a problem, imagine that which would be ridiculously convenient.',
   },
