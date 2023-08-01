@@ -3,47 +3,48 @@
 In this chapter I will describe my custom solution. It aims to achieve a compromise between the strengths and
 weaknesses of the approaches that I mentioned in the previous chapter:
 
-- the starting point is the inline styling approach proposed by TailwindUI
-- "intrinsic" styles are moved to a SCSS file that is co-located with the JSX file
-- recurring patterns in the remaining styles are moved to a layout object. The fields of this layout object can be injected
-  into JSX elements much like UIkit classes are injected.
+- The starting point is the inline styling approach proposed by TailwindUI;
+- The "intrinsic" styles (e.g. colors, font properties) are moved to a SCSS file that is co-located with the JSX file;
+- If the remaining inline styles (e.g. margins, sizes, etc) are repeated, then I may move them to a so-called "style object". The fields of a style object can be injected into other JSX elements much like UIkit classes are injected;
+- If the HTML structure or component logic is also repeated in the code, then I may capture this code in a custom component. Custom components can be themed using a `componentClassName` property or using SCSS scopes.
 
 # Breaking out intrinsic styles
 
-When we use TailwindUI then inline styles are copied from a snippet and adjusted to suit the local context.
-However, there is often a subset of styles that remain unchanged. These can be referred to as the component's intrinsic styles.
-In my view, it's preferable to move these styles to a CSS class, reducing code clutter.
-Let's examine an example where this principle is applied. In this example:
+When we use TailwindUI then inline styles are copied from a snippet and adjusted to suit the local context. For the purpose
+of understanding the code, the styles that are most important are those that affect the layout. To understand if a particular
+margin or padding is correct, we have to consider it in relation to the margins and paddings of neighouring components. You
+could say that margins, paddings and possibly sizes are context dependent. The context-dependent styles I will call "ad-hoc
+styles" and the context-independent ones "intrinsic styles".
+
+There is no formal rule for deciding which styles are intrinsic. From a design perspective, colors and font-weights are often
+context dependent too. However, when I'm verifying the code I'm usually intested in the layout and not in colors and font-weights.
+Although there is no formal rule, I trust that the reader will intuitively understand why certain styles are considered
+intrinsic while others are not. In less obvious situations, such as when a margin appears in the SCSS file, it's helpful to include a comment.
+
+Let's look at an example of splitting instrinsic and ad-hoc styles:
 
 - the email-field code snippet from the previous chapter has been copied to the body of a SignInForm component;
-- the intrinsic styles have been moved to rules in a SCSS file: `FormField__Label` and `FormField__Input`;
-
-Following the "inline components" approach from UIkit, we've introduced a loosely
-structured `FormField` component that has a label and an input. To apply this "inline component"
-we add the `FormField__Label` and `FormField__Input` classes at the appropriate places in the email field (see below).
-We can use the same CSS classes for other fields, such as the password field. This will work well as long as these fields
-have the same intrinsic styles.
+- the intrinsic styles have been moved to rules in a SCSS file: `SignInForm__EmailFieldLabel` and `SignInForm__EmailFieldInput`;
 
 export const code1 = `
-export const SignInForm = () => {
+import { classnames as cn } from 'classnames';
+
+type PropsT = {};
+
+export const SignInForm = (props: PropsT) => {
   return (
-    <div className="SignInForm">
-      {
-        // Note that other parts of the SignInForm component
-        // are omitted for brevity
-      }
-      <div className="FormField mb-6">
-        <label for="email" className="FormField__Label mb-2">
-          Email address
-        </label>
-        <div>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            className="FormField__Input py-1.5 w-full"
-          />
-        </div>
+    <div className={cn("SignInForm__EmailField", ["mb-6"])}>
+      <label
+        for="email"
+        className={cn("SignInForm__EmailFieldLabel", ["mb-2"])}
+      >
+        Email address
+      </label>
+      <div>
+        <input
+          id="email" name="email" type="email"
+          className={cn("SignInForm__EmailFieldInput", ["py-1.5"])}
+        />
       </div>
     </div>
   );
@@ -51,11 +52,11 @@ export const SignInForm = () => {
 `;
 
 export const code2 = `
-.FormField__Label {
+.SignInForm\_\_EmailFieldLabel {
   @apply block text-sm font-medium leading-6 text-gray-900;
 }
 
-.FormField\_\_Input {
+.SignInForm\_\_EmailFieldInput {
 @apply block rounded-md border-0 shadow-sm;
 @apply text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6;
 @apply ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600;
@@ -67,37 +68,35 @@ export const code2 = `
   <CodeSnippet lang="sass" code={code2} />
 </TabView>
 
-There are no rigid guidelines for determining which properties are intrinsic. For example, the padding of the
-input field was chosen not to be intrinsic, probably because we can foresee that we need a different padding in
-some cases. Usually, the reader can intuitively undertand why certain styles are inline while others are not.
-In less obvious situations, such as when a margin appears in the SCSS file, it's helpful to include a comment.
+Note that in the case snippet, every className attribute has two parts: the class-name of the sub-component (which is used
+to attach the intrinsic styles defined in the .scss files) and the list of ad-hoc styles.
 
-# Ad-hoc properties and layouts
+# Style objects
 
-I refer to the properties that remain inline as ad-hoc properties. These typically involve the component's layout and geometry,
-including flex-box properties, margins, heights, widths, and paddings. While ad-hoc properties can be adjusted to fit a specific context,
-it's good for consistency to limit the variation in these properties. For instance, if an email field has a vertical padding of 1.5,
-it's likely that the password field in the same form should also have this padding. To address this, I extract the ad-hoc properties and
-place them in a layout object.
+The ad-hoc styles typically involve the component's layout and geometry, such as flex-box properties, margins, heights, widths, and
+paddings. Because they are inlined, ad-hoc properties can easily be adjusted to fit a specific context. Still, it's good for consistency to
+limit the variation in these properties. For instance, if an email field has a vertical padding of 1.5, it's likely that the password field
+in the same form should also have this padding. To address this, I often extract the ad-hoc properties and place them in a styles object:
 
 export const code3 = `
 import { classnames as cn } from 'classnames';
 
 export const SignInForm = () => {
   return (
-      ...
-      <div className={cn(L.FormField.root())}>
-        <label for="email" className={cn(L.FormField.label())}>
-          Email address
-        </label>
-        <div>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            className={cn(L.FormField.input())}
-          />
-        </div>
+    ...
+    <div className={cn(FormFieldS.root(), "SignInForm__EmailField")}
+    >
+      <label
+        for="email"
+        className={cn(FormFieldS.Label(), "SignInForm__EmailFieldLabel")}
+      >
+        Email address
+      </label>
+      <div>
+        <input
+          id="email" name="email" type="email"
+          className={cn(FormFieldS.Input(), "SignInForm__EmailFieldInput")}
+        />
       </div>
     </div>
   );
@@ -105,15 +104,13 @@ export const SignInForm = () => {
 `;
 
 export const code4 = `
-export const L = {
-  FormField: {
-    // Use the root style in the top level element of the FormField
-    root: () => 'FormField mb-6',
-    // Use this style if the form-field contains a label
-    label: () => 'FormField__Label mb-2',
-    // Use this style if the form-field contains an input
-    input: () => 'FormField__Input py-1.5 w-full',
-  },
+export const FormFieldS = {
+  // The `root` style adds the styles for the FormField container
+  root: () => 'mb-6',
+  // Use this style if the form-field contains a label
+  Label: () => 'mb-2',
+  // Use this style if the form-field contains an input
+  Input: () => 'py-1.5',
 };
 `;
 
@@ -122,8 +119,27 @@ export const L = {
   <CodeSnippet code={code4} />
 </TabView>
 
-As indicated by the comments, it's not mandatory to use all the keys in the layout object. For example, the `label` key is only
-utilized if the form-field includes a label. It's also possible to incorporate variations in the layout, as demonstrated below:
+I think of a style object as a loosely defined custom component that I can mix into my concrete components.
+For example, when we add the `SignInForm__EmailFieldLabel`, we declare that it is an instance of a `FormField.Label`
+by mixing in this part of the style object. As indicated by the comments, it's not mandatory to use all the keys in the layout object.
+For example, the `Label` key is only utilized if the form-field includes a label.
+
+Style objects are useful when there is repetition in the styles, but not so much in the JSX structure.
+For example, many components can be considered "cards", but there is often not enough regularity in them to warrant a Card component.
+In fact, if we would introduce a Card component then we may run into the problem that it's hard to make it generic enough so that it can
+be adjusted correctly to each particular context where the card is used.
+In that case, it can be better to introduce a `CardS` style object that offers a choice of card paddings, colours, title styles,
+subtitle styles, etc from which we can choose when we "instantiate" a card. This is reminiscent of the design systems that we may use in tools
+such as Figma.
+
+## Adding intrinsic styles and choices to style objects
+
+We can extend the use of style objects in two ways:
+
+- fields of a style object can also mix in intrinsic styles;
+- fields of a style object can offer different choices for the same type of styles.
+
+This is demonstrated below:
 
 export const code5 = `
 import { classnames as cn } from 'classnames';
@@ -131,15 +147,10 @@ import { classnames as cn } from 'classnames';
 export const SignInForm = () => {
   return (
     <div className="SignInForm">
-      <div
-        className={cn(
-          L.FormField.container.root(),
-          L.FormField.container.gap.big()
-        )}
-      >
+      <div className={cn(L.FormField.root(), L.FormField.gap.big())}>
         <label
           for="email"
-          className={cn(L.FormField.label.root(), L.FormField.label.color.blue())}
+          className={cn(L.FormField.Label.root(), L.FormField.Label.color.blue())}
         >
           Email address
         </label>
@@ -150,29 +161,30 @@ export const SignInForm = () => {
 `;
 
 export const code6 = `
-export const L = {
-  FormField: {
-    // The container element is the top-level element that contains the entire form field
-    container: {
-      root: () => 'FormField',
-      // Use one of the gap styles to create space below the form-field
-      gap: {
-        big: () => 'mb-6',
-        small: () => 'mb-2',
-      },
-    },
-    // Use this style if the form-field contains a label
-    label: {
-      root: () => 'FormField__Label mb-2',
-      // Pick one color for the label
-      color: {
-        blue: () => 'text-blue-500',
-        green: () => 'text-green-400',
-      }
-    }
-    // Use this style if the form-field contains an input
-    input: () => 'FormField__Input py-1.5 w-full',
+import "./FormField.scss";
+
+export const FormFieldS = {
+  // The form-field container uses the `FormField` instrinsic styles that
+  // come from "./FormField.scss".
+  root: () => 'FormField',
+  // Use one of the gap styles to create space below the form-field
+  gap: {
+    big: () => 'mb-6',
+    small: () => 'mb-2',
   },
+  // Use this style if the form-field contains a label
+  Label: {
+    // The form-field label has bottom margin, and it uses the `FormField__Label`
+    // intrinsic styles.
+    root: () => 'FormField__Label mb-2',
+    // Pick one color for the label
+    color: {
+      blue: () => 'text-blue-500',
+      green: () => 'text-green-400',
+    }
+  }
+  // Use this style if the form-field contains an input
+  Input: () => 'FormField__Input py-1.5',
 };
 `;
 
@@ -180,10 +192,6 @@ export const L = {
   <CodeSnippet code={code5} />
   <CodeSnippet code={code6} />
 </TabView>
-
-I typically include numerous comments in the layout object to clarify the intended use of each layout.
-Of course, a developer might choose the wrong values from the layout, resulting in an inconsistent appearance.
-However, since the use of a layout object constrains the variation in ad-hoc styles, it still promotes greater consistency.
 
 # Making intrinsic styles context-dependent
 

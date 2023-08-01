@@ -8,7 +8,7 @@ custom component library for your application.
 
 TailwindUI offers a collection of UI components, not in the traditional sense (as software components) but as a set of HTML code snippets.
 To utilize a component, simply copy the snippet to your source file and modify it as required. Note that the same snippet can appear
-in different places in your code. Here's an example of a snippet for an email form field:
+in different places in your code, but that's considered to be okay. Here's an example of a snippet for an email form field:
 
 export const code1 = `
 <div class="mb-6">
@@ -21,9 +21,7 @@ export const code1 = `
   >
   <div>
     <input
-      id="email"
-      name="email"
-      type="email"
+      id="email" name="email" type="email"
       class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
     />
   </div>
@@ -55,10 +53,10 @@ As we shall see later, it's the starting point for my hybrid approach.
 
 ## Custom components ≠ third party components
 
-Before we continue I would like to point out that can still be a good idea to create custom components based on TailwindUI snippets. You can do this
+Before we continue I would like to point out that it can still be a good idea to create custom components based on TailwindUI snippets. You can do this
 on a case-by-case basis, and when doing so, you trade some flexibility for increased consistency and reusability. However, it may seem counter-intuitive
 to start with TailwindUI and then go into the direction of components. Shouldn't we just use MaterialUI then? The answer is no, because building custom
-components is a very different approach from using third party components. These custom components are already shaped to meet the needs of the application.
+components is a very different approach from using third party components. Custom components are already shaped to meet the needs of the application.
 Therefore, there will usually be no need to "break into" them. On the other hand, when using MaterialUI, it can be very challenging to
 get the component to do exactly what you want.
 
@@ -88,7 +86,7 @@ mixing in the `uk-dropdown` attribute. This is somewhat analogous to using inlin
 It suggests a more loose concept of what a component is. Instead of an object or function, it can also be a collection of utilities
 that add styles and behaviours to some JSX structure. This is a very flexible approach. For example, if you want to add an icon to
 the drop-down button, then instead of having to extend a DropDownButton component function you can just add the icon
-directly in the "inline component" code. In my hybrid approach, I will build on this idea.
+directly to the inlined code. In my hybrid approach, I will build on this idea.
 
 Advantages of UIkit:
 
@@ -106,11 +104,11 @@ large set of SCSS variables. Still, the idea of creating components as sets of u
 
 # SCSS
 
-Since we all know what SCSS looks like, let's go straight to the advantages and disadvantages. Here, I should add that much depends on how
+Since we all know what SCSS is, let's go straight to the advantages and disadvantages. Here, I should add that much depends on how
 SCSS is used. Some of its features are an advantage if used in the right way, and a disadvantage if used wrongly.
 
 - **Flexibility**: since SCSS is a powerful language for styling elements, we can cover a lot of use-cases with it;
-- **Flexibility**: we can use CSS variables to make the effect of the SCSS code depend on the context (e.g. the current theme);
+- **Flexibility**: we can use CSS variables and scoping to make the effect of the SCSS code depend on the context (e.g. the current theme);
 - **Readability**: when we move styles to an SCSS file, the remaining source code usually becomes more readable;
 - **Performance**: I'm not an expert on this but the consensus seems to be that using SCSS gives very good performance;
 - **Maintenance**: when inspecting the DOM, it's usually easy to find out where the styles are defined in the code.
