@@ -34,7 +34,7 @@ export const Banner = (props: PropsT) => {
           'mx-auto'
         )}
       />
-      <Menu className="mb-8" />
+      <Menu className="mb-12" />
     </div>
   );
 };
