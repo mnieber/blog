@@ -6,9 +6,10 @@ work well when the code that appears in multiple places is highly similar. For e
 similar to each other, with some variation in sizes and colours that can be captured in the parameters of a custom
 component.
 
-An example of where it's harder to use a custom component is a form. Different forms will share some features,
-such as labels, titles, and subtitles but there can also be major differences between them that make it hard
-to support all use-cases with a single component.
+There are also cases where it's harder to use a custom component, such as forms. Different forms will share some features,
+such as labels, titles, and subtitles but there are usually major differences between them that make it hard
+to support all use-cases with a single component. In this case we can still reuse code and increase
+consistency by using a so-called style object. as we shall see below.
 
 In this chapter, I will use the component snippet from chapter 2 as a starting point. I will discuss how the
 code can be decluttered by moving a subset of the styles to an .scss file, and explain how a style object
@@ -16,11 +17,14 @@ can be used to capture common patterns in the remaining styles without introduci
 
 # Breaking out intrinsic styles
 
-To add a new component we can copy a TailwindUI snippet and adjust it to suit the local context. For the purpose
-of understanding the code, the styles that are most important are those that affect the layout. We can verify that a particular
-margin or padding is correct by relating it to the margins and paddings of neighouring components. I will use the term
-"ad-hoc styles" for these context-dependent and "intrinsic styles" for the context-independent ones. To reduce code clutter,
-intrinsic styles can be moved to an .scss file.
+To add a new component we can copy a TailwindUI snippet and adjust it to suit the local context. As discussed in the previous
+chapter, this approach has many benefits but having a long list of inline styles can make it harder to understand the code.
+We'll try to improve this by moving some of the styles (the least interesting ones) to an .scss file.
+
+For the purpose of understanding the code, the styles that are most important are those that affect the layout.
+We can verify that a particular margin or padding is correct by relating it to the margins and paddings of neighouring components.
+I will use the term "ad-hoc styles" for these context-dependent and "intrinsic styles" for the context-independent ones.
+To reduce code clutter, intrinsic styles can be moved to an .scss file.
 
 There is no formal rule for deciding which styles are intrinsic. From a design perspective, most styles - including
 colors and font-weights - are context dependent. However, when I'm verifying the code I'm usually interested in the layout, and therefore
