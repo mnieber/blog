@@ -3,19 +3,19 @@
 I will explain a hybrid approach - based on inline styles and SCSS - for writing style-related code that is compact,
 flexible and maintainable.
 
-# Assumptions
+## Assumptions
 
 You are familiar with the basics of SCSS and inline styles.
 
-# Caveats
+## Caveats
 
-This article describes an experimental approach. I think it contains interesting ideas, and can be of practical
-value. I've used this approach in my Vidlito application, and got good results.
-Although I've used CSS a lot, I'm not an expert. I focus on a subset of CSS that serves my purposes, but there is
-always more to learn. Therefore, though I will discuss some of my experiences with inline styles, SCSS and CSS-in-JS,
-I can't make a strong case for which approaches should be preferred.
+I've used this approach in my Vidlito application, and got good results, but this approach is nonetheless
+still experimental.
 
-# Conventions
+Although I've used CSS a lot, I'm not an expert. Therefore, though I will discuss some of my experiences with inline styles,
+SCSS and CSS-in-JS, I can't make a strong case for which approaches should be preferred.
+
+## Conventions
 
 I will sometimes use the terms HTML and JSX interchangeably (since JSX is a way to write HTML inside Typescript).
 
@@ -27,8 +27,10 @@ how styles are applied to elements, and how they are adapted to different contex
 it's very likely that different solutions will be used in different places, which will make it harder
 to understand and maintain the code.
 
-# Overview
+# Outlook
 
 In this article I will share my thoughts on writing style code. I will start by discussing various approaches for creating
 UIs: TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI. I will discuss what I like and dislike about these approaches,
-and explain what qualities I aim for in a style system. Then, I will introduce my own hybrid approach for implementing styles.
+and explain what qualities I aim for in a style system. Then, I will discuss style objects; these are a type of loosely defined component
+that we can mix into our concrete components. Finally, I will introduce a hybrid approach for implementing styles that is based on
+custom components, style objects, inline styles and SCSS.

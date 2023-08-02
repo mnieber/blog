@@ -15,10 +15,14 @@ export const posts = [
       },
       {
         slug: 'chapter-3',
-        title: 'Hybrid approach for managing styles',
+        title: 'Style objects and custom components',
       },
       {
         slug: 'chapter-4',
+        title: 'Hybrid approach for managing styles',
+      },
+      {
+        slug: 'chapter-5',
         title: 'Conclusion',
       },
     ],
