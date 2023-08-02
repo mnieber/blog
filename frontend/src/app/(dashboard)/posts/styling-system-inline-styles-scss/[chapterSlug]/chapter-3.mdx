@@ -29,13 +29,13 @@ To reduce code clutter, intrinsic styles can be moved to an .scss file.
 There is no formal rule for deciding which styles are intrinsic. From a design perspective, most styles - including
 colors and font-weights - are context dependent. However, when I'm verifying the code I'm usually interested in the layout, and therefore
 I will move colors and font-weights to the .scss file. In general, I trust that the reader will intuitively understand why
-certain styles are in the .scss file and others are not. In less obvious situations, such as when a margin appears in the SCSS file,
+certain styles are in the .scss file and others are not. In less obvious situations, such as when a margin appears in the .scss file,
 it's helpful to include a comment.
 
 Let's look at an example of splitting instrinsic and ad-hoc styles:
 
 - the email-field code snippet from the previous chapter has been copied to the body of a SignInForm component;
-- the intrinsic styles are captured in a SCSS file as `SignInForm__EmailFieldLabel` and `SignInForm__EmailFieldInput`;
+- the intrinsic styles are captured in a .scss file as `SignInForm__EmailFieldLabel` and `SignInForm__EmailFieldInput`;
 
 export const code1 = `
 import { classnames as cn } from 'classnames';
@@ -86,7 +86,7 @@ export const code2 = `
 The ad-hoc styles typically involve the component's layout and geometry, such as flex-box properties, margins, heights, widths, and
 paddings. Because they are inlined, ad-hoc properties can easily be adjusted to fit a specific context. Still, it's good for consistency to
 limit the variation in these properties. For instance, if an email field has a vertical padding of 1.5, then it's likely that the password field
- has the same padding. To address this, I extract the ad-hoc properties and place them in a style object:
+has the same padding. To address this, I extract the ad-hoc properties and place them in a style object:
 
 export const code3 = `
 import { classnames as cn } from 'classnames';

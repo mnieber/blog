@@ -112,14 +112,14 @@ SCSS is used. Some of its features are an advantage if used in the right way, an
 
 - **Flexibility**: since SCSS is a powerful language for styling elements, we can cover a lot of use-cases with it.
 - **Flexibility**: we can use CSS variables and scoping to make the effect of the SCSS code depend on the context (e.g. the current theme);
-- **Readability**: when we move styles to an SCSS file, the remaining source code usually becomes more readable;
+- **Readability**: when we move styles to an .scss file, the remaining source code usually becomes more readable;
 - **Performance**: I'm not an expert on this but the consensus seems to be that using SCSS gives very good performance;
 - **Maintenance**: when inspecting a component in the DOM, it's usually easy to find the related style rules (though these rules may be complex, see below);
 
 Disadvantages are:
 
-- **Isolation**: if you define SCSS rules that have a global scope then it can become very hard to understand the combined effect of different SCSS files.
-  Changing an SCSS file can become very risky;
+- **Isolation**: if you define SCSS rules that have a global scope then it can become very hard to understand the combined effect of different .scss files.
+  Changing an .scss file can become very risky;
 - **Maintenance**: because SCSS is very flexible, it can easily lead to complex solutions that are hard to understand and maintain;
 - **Explicitness**: if multiple SCSS rules are responsible for styling an element, then it can be hard to figure out which rules apply;
 - **Explicitness**: even when you co-locate JSX and SCSS, you still need to jump between these files to understand how elements are styled.

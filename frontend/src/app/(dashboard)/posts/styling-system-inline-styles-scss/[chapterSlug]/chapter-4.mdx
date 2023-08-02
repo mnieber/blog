@@ -173,7 +173,7 @@ Note that inside the `.Blue-DialogButton` selector there are rules for `.DialogB
 new names for these selectors.
 
 Note also that we've moved the `select-none` class from the .scss file to the JSX code. This is a pragmatic way to ensure
-that all buttons have `select-none` and remove the need to add this class to every theme.
+that all buttons have `select-none` and removes the need to add this class to every theme.
 
 # Using themeClassname instead of componentClassName
 
@@ -185,7 +185,9 @@ export const DialogButton = (props: PropsT) => {
   const { className, fontSize, iconName, label, ...rest } = props;
   const hasIcon = !!iconName;
 
-  const name = props.themeClassName ? (props.themeClassName + '-DialogButton') : 'DialogButton';
+  const name = props.themeClassName
+    ? (props.themeClassName + '-DialogButton')
+    : 'DialogButton';
 
   return (
     <button
