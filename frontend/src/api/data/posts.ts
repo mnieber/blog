@@ -15,11 +15,11 @@ export const posts = [
       },
       {
         slug: 'chapter-3',
-        title: 'Style objects and custom components',
+        title: 'Style objects',
       },
       {
         slug: 'chapter-4',
-        title: 'Hybrid approach for managing styles',
+        title: 'Combining style objects with custom components',
       },
       {
         slug: 'chapter-5',

@@ -4,6 +4,7 @@ import Chapter1 from './chapter-1.mdx';
 import Chapter2 from './chapter-2.mdx';
 import Chapter3 from './chapter-3.mdx';
 import Chapter4 from './chapter-4.mdx';
+import Chapter5 from './chapter-5.mdx';
 import { ChapterLayout } from '/src/chapter/components/ChapterLayout';
 
 export default function Page({ params }: any) {
@@ -19,6 +20,7 @@ export default function Page({ params }: any) {
       {chapterSlug === 'chapter-2' && <Chapter2 />}
       {chapterSlug === 'chapter-3' && <Chapter3 />}
       {chapterSlug === 'chapter-4' && <Chapter4 />}
+      {chapterSlug === 'chapter-5' && <Chapter5 />}
     </ChapterLayout>
   );
 }
@@ -29,5 +31,6 @@ export async function generateStaticParams() {
     { chapterSlug: 'chapter-2' },
     { chapterSlug: 'chapter-3' },
     { chapterSlug: 'chapter-4' },
+    { chapterSlug: 'chapter-5' },
   ];
 }

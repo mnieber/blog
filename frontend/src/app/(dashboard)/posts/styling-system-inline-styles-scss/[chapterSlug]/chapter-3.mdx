@@ -2,40 +2,36 @@
 
 As mentioned in the previous chapter, it's often a good idea to start a design with inline components
 (snippets of JSX code that have inline styles) and then move repeated code to custom components. Custom components
-work well when:
+work well when the code that appears in multiple places is highly similar. For example, dialog buttons usually look
+similar to each other, with some variation in sizes and colours that can be captured in the parameters of a custom
+component.
 
-- the code that appears in multiple places is highly similar;
-- you expect future use-cases for the component to be highly similar to current use-cases.
-
-An example of this scenario is dialog buttons. Most likely, all dialog buttons will look similar to each other,
-with some variation in sizes and colours that can be captured in the parameters of the custom component. An example
-of where it's harder to use a custom component is a form. In this case, different forms will share some features,
+An example of where it's harder to use a custom component is a form. Different forms will share some features,
 such as labels, titles, and subtitles but there can also be major differences between them that make it hard
-to support all use-cases.
+to support all use-cases with a single component.
 
 In this chapter, I will use the component snippet from chapter 2 as a starting point. I will discuss how the
 code can be decluttered by moving a subset of the styles to an .scss file, and explain how a style object
-can be used to capture common patterns in the remaining styles, without introducing a full-blown custom component.
+can be used to capture common patterns in the remaining styles without introducing a full-blown custom component.
 
 # Breaking out intrinsic styles
 
-When we use TailwindUI then inline styles are copied from a snippet and adjusted to suit the local context. For the purpose
-of understanding the code, the styles that are most important are those that affect the layout. To understand if a particular
-margin or padding is correct, we have to consider it in relation to the margins and paddings of neighouring components. You
-could say that margins, paddings and possibly sizes are context dependent. The context-dependent styles I will call "ad-hoc
-styles" and the context-independent ones "intrinsic styles". To reduce code clutter, intrinsic styles can be moved to
-an .scss file.
+To add a new component we can copy a TailwindUI snippet and adjust it to suit the local context. For the purpose
+of understanding the code, the styles that are most important are those that affect the layout. We can verify that a particular
+margin or padding is correct by relating it to the margins and paddings of neighouring components. I will use the term
+"ad-hoc styles" for these context-dependent and "intrinsic styles" for the context-independent ones. To reduce code clutter,
+intrinsic styles can be moved to an .scss file.
 
 There is no formal rule for deciding which styles are intrinsic. From a design perspective, most styles - including
 colors and font-weights - are context dependent. However, when I'm verifying the code I'm usually interested in the layout, and therefore
-I will move colors and font-weights to the .scss file. Although there is no formal rule that says that margins are ad-hoc and colors
-are intrinsic, I trust that the reader will intuitively understand why certain styles are in the .scss file and others are not.
-In less obvious situations, such as when a margin appears in the SCSS file, it's helpful to include a comment.
+I will move colors and font-weights to the .scss file. In general, I trust that the reader will intuitively understand why
+certain styles are in the .scss file and others are not. In less obvious situations, such as when a margin appears in the SCSS file,
+it's helpful to include a comment.
 
 Let's look at an example of splitting instrinsic and ad-hoc styles:
 
 - the email-field code snippet from the previous chapter has been copied to the body of a SignInForm component;
-- the intrinsic styles have been moved to rules in a SCSS file: `SignInForm__EmailFieldLabel` and `SignInForm__EmailFieldInput`;
+- the intrinsic styles are captured in a SCSS file as `SignInForm__EmailFieldLabel` and `SignInForm__EmailFieldInput`;
 
 export const code1 = `
 import { classnames as cn } from 'classnames';
@@ -63,6 +59,8 @@ export const SignInForm = (props: PropsT) => {
 `;
 
 export const code2 = `
+.SignInForm\_\_EmailField {}
+
 .SignInForm\_\_EmailFieldLabel {
   @apply block text-sm font-medium leading-6 text-gray-900;
 }
@@ -79,15 +77,12 @@ export const code2 = `
   <CodeSnippet lang="sass" code={code2} />
 </TabView>
 
-Note that in the snippet shown above, every className attribute has two parts: the class-name of the sub-component (which is used
-to attach the intrinsic styles defined in the .scss files) and the list of ad-hoc styles.
-
 # Style objects
 
 The ad-hoc styles typically involve the component's layout and geometry, such as flex-box properties, margins, heights, widths, and
 paddings. Because they are inlined, ad-hoc properties can easily be adjusted to fit a specific context. Still, it's good for consistency to
-limit the variation in these properties. For instance, if an email field has a vertical padding of 1.5, it's likely that the password field
-in the same form should also have this padding. To address this, I often extract the ad-hoc properties and place them in a style object:
+limit the variation in these properties. For instance, if an email field has a vertical padding of 1.5, then it's likely that the password field
+ has the same padding. To address this, I extract the ad-hoc properties and place them in a style object:
 
 export const code3 = `
 import { classnames as cn } from 'classnames';
@@ -125,27 +120,27 @@ export const FormFieldS = {
 };
 `;
 
-<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+<TabView titles={['SignInForm.tsx', 'FormField.tsx']}>
   <CodeSnippet code={code3} />
   <CodeSnippet code={code4} />
 </TabView>
 
 I think of a style object as a loosely defined custom component that I can mix into my concrete components.
-For example, when we add the `SignInForm__EmailFieldLabel` to our code, we can declare that it is an instance of a `FormField.Label`
+For example, when we add the `SignInForm__EmailFieldLabel` to our code, we can declare that it's a `FormField.Label`
 by mixing in this part of the style object. As indicated by the comments, it's not mandatory to use all the keys in the layout object.
 For example, the `Label` key is only utilized if the form-field includes a label.
 
-The goal of style objects can also be achieved by mixing in CSS classes, but in my opinion that doesn't work quite as well:
+We can achieve the same result by mixing in CSS classes, but in my opinion that doesn't work quite as well:
 
 - since a CSS mixin class can be used in any CSS selector, it opens the door to more complex code;
 - we can easily jump to the style object in our IDE, but not so easily to a CSS mixin;
-- it's easy to create hierarchies within a style object (as we shall see below), but not in SCSS.
+- we can create hierarchies within a style object (as we shall see below), but not in SCSS.
 
 # Adding choices to a style object
 
 The logical next step is to have style objects that offer a choice of paddings, colours, title styles,
 subtitle styles, etc from which we can choose when we create a concrete component. This is reminiscent of the design systems that we may
-use in tools such as Figma. This is demonstrated below:
+use in tools such as Figma. Here's an example:
 
 export const code5 = `
 import { classnames as cn } from 'classnames';
@@ -163,7 +158,7 @@ export const SignInForm = () => {
           className={cn(
             FormFieldS.Label.root(),
             FormFieldS.Label.color.blue(),
-            "SignInForm__Label"
+            "SignInForm__EmailFieldLabel"
           )}
         >
           Email address
@@ -173,7 +168,7 @@ export const SignInForm = () => {
             id="email" name="email" type="email"
             className={cn(
               FormFieldS.Input(),
-              "SignInForm__Input"
+              "SignInForm__EmailFieldInput"
             )}
           />
         </div>
@@ -205,15 +200,17 @@ export const FormFieldS = {
 };
 `;
 
-<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+<TabView titles={['SignInForm.tsx', 'FormField.tsx']}>
   <CodeSnippet code={code5} />
   <CodeSnippet code={code6} />
 </TabView>
 
 # Adding intrinsic styles to a style object
 
-If we always combine a style object with the same intrinsic styles then it can make sense
-to include those intrinsic styles in the style object:
+If we always combine a style object with the same intrinsic styles then it makes sense
+to include them in the style object. In the updated code below, the `SignInForm__EmailFieldLabel` and
+`SignInForm__EmailFieldInput` classes are replaced by `FormField__Label` and
+`FormField__Input`.
 
 export const code7 = `
 import { classnames as cn } from 'classnames';
@@ -245,14 +242,12 @@ import "./FormField.scss";
 
 export const FormFieldS = {
   root: () => 'FormField',
-  // Use one of the gap styles to create space below the form-field
   gap: {
     big: () => 'mb-6',
     small: () => 'mb-2',
   },
   Label: {
     root: () => cn('FormField__Label', 'mb-2'),
-    // Pick one color for the label
     color: {
       blue: () => 'text-blue-500',
       green: () => 'text-green-400',
@@ -265,19 +260,23 @@ export const FormFieldS = {
 export const code9 = `
 .FormField {
   .FormField\_\_Label {
-  @apply block text-sm font-medium leading-6 text-gray-900;
+    @apply block text-sm font-medium leading-6 text-gray-900;
   }
 
   .FormField\_\_Input {
-  @apply block rounded-md border-0 shadow-sm;
-  @apply text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6;
-  @apply ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600;
+    @apply block rounded-md border-0 shadow-sm;
+    @apply text-gray-900 placeholder:text-gray-400 sm:text-sm sm:leading-6;
+    @apply ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600;
   }
 }
 `;
 
-<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+<TabView titles={['SignInForm.tsx', 'FormField.tsx', 'FormField.scss']}>
   <CodeSnippet code={code7} />
   <CodeSnippet code={code8} />
-  <CodeSnippet code={code9} />
+  <CodeSnippet lang="sass" code={code9} />
 </TabView>
+
+# What's next
+
+In the next chapter we'll see how style objects can be used in custom components.
