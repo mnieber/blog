@@ -243,6 +243,22 @@ In addition, we want to ensure that it's easy to find the intrinsic style rule f
 in the DOM. Here is an example that illustrates how this can be achieved:
 
 export const code7 = `
+// We'll import all themed variations on DialogButton in
+// the DialogButton.tsx file itself
+
+import "./DialogButton.AuthCard.scss";
+import "./DialogButton.UserProfileCard.scss";
+
+export const DialogButton = (props: PropsT) => {
+  // This code is still the same
+};
+`;
+
+export const code8 = `
+// Note that we've put .AuthCard .DialogButton on one line.
+// This will make it easier to find this code when we copy
+// a selector in the browser's debugger.
+
 .AuthCard .DialogButton {
 
   .DialogButton--disabled {
@@ -255,7 +271,11 @@ export const code7 = `
 }
 `;
 
-export const code8 = `
+export const code9 = `
+// Note that we've put .UserProfileCard .DialogButton on one line.
+// This will make it easier to find this code when we copy
+// a selector in the browser's debugger.
+
 .UserProfileCard .DialogButton {
   @apply font-bold;
   
@@ -269,11 +289,8 @@ export const code8 = `
 }
 `;
 
-<TabView titles={['SignInForm.tsx', 'layout.ts']}>
+<TabView titles={['DialogButton.tsx', 'DialogButton.AuthCard.scss', 'DialogButton.UserProfileCard.scss']}>
   <CodeSnippet code={code7} />
-  <CodeSnippet code={code8} />
+  <CodeSnippet lang="sass" code={code8} />
+  <CodeSnippet lang="sass" code={code9} />
 </TabView>
-
-Note that in `AuthCard/FormField.scss` and `UserProfileCard/FormField.scss`, we purposely did not use nested SCSS rules.
-Instead, we've put `.AuthCard .FormField__Label` on the same line. This will allow us to copy a selector from the browser's
-debugger and use that to find the related style code.
