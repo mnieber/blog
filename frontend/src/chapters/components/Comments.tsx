@@ -26,12 +26,3 @@ export const Comments = (props: PropsT) => {
     </div>
   );
 };
-
-<script
-  src="https://giscus.app/client.js"
-  mapping="specific"
-  term="foobar"
-  strict="1"
-  crossorigin="anonymous"
-  async
-></script>;
