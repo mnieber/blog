@@ -22,9 +22,10 @@ export class Selection<T = any> {
     const cbs = getCallbacks(this) as SelectionCbs['select'];
     cbs.selectItem();
   }
+};
 
-  type Cbs<T> = {
-    select: {
+type Cbs<T> = {
+  select: {
     selectItem(): void;
   };
 };
@@ -99,8 +100,9 @@ registerCtr({
   ctr: clipsCtr,
   options: { name: 'Clips' },
   initCtr: () => {
-  initClips(this, props);
-  mapClipsData(props);
+    initClips(this, props);
+    mapClipsData(props);
+  }
 });
 `;
 
