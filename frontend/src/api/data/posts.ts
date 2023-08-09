@@ -151,7 +151,7 @@ export const posts = [
       },
       {
         slug: 'chapter-2',
-        title: 'Routes management',
+        title: 'Route management',
       },
       {
         slug: 'chapter-3',

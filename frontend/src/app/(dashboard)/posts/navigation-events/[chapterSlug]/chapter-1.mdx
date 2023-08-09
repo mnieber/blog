@@ -1,7 +1,6 @@
 # Goals
 
-To explain how events that lead to a url change can be generated in a React component
-but handled outside of it.
+In this post I will explain how url-changes can be requested in React components but handled outside of it.
 
 # Rationale
 
@@ -10,27 +9,28 @@ I like to reflect the application state in the url, for two reasons:
 - it tells the user where they are in the application;
 - it allows the user to save the url and come back to the same page later.
 
-Reflecting the application state in the url implies that our application must do some kind of
-url management. In particular, our application needs to handle the following concerns:
+To achieve this our application must do some kind of url management:
 
-- we need a mechanism for changing the url in response to user actions.
-- we must update the application state in response to changes in the url, and vice versa;
+- we must update the url in response to user actions. For example, when the user clicks on a folder in
+  a map-view then we need to navigate to that folder;
+- we must update the url when the application state changes, and vice versa. For example, when
+  the user renames a folder, then we need to update the url accordingly.
 
-I will illustrate how these challenges can be tackled using two techniques: the navigation handler
-and the router effect.
+I tackle these challenges using two techniques: the navigation handler and the router effect.
 
-A navigation handler is used to decouple views from url changes. A view no longer changes the url
-directly but instead makes a request to the navigation handler. For example, imagine that our
-application has a "archived blog-posts" view and a "current blog-posts" view. Both views can use the
-same `BlogPostListView` component that makes `navigateToBlogPost` requests, and these requests can
-produce different url-changes in each context.
+A **navigation handler** is used to decouple components from url changes. In the given example, a `MapTreeView`
+can detect the mouse-click on a folder, but it cannot decide the url-change that must happen (because the
+same `MapTreeView` could be used on different pages). Instead, it will send a `navToFolder` request to the
+navigation handler, that takes care of the url update in a context-dependent way.
 
-A router effect is a render component that is inserted into the routing
-schema. Since the router effect is aware of the current view, it can respond to the application state
-changes that are generated this view and update the url accordingly.
+A **router effect** is a render component that is inserted into the routing schema. Since a router effect is only
+rendered if it matches the current url, it knows which page the user is on. Therefore, it can synchronize the
+application state with the url in a context-dependent way.
+
+In both cases, "context-dependent" is the key term, and we will come back to it.
 
 # Overview
 
 In the next section I will first explain how I do (ordinary) routing in my application. This is a preparation
-for the subsequent section in which I explain how url management is tackled. In the final section I will
-discuss the pros and cons of this approach.
+for the subsequent section in which I explain how url management is tackled using a navigation handler and
+router effects. In the final section I will discuss the pros and cons of this approach.
