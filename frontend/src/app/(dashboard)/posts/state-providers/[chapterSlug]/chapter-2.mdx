@@ -1,0 +1,140 @@
+# The ResourceState class
+
+A resource state is a value that indicates whether the resource is loading or updating. Since tracking resource
+states is not trival, it's a good idea to only track the resources that require it. We'll return to this idea
+in the next chapter.
+
+## Internal and external resource states
+
+We can store a resource state externally (in some lookup table) or internally in the resource itself. I prefer to
+store it internally for several reasons:
+
+- it reduces the amount of bookkeeping: if the resource is deleted then there is no need to remove its resource state
+  from the external storage;
+- it removes the need for a unique id that we can use to store the resource state for a resource;
+- I find it less elegant to make React components dependent on a global storage of resource states.
+
+To add a resource state, I'm using a `initRS(resource)` function. This function is implemented as follows:
+
+export const code1 = `
+export const symbolRS = Symbol('ResourceState');
+
+export const initRS = (resource: any) => {
+  if (resource && !resource[symbolRS]) {
+    resource[symbolRS] = new ResourceState();
+  }
+  return resource;
+};
+`;
+
+<CodeSnippet
+  title="resourceStates/ResourceState.ts"
+  code={code1}
+/>
+
+# Adding sources to a ResourceState
+
+Instead of storing a value such `loading` or `updating` in the `ResourceState` class, I'm storing a list of sources
+from which the final state (`loading` or `updating`) is derived. This approach makes it possible to construct
+a pipeline of resource states. For example, the state of a `todo-item` resource can be derived from the state of
+a `todo-list` resource, that can be derived from a `user-profile` resource. By using such a pipeline it's easier
+to ensure that the final resource state is correct, and not based on stale data.
+
+Here is the source code for the `ResourceState` class:
+
+export const code2 = `
+export type ConditionT = () => boolean | undefined;
+
+export type SourceT = {
+  state: string;
+  condition: ConditionT;
+  name: string;
+};
+
+export class ResourceState {
+  name?: string = undefined;
+  sources: SourceT[] = [];
+
+  addSource(source: SourceT) {
+    // Implementation simplified for brevity
+    this.sources.push(source);
+  }
+
+  removeSource(state: string, name: string) {
+    // Implementation omitted for brevity
+  }
+
+  get value() {
+    const result: string[] = [];
+    for (const source of this.sources) {
+      if (source.condition()) {
+        const state = source.state;
+        if (!result.includes(state)) result.push(state);
+      }
+    }
+    return result;
+  }
+
+  constructor() {
+    makeObservable(this, {
+      addSource: action,
+      removeSource: action,
+      sources: observable,
+      value: computed,
+    });
+  }
+}
+`;
+
+<CodeSnippet
+  title="resourceStates/ResourceState.ts"
+  code={code1}
+/>
+
+As we can see, the value of a `ResourceState` is an array that contains all resource states of all sources for which
+`source.condition()` returns true.
+
+# The null resource state
+
+While a resource is loading, we don't have it. Therefore, we cannot access the resource state via the resource instance.
+Instead, I use `null` to represent a loading resource. When a React component receives a resource, it can be either
+`null` (which means that the resource is loading), or some object (that has a resource state), or `undefined` (which
+means that the resource is unavailable, but not loading).
+
+Here is the code for getting the resource state of a resource:
+
+export const code3 = `
+import { symbolRS } from '/src/resourceStates/ResourceState';
+
+export const loadingResource = null;
+
+export const getState = <StateT = string>(
+  resource: any
+): StateT[] => {
+  if (resource === undefined)  return [];
+  return resource === loadingResource
+    ? ['loading']
+    : resource[symbolRS].value;
+};
+
+export const isUpdating = (resource: any) =>
+  getState(resource).includes('updating');
+
+export const isLoading = (resource: any) =>
+  getState(resource).includes('loading');
+
+export const isReady = (resource: any) => {
+  const state = getState(resource);
+  return resource
+    && !state.includes('loading')
+    && !state.includes('updating');
+};
+
+export const isUndefined = (resource: any) =>
+  resource === undefined || getState(resource).length === 0;
+`;
+
+# What's next
+
+In the next chapter we'll look at how state-providers fetch data and expose
+it to React components, including the resource states.

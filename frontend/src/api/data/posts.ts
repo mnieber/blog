@@ -1,5 +1,29 @@
 export const posts = [
   {
+    slug: 'state-providers',
+    title: 'Separating state from presentation using state providers',
+    shortTitle: 'State providers',
+    date: 'August 2023, by Maarten Nieber',
+    chapters: [
+      {
+        slug: 'chapter-1',
+        title: 'Introduction',
+      },
+      {
+        slug: 'chapter-2',
+        title: 'Managing resource states',
+      },
+      {
+        slug: 'chapter-3',
+        title: 'State providers',
+      },
+      {
+        slug: 'chapter-4',
+        title: 'Conclusion',
+      },
+    ],
+  },
+  {
     slug: 'styling-system-inline-styles-scss',
     title: 'A styling system based on inline styles and SCSS',
     shortTitle: 'Inline styles and SCSS',

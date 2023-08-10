@@ -1,0 +1,27 @@
+# Goals
+
+In this article I will explain how we can get state from the server, store it locally and provide it
+to the React components that render the information.
+
+# Caveats
+
+The approach presented in this article is experimental. It has worked well for me in practice, but
+I expect that for many people it's too elaborate to consider using it. That said, I hope you find
+this article interesting for the ideas that it puts forward.
+
+# Rationale and overview
+
+In the post about [skandha](/posts/skandha/chapter-1) I've explained how we can store data in containers
+that add behaviours such as selection and filtering. A complete solution for managing server
+state and local state requires more than this:
+
+- We must decide how the fetching of server data is triggered. E.g. do we fetch data when the React
+  component that needs the data is mounted?
+- How can we determine the loading state of a resource that is used in some React component? We
+  may show a special loading state (e.g. a spinner) if the resource is currently loading or
+  updating;
+- How can we share state among different React components?
+
+This article describes how I solve these issues. I will start by explaining how resource states are tracked.
+Then, I will explain how state providers are responsible for fetching the data and exposing it to the
+React components.
