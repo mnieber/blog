@@ -1,3 +1,146 @@
+# The useQuery function and ObservableQuery
+
+I'm using `useQuery` function from `@tanstack/query` to fetch data from the server. This function
+has the benefit of caching the state, so that we can call `useQuery` on any render without
+overfetching. When the fetched data becomes available then the React component that called
+`useQuery` will be re-rendered.
+
+However, in my application, it's not only React components that need to respond to changes in the
+query status. For example, when the query status changes, it should also impact the resource state
+of the resource that is being loaded (see the call to `updateSources` in the previous chapter).
+My application uses MobX for this type of reactive behaviour. Therefore, I wrap the result of
+`useQuery` in an `ObservableQuery` object that is an observable wrapper around the query state.
+
+export const code1 = `
+export type QueryDataT = ObjT | undefined;
+
+// This class is used as a MobX-observable replacement for a TanstackQuery.
+
+export class ObservableQuery {
+  data: QueryDataT = undefined;
+  status: string = 'idle';
+
+  clear = () => {
+    this.data = undefined;
+    this.status = 'idle';
+  };
+
+  constructor() {
+    this.id = createUUID();
+    makeObservable(this, {
+      status: observable,
+      data: observable,
+      clear: action,
+    });
+  }
+}
+
+export const isQueryLoading = (query: ObservableQuery) => {
+  return query.status === 'loading' && !query.data;
+};
+
+export const isQueryUpdating = (query: ObservableQuery) => {
+  return query.status === 'loading' && !!query.data;
+};
+`;
+
+export const code2 = `
+export interface TanstackQuery {
+  data: QueryDataT;
+  status: string;
+  isFetching: boolean;
+}
+
+export type OptionsT = {
+  fetchAsLoad?: boolean;
+};
+
+export const useObservableQuery = (
+  query: TanstackQuery,
+  options?: OptionsT
+) => {
+  const fetchAsLoad = options?.fetchAsLoad;
+
+  const observableQuery = useBuilder(() => {
+    const observableQuery = new ObservableQuery();
+    updateObservableQuery(observableQuery, query, fetchAsLoad);
+    return observableQuery;
+  });
+
+  React.useEffect(() => {
+    runInAction(() => {
+      updateObservableQuery(observableQuery, query, fetchAsLoad);
+    });
+  }, [query]);
+
+  return observableQuery;
+};
+
+function updateObservableQuery(
+  observableQuery: ObservableQuery,
+  tanstackQuery: TanstackQuery,
+  fetchAsLoad: boolean | undefined
+) {
+  observableQuery.data = tanstackQuery.data;
+  observableQuery.status =
+    fetchAsLoad && tanstackQuery.isFetching ? 'loading' : tanstackQuery.status;
+}
+`;
+
+export const code3 = `
+import { useQuery } from '@tanstack/react-query';
+
+export const useGetTodolists = () => {
+  return useQuery({
+    queryKey: ['getTodolists'],
+    queryFn: () => getTodolists(),
+  });
+};
+`;
+
+<TabView titles={['ObservableQuery.ts', 'hooks/useObservableQuery.ts', 'useGetTodolists.ts']}>
+  <CodeSnippet code={code1} />
+  <CodeSnippet code={code2} />
+  <CodeSnippet code={code3} />
+</TabView>
+
+# The useMutation function
+
+We could use the same approach to wrap the result of `useMutation` in an `ObservableMutation` object.
+However, in my opinion, the `useMutation` function from `@tanstack/query` is not very useful. Therefore,
+I prefer to write my own `useMutation` function:
+
+export const code4 = `
+export class ObservableMutation {
+  status = 'idle';
+  mutationFn: (args: any) => Promise<any> | void;
+  onMutate?: (args: any) => Promise<any> | void;
+  onSuccess?: (response: ObjT, args: any) => Promise<any> | void;
+  onError?: (args: any) => void;
+
+  setStatus = (status: MutationStatusT) => {
+    this.status = status;
+  };
+
+  mutateAsync = (args: any) => {
+    // Omitted for brevity
+  };
+
+  constructor(args: ArgsT) {
+    this.mutationFn = args.mutationFn;
+    this.onSuccess = args.onSuccess;
+    this.onError = args.onError;
+
+    makeObservable(this, {
+      status: observable,
+      setStatus: action,
+    });
+  }
+}
+`;
+
+This code is actually not that interesting. It's just the MobX equivalent of `useMutation` from `tanstack`.
+
 # What's next
 
 In the next chapter we'll look at how state-providers fetch data, add resource states and expose the
