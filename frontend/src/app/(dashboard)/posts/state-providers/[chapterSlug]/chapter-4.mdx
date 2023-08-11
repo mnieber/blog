@@ -1,1 +1,200 @@
-# Conclusion
+import { Example } from '/src/snippets/components/Example';
+
+# Outlook
+
+In this chapter, we'll continue the example that was used in the previous chapters,
+where the user has a list of todolists (loaded with the `useGetTodolists`). The individual
+todos of the highlighted todolist will be loaded with the `useGetTodos` query. We'll see how
+so-called state providers can be used to load the data and provide it to the React components.
+
+# State providers
+
+In general, React components that are on the same page in the application tend to need the same data.
+Therefore, I've adopted the approach of loading all data for all components on a page in a special component
+called a `StateProvider`. This component provides the data to all of its children via React's `context` API.
+Note that although a `StateProvider` is a React component, it is not responsible for rendering.
+
+I prefer this to letting components fetch their own data, for different reasons:
+
+- It keeps the components simple and focused on rendering;
+- It prevents synchronization problems with components fetching data at different times;
+- It makes it easy to share (more complex) state between components.
+
+# Adding state providers to the component tree
+
+Before we discuss the `StateProvider` component in detail, let's look at how it is used
+in the rendering tree. The example code below shows a `TodolistsStateProvider` component that
+fetches the todolists and provides them to `TodolistsView` and `TodosStateProvider`
+(and to all other wrapped components). The `TodosStateProvider` loads the todo's of the currently
+highlighted list, and provides them to the `TodosView` component.
+
+export const code1 = `
+export const UrlRouter = observer((props: PropsT) => {
+  return (
+    <Switch>
+      <TodoListsStateProvider>
+        <Route path="/todolists">
+          <TodolistsView />
+
+          <Route path="/todolists/:todolistSlug">
+            <TodosView />
+          </Route>
+        </Route>
+      </TodoListsStateProvider>
+    </Switch>
+  );
+});
+`;
+
+<CodeSnippet
+  title="routes/components/UrlRouter.tsx"
+  code={code1}
+/>
+
+# The `TodolistsStateProvider`
+
+A state provider does three things:
+
+- It instantiates a state object;
+- It caches certain resources in the state and adds resource states to them;
+- It provides the state as a set of default properties (to its wrapped components)
+
+Here we see the example of a `TodolistsStateProvider`:
+
+export const code2 = `
+export type PropsT = React.PropsWithChildren<{}>;
+
+const DefaultProps = {};
+
+export const TodolistsStateProvider = observer(
+  withDefaultProps((props: PropsT & typeof DefaultProps) => {
+    const { todolistsState, getTodolists } = useTodolistsState({});
+
+    const cache = useBuilder(() =>
+      makeAutoObservable({
+        get todolists() {
+          return updateSources(
+            { resource: todolistsState.todolistsCtr.data.items },
+            ['loading', () => isQueryLoading(getTodolists), 'getTodolists'],
+          );
+        },
+        get todolist() {
+          return updateSources(
+            { resource: todolistsState.todolistsCtr.highlight.item },
+            ['loading', () => isQueryLoading(getTodolists), 'getTodolists'],
+          );
+        },
+      })
+    );
+
+    const getDefaultPropsContext = () => {
+      const result: any = {
+        defaultProps: {
+          todolistsState: () => todolistsState,
+          todolists: () => cache.todolists,
+          todolist: () => cache.todolist,
+          todolistsDeletion: () => todolistsState.todolistsCtr.deletion,
+          todolistsHighlight: () => todolistsState.todolistsCtr.highlight,
+          todolistsSelection: () => todolistsState.todolistsCtr.selection,
+        },
+      };
+      return result;
+    };
+
+    return (
+      <DefaultPropsProvider extend value={getDefaultPropsContext()}>
+        {props.children}
+      </DefaultPropsProvider>
+    );
+  }, DefaultProps)
+);
+`;
+
+export const code3 = `
+export type PropsT = {};
+
+export const useTodolistsState = (props: PropsT) => {
+  const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
+
+  // Mutations. Note that useDeleteTodolists returns a
+  // ObservableMutation instance.
+  const deleteTodolists = useDeleteTodolists();
+
+  // Queries
+  const getTodolists = useObservableQuery(
+    useGetTodolists(),
+    { fetchAsLoad: true }
+  );
+
+  const todolistsState = useBuilder(() => {
+    return new TodolistsState({
+      //
+      getTodolists: () => {
+        return graftResourceStatesFromMemo({
+          resources: getTodolists.data?.todolists ?? [],
+        });
+      },
+      deleteTodolists: (ids: string[]) => {
+        const todolists = lookUp(
+          ids, todolistsState.todolistsCtr.data.itemById
+        );
+        return trackPromise({
+          name: 'deleteTodolists',
+          states: { updating: todolists },
+          promise: deleteTodolists.mutateAsync(ids),
+        }).result;
+      },
+    });
+  }) as TodolistsState;
+  React.useEffect(() => () => todolistsState.destroy(), [todolistsState]);
+
+  return { todolistsState, deleteTodolists };
+};
+`;
+
+export const code4 = `
+export type PropsT = {
+  getTodolists: () => TodolistT[];
+  deleteTodolists: (ids: string[]) => Promise<any>;
+};
+
+export class TodolistsState {
+  props: PropsT;
+
+  todolistsCtr = {
+    deletion: new DeletionWithFlag(),
+    highlight: new Highlight<TodolistT>(),
+    selection: new Selection<TodolistT>(),
+  };
+
+  getSummary() {
+    return {
+      todolistsCtr: Skandha.getCtrState(this.todolistsCtr),
+    };
+  }
+
+  destroy() {
+    Skandha.cleanUpCtr(this);
+  }
+
+  constructor(props: PropsT) {
+    this.props = props;
+    registerTodolistsCtr(this);
+  }
+}
+`;
+
+<TabView titles={['todolists/components/TodolistsStateProvider.tsx', 'todolists/hooks/useTodolistsState.tsx', 'todolists/TodolistState.ts']}>
+  <CodeSnippet code={code2} />
+  <CodeSnippet code={code3} />
+  <CodeSnippet code={code4} />
+</TabView>
+
+In this example, several parts that are discussed on my blog come together:
+
+- The `updateSources` function is used to return a resource that has a resource state;
+- An `ObservableQuery` is used to track the loading state of the `getTodolists` query;
+- The `trackPromise` function is used to track the state of the `deleteTodolists` mutation, and to reflect
+  this in the resource state of the todolists that are being deleted;
+- The `TodolistsState` is provided to the React components using a [DefaultPropsProvider](/posts/default-props/chapter-1);
+- Different parts of the `TodolistsState`, such as `Selection`, `Highlight` and `Deletion` are captured in [facets](/posts/skandha/chapter-1).

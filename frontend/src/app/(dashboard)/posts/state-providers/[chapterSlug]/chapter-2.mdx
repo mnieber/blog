@@ -11,10 +11,11 @@ store it internally for several reasons:
 
 - it reduces the amount of bookkeeping: if the resource is deleted then there is no need to remove its resource state
   from the external storage;
-- it removes the need for a unique id that we can use to store the resource state for a resource;
+- it removes the need for a globally unique id that we can use to store the resource state for a resource;
 - I find it less elegant to make React components dependent on a global storage of resource states.
 
-To add a resource state, I'm using a `initRS(resource)` function. This function is implemented as follows:
+To add a resource state, I'm using a `initRS(resource)` function. This function adds the internal resource state if
+the resource doesn't have one:
 
 export const code1 = `
 export const symbolRS = Symbol('ResourceState');
@@ -36,8 +37,8 @@ export const initRS = (resource: any) => {
 
 Instead of storing a value such `loading` or `updating` in the `ResourceState` class, I'm storing a list of sources
 from which the final state (`loading` or `updating`) is derived. This approach makes it possible to construct
-a pipeline of resource states. For example, the state of a `todo-item` resource can be derived from the state of
-a `todo-list` resource, that can be derived from a `user-profile` resource. By using such a pipeline it's easier
+a pipeline of resource states. For example, the state of a `todo` resource can be derived from the state of
+a `todolist` resource, that can be derived from a `todolists` resource. By using such a pipeline it's easier
 to ensure that the final resource state is correct, and not based on stale data.
 
 Here is the source code for the `ResourceState` class:
@@ -94,16 +95,38 @@ export class ResourceState {
 As we can see, the value of a `ResourceState` is an array that contains all resource states of all sources for which
 `source.condition()` returns true.
 
+## The updateSources function
+
+The `updateSources` function is a helper function that is used as follows:
+
+export const code3 = `
+const resources = updateSources(
+  { resource: myTodolist },
+  ['loading', () => isQueryLoading(getTodolists), 'getTodolists'],
+)
+`;
+
+<CodeSnippet
+  title="example.ts"
+  code={code3}
+/>
+
+This function does the following:
+
+- it calls `initRS` on the resource (in this case: `myTodolist`) to create a resource state;
+- it adds sources to the resource state. In this case, it "states" that the resource is loading if the `getTodolists`
+  query is loading.
+
 # The null resource state
 
 While a resource is loading, we don't have it. Therefore, we cannot access the resource state via the resource instance.
 Instead, I use `null` to represent a loading resource. When a React component receives a resource, it can be either
 `null` (which means that the resource is loading), or some object (that has a resource state), or `undefined` (which
-means that the resource is unavailable, but not loading).
+means that the resource is unavailable, but not in a `loading` state).
 
 Here is the code for getting the resource state of a resource:
 
-export const code3 = `
+export const code4 = `
 import { symbolRS } from '/src/resourceStates/ResourceState';
 
 export const loadingResource = null;
@@ -128,7 +151,7 @@ export const isReady = (resource: any) => {
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
-  code={code3}
+  code={code4}
 />
 
 # The trackPromise function
@@ -139,7 +162,7 @@ be `updating`. The `trackPromise` function helps to manage this. While the promi
 a source to the resource state of the affected resources. This source effectively puts these todolists in the
 `updating` state. When the promise is resolved, the source is removed.
 
-export const code4 = `
+export const code5 = `
   const todolistsToBeDeleted = [todolist1, todolist2];
 
   const promise = trackPromise({
@@ -153,6 +176,11 @@ export const code4 = `
   }).result;
 `;
 
+<CodeSnippet
+  title="resourceStates/ResourceState.ts"
+  code={code5}
+/>
+
 # The graftResourceStatesFromMemo function
 
 When you store resource states inside the resource objects themselves, there is a potential
@@ -162,7 +190,7 @@ you are locally updating a resource, for example: when the resource is being del
 To avoid this, we should move the resource state from the old resource to the new resource.
 This is what the `graftResourceStatesFromMemo` function does. It's used as follows:
 
-export const code4 = `
+export const code6 = `
   // We're using React.useState to locally store the todolists. This is not what
   // I would use in a real application, but for illustration purposes it's good enough.
   const [todolists, setTodolists] = React.useState<TodolistT[]>([]);
@@ -178,6 +206,11 @@ export const code4 = `
   })
 `;
 
+<CodeSnippet
+  title="resourceStates/ResourceState.ts"
+  code={code6}
+/>
+
 When you pass an array of resources to the `graftResourceStatesFromMemo` function then it stores a memo
 of the resource states. The next time you call `graftResourceStatesFromMemo` it will copy the
 resource states from the memo to the new resources. This way, the resource states are preserved
@@ -185,5 +218,5 @@ when the resources are replaced.
 
 # What's next
 
-In the next chapter we'll look at how state-providers fetch data and expose
-it to React components, including the resource states.
+In the next chapter we'll look at how we can observe the state of queries and mutations. This is necessary
+since resource states usually depend on which queries and mutations are currently running.
