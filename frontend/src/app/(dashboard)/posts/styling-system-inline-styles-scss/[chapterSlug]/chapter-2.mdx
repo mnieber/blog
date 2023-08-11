@@ -28,7 +28,11 @@ export const code1 = `
 </div>
 `;
 
-<CodeSnippet lang="html" addMb={true} code={code1} />
+<CodeSnippet
+  lang="html"
+  addMb
+  code={code1}
+/>
 
 There are many advantages to this approach:
 
@@ -80,7 +84,11 @@ export const code2 = `
 </div>
 `;
 
-<CodeSnippet addMb lang="jsx" code={code2} />
+<CodeSnippet
+  lang="jsx"
+  addMb
+  code={code2}
+/>
 
 Interestingly, there is no separate drop-down component in this code snippet. Instead, you turn the button into a drop-down by
 mixing in the `uk-dropdown` attribute. This is somewhat analogous to using inline styles, so I will call it an "inline components" approach.

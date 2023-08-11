@@ -9,9 +9,9 @@ in the next chapter.
 We can store a resource state externally (in some lookup table) or internally in the resource itself. I prefer to
 store it internally for several reasons:
 
-- it reduces the amount of bookkeeping: if the resource is deleted then there is no need to remove its resource state
+- It reduces the amount of bookkeeping: if the resource is deleted then there is no need to remove its resource state
   from the external storage;
-- it removes the need for a globally unique id that we can use to store the resource state for a resource;
+- It removes the need for a globally unique id that we can use to store the resource state for a resource;
 - I find it less elegant to make React components dependent on a global storage of resource states.
 
 To add a resource state, I'm using a `initRS(resource)` function. This function adds the internal resource state if
@@ -30,13 +30,14 @@ export const initRS = (resource: any) => {
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
+  addMb
   code={code1}
 />
 
 # Adding sources to a ResourceState
 
 Instead of storing a value such `loading` or `updating` in the `ResourceState` class, I'm storing a list of sources
-from which the final state (`loading` or `updating`) is derived. This approach makes it possible to construct
+from which the final state is derived. This approach makes it possible to construct
 a pipeline of resource states. For example, the state of a `todo` resource can be derived from the state of
 a `todolist` resource, that can be derived from a `todolists` resource. By using such a pipeline it's easier
 to ensure that the final resource state is correct, and not based on stale data.
@@ -56,14 +57,8 @@ export class ResourceState {
   name?: string = undefined;
   sources: SourceT[] = [];
 
-  addSource(source: SourceT) {
-    // Implementation simplified for brevity
-    this.sources.push(source);
-  }
-
-  removeSource(state: string, name: string) {
-    // Implementation omitted for brevity
-  }
+  addSource(source: SourceT) { // Implementation omitted for brevity }
+  removeSource(state: string, name: string) { // Implementation omitted for brevity }
 
   get value() {
     const result: string[] = [];
@@ -89,6 +84,7 @@ export class ResourceState {
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
+  addMb
   code={code2}
 />
 
@@ -108,6 +104,7 @@ const resources = updateSources(
 
 <CodeSnippet
   title="example.ts"
+  addMb
   code={code3}
 />
 
@@ -151,6 +148,7 @@ export const isReady = (resource: any) => {
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
+  addMb
   code={code4}
 />
 
@@ -178,6 +176,7 @@ export const code5 = `
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
+  addMb
   code={code5}
 />
 
@@ -208,6 +207,7 @@ export const code6 = `
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
+  addMb
   code={code6}
 />
 

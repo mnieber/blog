@@ -21,7 +21,11 @@ const MyComponent = withDefaultProps(
 );
 `;
 
-<CodeSnippet title="" code={code1} addMb />
+<CodeSnippet
+  title=""
+  addMb
+  code={code1}
+/>
 
 The `withDefaultProps` function is a higher order function that adds the support for default properties.
 It creates a new properties object with a special lookup function that is passed into the wrapped component.
@@ -62,7 +66,11 @@ const MyFrame = observer(() => {
   );
 });`
 
-<CodeSnippet title="" code={code2} addMb />
+<CodeSnippet
+  title=""
+  addMb
+  code={code2}
+/>
 
 The `DefaultPropsProvider` provides the dictionary of default property values to the `withDefaultProps` function.
 For example, if we don't set the `color` property on `MyComponent` then the value from the enclosing `<DefaultPropsProvider>` is
@@ -124,4 +132,7 @@ const MyFrame = observer(() => {
   );
 });`;
 
-<CodeSnippet title="example/MyFrame.tsx" code={code3} />
+<CodeSnippet
+  title="example/MyFrame.tsx"
+  code={code3}
+/>

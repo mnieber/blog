@@ -33,7 +33,11 @@ type Cbs<T> = {
 export type SelectionCbs<T = any> = DefineCbs<Selection<T>, Cbs<T>>;
 `;
 
-<CodeSnippet title="facets/Selection.ts" code={code1} />
+<CodeSnippet
+  title="facets/Selection.ts"
+  addMb
+  code={code1}
+/>
 
 This `Selection` facet is part of the `skandha-facets` library that you can install from npm. However, you can also
 write your own facet classes.
@@ -80,7 +84,11 @@ export const initClips = (clipsCtr: any) => {
 };
 `;
 
-<CodeSnippet title="clips/initClips.ts" code={code2} />
+<CodeSnippet
+  title="clips/initClips.ts"
+  addMb
+  code={code2}
+/>
 
 As was mentioned above, the `cbs` object contains a copy of the input arguments of the operation. That is
 why we can use `this.args` inside the call to `setCallbackMap` to access the selection arguments.
@@ -106,7 +114,11 @@ registerCtr({
 });
 `;
 
-<CodeSnippet title="clips/initClips.ts" code={code3} />
+<CodeSnippet
+  title="clips/initClips.ts"
+  addMb
+  code={code3}
+/>
 
 # Connection to Adobe Aria
 
