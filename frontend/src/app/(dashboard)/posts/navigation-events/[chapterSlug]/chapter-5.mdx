@@ -1,12 +1,12 @@
 # Pros and cons
 
-The advantage of using a navigation handler is that we can use the same component in different places,
-and trigger url changes from this component, without the need to explicitly tell the component
-how the url change should happen. In general, I like to have dumb components with simple code,
-and this approach promotes this. Moreover, by offering centralized navigation functions (such as
-`navToPpost`) we can expect more consistency in the url changes than when this is left to the components.
+We've seen how do context-depend url updates using a navigation handler. This has the advantage
+that we can use the same component in different places, without the need to explicitly tell the component
+how url changes should happen. In general, I like to have dumb components with simple code,
+and this approach promotes this. Moreover, by using centralized navigation functions (such as
+`navToPpost`) it's easier to enforce consistency in the url changes than when this is left to the components.
 Finally, since we don't have to pass any details related to url management to the components,
-there is less prop drilling and therefore less clutter in the code.
+there is less prop drilling and therefore less code clutter.
 
 The downside is that the indirection makes the code for handling navigation less explicit. When we call
 `navToPost` then a dynamic lookup is performed to determine which url change must be performed. This
@@ -17,6 +17,7 @@ a navigation function, and only extend the navigation handler when we need the d
 
 # Conclusion
 
-I've introduced an approach for decoupling the handling of navigation events from the components.
-I'm still experimenting with this approach, but so far it seems to work well. I expect my
-thoughts on this topic to evolve, so I wil probably return to this topic later.
+I've introduced an approach for decoupling the handling of navigation events from the components. I've also
+shown how the url and application can be synchronized using url effects. I'm still experimenting with this
+approach, but so far it seems to work well. I expect my thoughts on this topic to evolve, so I wil probably
+return to this topic later.

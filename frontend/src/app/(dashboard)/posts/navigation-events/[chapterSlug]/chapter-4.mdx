@@ -1,12 +1,13 @@
 import { aphorisms } from '/src/api/data/aphorisms';
 
-# The `UrlEffect`
+# The sync-url-effect
 
 The need for synchronizing the application state with the url is most obvious when
-the application is loaded. The url will indicate some application page that requires
-a certain state. In this chapter, I will not discuss data fetching, which is the topic
-of [this post](/posts/state-providers/chapter-1). Instead, I will show a
-`SyncPostWithUrlEffect` that:
+the application is loaded. The url will point to some application page that requires
+a certain state that includes data (e.g. the blog-posts) and meta-data (e.g. the id of
+the highlighted blog-post). In this chapter, I will not discuss data fetching, which is the
+topic of [this post](/posts/state-providers/chapter-1). Instead, I will show
+a `SyncPostWithUrlEffect` that:
 
 - Ensures that the correct post is highlighted, based on the current url;
 - Updates the url when the highlighted post changes.
@@ -59,6 +60,7 @@ export const SyncPostWithUrlEffect = observer(
 <CodeSnippet
   title="SyncPostWithUrlEffect.tsx"
   code={code1}
+  addMb
 />
 
 Note that the example code depends on some of other libraries that are discussed in
@@ -68,20 +70,19 @@ explain what these libraries do, so that you can understand the example:
 
 - the `react-default-props-context` library provides a `withDefaultProps` function that
   can be used to define default properties for a component. The `DefaultProps` constant
-  declares which default properties are used. The default properties are provided by a
-  `DefaultPropsProvider` (using a React context).
+  declares which default properties are used (in our case: `posts` and `postsHighlight`).
+  These default properties are provided (using a React context) by a `DefaultPropsProvider`.
 - the `skandha` library provides reusable behaviours, such as `Highlight`. In the example
   code, we're assuming that a `Highlight` object is used to track the highlighted post.
 
 
-# Inserting the `SyncPostWithUrlEffect` in the router
+# Inserting the sync-url-effect in the router
 
 The `SyncPostWithUrlEffect` must be inserted in the appropriate place in the component tree.
 Specifically, it must be inserted at a location where there is a `postSlug` url parameter,
 and where `posts` and `postsHighlight` are available as default properties. In the example below,
-the default properties are provided by the `PostsStateProvider` component. This component fetches
-the posts from the server, and provides them to its children via a `DefaultPropsProvider` (this
-design is discussed in detail in [this post](/posts/state-providers/chapter-1)).
+the default properties are provided by the `PostsStateProvider` component. The `SyncPostWithUrlEffect`
+is inserted inside of the `Route` element that adds the `postSlug` url parameter.
 
 export const code2 = `
 export const UrlRouter = observer((props: PropsT) => {
@@ -103,4 +104,5 @@ export const UrlRouter = observer((props: PropsT) => {
 <CodeSnippet
   title="UrlRouter.tsx"
   code={code2}
+  addMb
 />

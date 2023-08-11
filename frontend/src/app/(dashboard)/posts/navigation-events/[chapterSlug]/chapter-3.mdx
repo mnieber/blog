@@ -65,9 +65,10 @@ To make the above code work correctly, we need to install one or more navigation
 that implement the handlers that were declared in `BlogPostsNavEvents`:
 
 - the `DashboardNavPage` and `ArchiveNavPage` components both implement `navToPost` and `navToPosts`.
-- in `UrlRouter` we install the `DashboardNavPage` component (that will be mounted when the user
-  visits the `/posts` page) and the `ArchiveNavPage` component (that will be mounted when the user
-  visits the `/archive` page).
+- in `UrlRouter` we add the `DashboardNavPage` component, that will be mounted when the user
+  visits the `/posts` page;
+- we also add the `ArchiveNavPage` component that will be mounted when the user visits the
+  `/archive` page.
 
 export const code3 = `
 import { useInstallNavPage, navHandler } from '/src/navHandler';
