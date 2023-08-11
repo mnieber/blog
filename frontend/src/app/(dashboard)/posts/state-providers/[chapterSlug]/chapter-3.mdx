@@ -1,38 +1,29 @@
-# The useQuery function and ObservableQuery
+# ObservableQuery and the useQuery function
 
 I'm using `useQuery` function from `@tanstack/query` to fetch data from the server. This function
 has the benefit of caching the state, so that we can call `useQuery` on any render without
-overfetching. When the fetched data becomes available then the React component that called
-`useQuery` will be re-rendered.
+overfetching.
 
-However, in my application, it's not only React components that need to respond to changes in the
-query status. For example, when the query status changes, it should also impact the resource state
-of the resource that is being loaded (see the call to `updateSources` in the previous chapter).
+When the fetched data becomes available then the React component that called
+`useQuery` will be re-rendered. However, in my application, it's not only React components that need
+to respond to changes in the query status. For example, the query status should also impact
+the resource state of the loaded resources (see the call to `updateSources` in the previous chapter).
 My application uses MobX for this type of reactive behaviour. Therefore, I wrap the result of
-`useQuery` in an `ObservableQuery` object that is an observable wrapper around the query state.
+`useQuery` in an `ObservableQuery` object that uses MobX:
 
 export const code1 = `
 export type QueryDataT = ObjT | undefined;
 
-// This class is used as a MobX-observable replacement for a TanstackQuery.
-
 export class ObservableQuery {
-  data: QueryDataT = undefined;
-  status: string = 'idle';
+  @observable data: QueryDataT = undefined;
+  @observable status: string = 'idle';
 
-  clear = () => {
+  @action clear = () => {
     this.data = undefined;
     this.status = 'idle';
   };
 
-  constructor() {
-    this.id = createUUID();
-    makeObservable(this, {
-      status: observable,
-      data: observable,
-      clear: action,
-    });
-  }
+  constructor() { makeObservable(this); }
 }
 
 export const isQueryLoading = (query: ObservableQuery) => {
@@ -51,95 +42,79 @@ export interface TanstackQuery {
   isFetching: boolean;
 }
 
-export type OptionsT = {
-  fetchAsLoad?: boolean;
-};
-
-export const useObservableQuery = (
-  query: TanstackQuery,
-  options?: OptionsT
-) => {
-  const fetchAsLoad = options?.fetchAsLoad;
-
+export const useObservableQuery = (query: TanstackQuery) => {
   const observableQuery = useBuilder(() => {
-    const observableQuery = new ObservableQuery();
-    updateObservableQuery(observableQuery, query, fetchAsLoad);
-    return observableQuery;
+    return updateObservableQuery(new ObservableQuery(), query);
   });
 
-  React.useEffect(() => {
-    runInAction(() => {
-      updateObservableQuery(observableQuery, query, fetchAsLoad);
-    });
-  }, [query]);
+  React.useEffect(
+    () => updateObservableQuery(observableQuery, query),
+    [observableQuery, query]
+  );
 
   return observableQuery;
 };
 
-function updateObservableQuery(
-  observableQuery: ObservableQuery,
-  tanstackQuery: TanstackQuery,
-  fetchAsLoad: boolean | undefined
-) {
+const updateObservableQuery = action((
+    observableQuery: ObservableQuery, tanstackQuery: TanstackQuery
+) => {
   observableQuery.data = tanstackQuery.data;
-  observableQuery.status =
-    fetchAsLoad && tanstackQuery.isFetching ? 'loading' : tanstackQuery.status;
-}
+  observableQuery.status = tanstackQuery.status;
+});
 `;
 
-export const code3 = `
-import { useQuery } from '@tanstack/react-query';
-
-export const useGetTodolists = () => {
-  return useQuery({
-    queryKey: ['getTodolists'],
-    queryFn: () => getTodolists(),
-  });
-};
-`;
-
-<TabView titles={['ObservableQuery.ts', 'hooks/useObservableQuery.ts', 'useGetTodolists.ts']}>
+<TabView titles={['ObservableQuery.ts', 'hooks/useObservableQuery.ts']}>
   <CodeSnippet code={code1} />
   <CodeSnippet code={code2} />
-  <CodeSnippet code={code3} />
 </TabView>
+
+The `useObservableQuery` hook can simply be wrapped around the call to `useQuery`,
+for example: `const getTodolists = useObservableQuery(useQuery(...))`.
+
+In my actual code the `useObservableQuery` hook also has a `fetchAsLoad` flag that handles
+the `isFetching` state of the tanstack query. Since explaining this would take us to far into the details
+of `tanstack/query` I've omitted this flag.
 
 # The useMutation function
 
-We could use the same approach to wrap the result of `useMutation` in an `ObservableMutation` object.
-However, in my opinion, the `useMutation` function from `@tanstack/query` is not very useful. Therefore,
-I prefer to write my own `useMutation` function:
+We could use the same approach to wrap the result of `useMutation` from `@tanstack/query`
+in an `ObservableMutation` object. However, since `useMutation` doesn't provide any features
+that I need, I prefer to replace it with my own `useObservableMutation` hook (that uses a
+similar API):
 
-export const code4 = `
+export const code3 = `
 export class ObservableMutation {
-  status = 'idle';
+  @observable status = 'idle';
   mutationFn: (args: any) => Promise<any> | void;
   onMutate?: (args: any) => Promise<any> | void;
   onSuccess?: (response: ObjT, args: any) => Promise<any> | void;
   onError?: (args: any) => void;
 
-  setStatus = (status: MutationStatusT) => {
-    this.status = status;
-  };
-
-  mutateAsync = (args: any) => {
-    // Omitted for brevity
-  };
+  @action setStatus = (status: MutationStatusT) => { this.status = status; };
+  mutateAsync = (args: any) => { /* Omitted for brevity */ };
 
   constructor(args: ArgsT) {
     this.mutationFn = args.mutationFn;
     this.onSuccess = args.onSuccess;
     this.onError = args.onError;
-
-    makeObservable(this, {
-      status: observable,
-      setStatus: action,
-    });
+    makeObservable(this);
   }
 }
+
+export const isRunning = (observableMutation: ObservableMutation) => {
+  return observableMutation.status === 'loading';
+};
+
+export const useObservableMutation = (args: ArgsT) => {
+  return useBuilder(() => new ObservableMutation(args));
+};
 `;
 
-This code is actually not that interesting. It's just the MobX equivalent of `useMutation` from `tanstack`.
+<CodeSnippet
+  title="ObservableMutation.ts"
+  addMb
+  code={code3}
+/>
 
 # What's next
 

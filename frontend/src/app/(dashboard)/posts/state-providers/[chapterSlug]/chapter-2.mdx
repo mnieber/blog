@@ -54,31 +54,19 @@ export type SourceT = {
 };
 
 export class ResourceState {
-  name?: string = undefined;
-  sources: SourceT[] = [];
+  @observable name?: string = undefined;
+  @observable sources: SourceT[] = [];
 
-  addSource(source: SourceT) { // Implementation omitted for brevity }
-  removeSource(state: string, name: string) { // Implementation omitted for brevity }
+  @action addSource(source: SourceT) { // Implementation omitted for brevity }
+  @action removeSource(state: string, name: string) { // Implementation omitted for brevity }
 
-  get value() {
-    const result: string[] = [];
-    for (const source of this.sources) {
-      if (source.condition()) {
-        const state = source.state;
-        if (!result.includes(state)) result.push(state);
-      }
-    }
-    return result;
+  @computed get value() {
+    return this.sources
+      .filter((source: SourceT) => source.condition())
+      .map((source: SourceT) => source.state);
   }
 
-  constructor() {
-    makeObservable(this, {
-      addSource: action,
-      removeSource: action,
-      sources: observable,
-      value: computed,
-    });
-  }
+  constructor() { makeObservable(this); }
 }
 `;
 
@@ -131,19 +119,15 @@ export const loadingResource = null;
 export const getState = <StateT = string>(
   resource: any
 ): StateT[] => {
-  if (resource === undefined)  return [];
-  return resource === loadingResource
+  return resource === undefined
+    ? []
+    : resource === loadingResource
     ? ['loading']
     : resource[symbolRS].value;
 };
 
 export const isUpdating = (resource: any) => getState(resource).includes('updating');
 export const isLoading = (resource: any) => getState(resource).includes('loading');
-export const isUndefined = (resource: any) => resource === undefined || getState(resource).length === 0;
-export const isReady = (resource: any) => {
-  const state = getState(resource);
-  return resource && !state.includes('loading') && !state.includes('updating');
-};
 `;
 
 <CodeSnippet
@@ -161,17 +145,16 @@ a source to the resource state of the affected resources. This source effectivel
 `updating` state. When the promise is resolved, the source is removed.
 
 export const code5 = `
-  const todolistsToBeDeleted = [todolist1, todolist2];
+const todolistsToBeDeleted = [todolist1, todolist2];
 
-  const promise = trackPromise({
-    // Add 'updating' to the resource state of the
-    // todolists that are being deleted
-    states: { updating: [todolistsToBeDeleted] },
-
-    promise: deleteTodoLists.mutateAsync({
-      todolistIds: getIds(todolistsToBeDeleted),
-    }),
-  }).result;
+const promise = trackPromise({
+  promise: deleteTodoLists.mutateAsync({
+    todolistIds: getIds(todolistsToBeDeleted),
+  }),
+  // Add 'updating' to the resource state of the
+  // todolists that are being deleted
+  states: { updating: [todolistsToBeDeleted] },
+}).result;
 `;
 
 <CodeSnippet
@@ -190,19 +173,19 @@ To avoid this, we should move the resource state from the old resource to the ne
 This is what the `graftResourceStatesFromMemo` function does. It's used as follows:
 
 export const code6 = `
-  // We're using React.useState to locally store the todolists. This is not what
-  // I would use in a real application, but for illustration purposes it's good enough.
-  const [todolists, setTodolists] = React.useState<TodolistT[]>([]);
+// We're using React.useState to locally store the todolists.
+// This is not what  I would use in a real application,
+// but for illustration purposes it's good enough.
+const [todolists, setTodolists] = React.useState<TodolistT[]>([]);
+const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
 
-  const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
-
-  React.useEffect(() => {
-    getTodolists().then(todolists => {
-      setTodolists(graftResourceStatesFromMemo({
-        resources: todolists
-      });
+React.useEffect(() => {
+  getTodolists().then(todolists => {
+    setTodolists(graftResourceStatesFromMemo({
+      resources: todolists
     });
-  })
+  });
+})
 `;
 
 <CodeSnippet
