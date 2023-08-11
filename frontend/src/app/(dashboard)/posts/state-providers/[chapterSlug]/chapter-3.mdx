@@ -33,11 +33,11 @@ export const UrlRouter = observer((props: PropsT) => {
   return (
     <Switch>
       <UserProfileStateProvider>
-        <Route path="/todo-lists">
-          <TodoListsStateProvider>
+        <TodoListsStateProvider>
+          <Route path="/todo-lists">
             <TodoListsView />
-          </TodoListsStateProvider>
-        </Route>
+          </Route>
+        </TodoListsStateProvider>
         <Route path="/preferences">
           <UserPreferencesView />
         </Route>

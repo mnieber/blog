@@ -88,7 +88,7 @@ export class ResourceState {
 
 <CodeSnippet
   title="resourceStates/ResourceState.ts"
-  code={code1}
+  code={code2}
 />
 
 As we can see, the value of a `ResourceState` is an array that contains all resource states of all sources for which
@@ -117,22 +117,71 @@ export const getState = <StateT = string>(
     : resource[symbolRS].value;
 };
 
-export const isUpdating = (resource: any) =>
-  getState(resource).includes('updating');
-
-export const isLoading = (resource: any) =>
-  getState(resource).includes('loading');
-
+export const isUpdating = (resource: any) => getState(resource).includes('updating');
+export const isLoading = (resource: any) => getState(resource).includes('loading');
+export const isUndefined = (resource: any) => resource === undefined || getState(resource).length === 0;
 export const isReady = (resource: any) => {
   const state = getState(resource);
-  return resource
-    && !state.includes('loading')
-    && !state.includes('updating');
+  return resource && !state.includes('loading') && !state.includes('updating');
 };
-
-export const isUndefined = (resource: any) =>
-  resource === undefined || getState(resource).length === 0;
 `;
+
+<CodeSnippet
+  title="resourceStates/ResourceState.ts"
+  code={code3}
+/>
+
+# The trackPromise function
+
+It often happens that the resource state is `updating` while some promise is being executed. For example,
+while we are running `deleteTodolists`, the resource state of the affected `todolists` resources should
+be `updating`. The `trackPromise` function helps to manage this. While the promise is running, it attaches
+a source to the resource state of the affected resources. This source effectively puts these todolists in the
+`updating` state. When the promise is resolved, the source is removed.
+
+export const code4 = `
+  const todolistsToBeDeleted = [todolist1, todolist2];
+
+  const promise = trackPromise({
+    // Add 'updating' to the resource state of the
+    // todolists that are being deleted
+    states: { updating: [todolistsToBeDeleted] },
+
+    promise: deleteTodoLists.mutateAsync({
+      todolistIds: getIds(todolistsToBeDeleted),
+    }),
+  }).result;
+`;
+
+# The graftResourceStatesFromMemo function
+
+When you store resource states inside the resource objects themselves, there is a potential
+problem when fresh data is fetched from the server. If you replace the local resource
+with the newly fetched one then the local resource state is lost. This is a problem when
+you are locally updating a resource, for example: when the resource is being deleted.
+To avoid this, we should move the resource state from the old resource to the new resource.
+This is what the `graftResourceStatesFromMemo` function does. It's used as follows:
+
+export const code4 = `
+  // We're using React.useState to locally store the todolists. This is not what
+  // I would use in a real application, but for illustration purposes it's good enough.
+  const [todolists, setTodolists] = React.useState<TodolistT[]>([]);
+
+  const graftResourceStatesFromMemo = useGraftResourceStatesFromMemo({});
+
+  React.useEffect(() => {
+    getTodolists().then(todolists => {
+      setTodolists(graftResourceStatesFromMemo({
+        resources: todolists
+      });
+    });
+  })
+`;
+
+When you pass an array of resources to the `graftResourceStatesFromMemo` function then it stores a memo
+of the resource states. The next time you call `graftResourceStatesFromMemo` it will copy the
+resource states from the memo to the new resources. This way, the resource states are preserved
+when the resources are replaced.
 
 # What's next
 
