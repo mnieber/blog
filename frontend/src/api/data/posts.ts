@@ -183,6 +183,10 @@ export const posts = [
       },
       {
         slug: 'chapter-4',
+        title: 'Url synchronization effects',
+      },
+      {
+        slug: 'chapter-5',
         title: 'Conclusion',
       },
     ],

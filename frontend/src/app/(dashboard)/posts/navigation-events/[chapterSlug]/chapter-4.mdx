@@ -1,23 +1,106 @@
-# Pros and cons
+import { aphorisms } from '/src/api/data/aphorisms';
 
-The advantage if this approach is that we can use the same component in different places,
-and trigger url changes from this component, without the need to explicitly tell the component
-how the url change should happen. In general, I like to have dumb components with simple code,
-and this approach promotes this. Moreover, by centralizing the processing of navigation events,
-we can expect more consistency in the url changes than when this is left to the components.
-Finally, since we don't have to pass any details related to url management to the components,
-there is less prop drilling and therefore less clutter in the code.
+# The `UrlEffect`
 
-The downside is that the indirection makes the code for handling navigation less explicit. Also,
-because there are more moving part, this approach is more complex then simply updating the url
-in the component. To reduce complexity, we could implement a function such as `navToPost` by
-directly navigating to a particular url (of course, in this case, we would loose the benefits
-provided by the navigation handler). In general, we can start with this direct approach when adding
-a navigation function, and only extend the navigation handler when we need the more complex
-navigation behaviour.
+The need for synchronizing the application state with the url is most obvious when
+the application is loaded. The url will indicate some application page that requires
+a certain state. In this chapter, I will not discuss data fetching, which is the topic
+of [this post](/posts/state-providers/chapter-1). Instead, I will show a
+`SyncPostWithUrlEffect` that:
 
-# Conclusion
+- Ensures that the correct post is highlighted, based on the current url;
+- Updates the url when the highlighted post changes.
 
-I've introduced an approach for decoupling the handling of navigation events from the components.
-I'm still experimenting with this approach, but so far it seems to work well. I expect my
-thoughts on this topic to evolve, so I wil probably return to this topic later.
+Here is the code:
+
+export const code1 = `
+type PropsT = {};
+
+const DefaultProps = {
+  ...dps.posts,              // of type PostT[]
+  ...dps.postsHighlight,     // of type Highlight<PostT>
+};
+
+export const SyncPostWithUrlEffect = observer(
+  withDefaultProps((props: PropsT & typeof DefaultProps) => {
+    const { postsHighlight, posts } = props;
+
+    const location = useLocation();
+    const { postSlug } = useParams() as ObjT;
+    const refUrl = React.useRef<string>('');
+
+    React.useEffect(() => {
+      // If there is a new url
+      if (refUrl.current !== location.pathname) {
+        const postForCurrentUrl = R.find(
+          (x: PostT) => x.slug === postSlug
+        )(posts);
+
+        if (postForCurrentUrl) {
+          refUrl.current = location.pathname;
+          if (postsHighlight.id !== postForCurrentUrl.id) {
+            postsHighlight.highlightItem({ id: postForCurrentUrl?.id });
+          }
+        }
+      } else {
+        // Check if we must update the current url based on the highlighted post.
+        const post = postsHighlight.item;
+        if (post && postSlug !== post.slug) {
+          navToPost(post.ownerUsername, post.slug);
+        }
+      }
+    }, [postSlug, post, posts, postsHighlight]);
+
+    return null;
+  }, DefaultProps)
+);
+`;
+
+<CodeSnippet
+  title="SyncPostWithUrlEffect.tsx"
+  code={code1}
+/>
+
+Note that the example code depends on some of other libraries that are discussed in
+this [post about Skandha](/posts/skandha/chapter-1) and this
+[post about default properties](/posts/default-props/chapter-1). Here I will briefly
+explain what these libraries do, so that you can understand the example:
+
+- the `react-default-props-context` library provides a `withDefaultProps` function that
+  can be used to define default properties for a component. The `DefaultProps` constant
+  declares which default properties are used. The default properties are provided by a
+  `DefaultPropsProvider` (using a React context).
+- the `skandha` library provides reusable behaviours, such as `Highlight`. In the example
+  code, we're assuming that a `Highlight` object is used to track the highlighted post.
+
+
+# Inserting the `SyncPostWithUrlEffect` in the router
+
+The `SyncPostWithUrlEffect` must be inserted in the appropriate place in the component tree.
+Specifically, it must be inserted at a location where there is a `postSlug` url parameter,
+and where `posts` and `postsHighlight` are available as default properties. In the example below,
+the default properties are provided by the `PostsStateProvider` component. This component fetches
+the posts from the server, and provides them to its children via a `DefaultPropsProvider` (this
+design is discussed in detail in [this post](/posts/state-providers/chapter-1)).
+
+export const code2 = `
+export const UrlRouter = observer((props: PropsT) => {
+  return (
+    <PostsStateProvider>
+      <Route path="/posts">
+        <PostsView />
+
+        <Route path="/posts/:postSlug">
+          <SyncPostWithUrlEffect />
+          <PostsView />
+        </Route>
+
+      </Route>
+    </PostsStateProvider>
+  );
+});`;
+
+<CodeSnippet
+  title="UrlRouter.tsx"
+  code={code2}
+/>
