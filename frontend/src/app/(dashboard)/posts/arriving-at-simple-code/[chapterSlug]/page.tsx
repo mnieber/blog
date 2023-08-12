@@ -4,7 +4,7 @@ import Chapter1 from './chapter-1.mdx';
 import { ChapterLayout } from '/src/chapter/components/ChapterLayout';
 
 export default function Page({ params }: any) {
-  const chapterSlug = params.params.chapterSlug;
+  const chapterSlug = params.chapterSlug;
 
   return (
     <ChapterLayout postSlug="arriving-at-simple-code" chapterSlug={chapterSlug}>
