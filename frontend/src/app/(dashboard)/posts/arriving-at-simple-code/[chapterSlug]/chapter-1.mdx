@@ -31,10 +31,11 @@ would produce that code at the first attempt. But usually this simple design req
 iterations of the solution. That's why I first focus on getting the code to work.
 Remember, while you are working on the code, you haven't actually solved the problem yet. If you
 simultaneously focus on writing simple code, you are making your life quite hard. It's often faster to
-solve the problem with clunky code, and then simplify. Note the tension with
-the previous advise: there should often be some degree of upfront planning (because developing on
-paper is more efficient than in code), but once we start coding then if often pays off to focus first
-on getting the code to work.
+solve the problem with clunky code, and then simplify.
+
+Note the tension with the previous advise: there should often be some degree of upfront planning
+(because developing on paper is more efficient than in code), but once we start coding then if
+often pays off to focus first on getting the code to work.
 
 ## Tip: make your data-structures work for you
 
@@ -95,9 +96,9 @@ Try to develop an internal "complexity alarm bell" for when the size of modules 
 Functions and classes become harder to understand when they have more responsibilities. Therefore, the
 following exercise is useful:
 
-- for each function or class in your module, try to complete the phrase
+- For each function or class in your module, try to complete the phrase
   "this function/class is responsible for ...".
-- if there is an "and" in your answer, then ask yourself whether this means that the function or class
+- If there is an "and" in your answer, then ask yourself whether this means that the function or class
   should be split.
 
 Although it's usually okay for source files and modules to have several responsibilities, the same type of reasoning applies.
@@ -118,11 +119,10 @@ source file.
 />
 
 There is no hard rule to tell you much code can live in a single file, but in general I strive for
-an "experience of cohesiveness" for every source file in a project. Sometimes a function that is in
-its own file seems a little lost: it's unclear where this function might be used. Then I will move it
-to the place where it's actually used. And sometimes there is so much going on in a single file that
-it seems to be just a dumping ground for code. In that case I will identify the different topics that
-are addressed in this file and split it accordingly.
+an "experience of cohesiveness" for every source file in a project. My preferences lead me to split
+the code often, even creating files with a single function, where
+the file is named after that function. If that function becomes too big, then I can split off helper
+functions that live in the same file. This file will usually still be cohesive.
 
 ## Tip: think both bottom-up and top-down
 
@@ -153,9 +153,9 @@ better direction than where you were going before.
 # Conclusion
 
 Arriving at simple code requires effort. It's only partially true that just by programming a lot, we will write ever simpler code.
-We also need to examine our programming habits and patterns. This is similar to how a pianist will only make real progress
-if they practice in an effective way. If they just repeat the pieces they already know without paying attention to how
-they play them, then they will only improve a little. Even code review is not a guarantee that we will write better and better code,
-because it often focuses on more superficial aspects, without challenging the more deeply ingrained habits and preferences.
-Finally, writing simple code is not a mechanical process: it often requires some inspiration or a new insight.
-And fortunately this is also what makes it enjoyable.
+We also need to examine our programming habits and patterns: what makes us happy about our code, and what makes us unhappy?
+This is similar to how a pianist will only make real progress if they practice in an effective way. If they just repeat the
+pieces they already know without paying attention to how they play them, then they will only improve a little. Even code review is
+not a guarantee that we will write better and better code, because it often focuses on more superficial aspects, without challenging
+the more deeply ingrained habits and preferences. Finally, writing simple code is not a mechanical process: it often requires some
+inspiration or a new insight. And fortunately this is also what makes it enjoyable.
