@@ -10,12 +10,30 @@ I will discuss an approach for managing environment variable files. The characte
 
 In addition, I will explain how to use these files in the dev, deploy and prod environments.
 
-# Caveats
+## Caveats
 
 I will mention the handling of secrets but I will not focus too much on security. I'm not an expert
 on this topic, and it would distract from the main goals of this article.
 
-# Overview
+## Sample code
+
+Enter the following commands to run a small example that uses `compile-env`.
+
+export const code1 = `
+git clone git@github.com:mnieber/blog-sample-apps.git
+cd blog-sample-apps/compile-env-sample
+# Before proceeding, create a Python virtualenv and activate it
+pip install -r requirements.txt
+make compile-env
+`;
+
+<CodeSnippet
+  lang="bash"
+  addMb
+  code={code1}
+/>
+
+# Outlook
 
 I will first discuss three different environments in which environment variables can be
 used: dev, prod and deploy. This explanation is not strictly necessary to understand the approach, but
