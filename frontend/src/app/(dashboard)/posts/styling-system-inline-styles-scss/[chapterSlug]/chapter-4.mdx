@@ -37,7 +37,7 @@ export const DialogButton = (props: PropsT) => {
         { 'DialogButton--disabled': disabled },
         [
           DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '', 
+          hasIcon ? 'flex flex-row items-stretch' : '',
           className
         ]
       )}
@@ -89,8 +89,8 @@ Also note that client code can use the style object even when it doesn't need th
 # Theming a custom component using a componentClassName property
 
 Theming our `DialogButton` component implies selecting a new set of intrinsic styles. The ad-hoc styles can
-already be chosen in a context-dependent way so there is no reason to include them in the theme. Here is an example of a 
-`DialogButton` that can be styled with the `Blue` theme or `Teal` theme (we'll show the `Blue` theme and omit most of the 
+already be chosen in a context-dependent way so there is no reason to include them in the theme. Here is an example of a
+`DialogButton` that can be styled with the `Blue` theme or `Teal` theme (we'll show the `Blue` theme and omit most of the
 `Teal` theme):
 
 export const code3 = `
@@ -124,7 +124,7 @@ export const DialogButton = (props: PropsT) => {
         [
           'select-none',
           DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '', 
+          hasIcon ? 'flex flex-row items-stretch' : '',
           className
         ]
       )}
@@ -169,15 +169,15 @@ export const code4 = `
 </TabView>
 
 Note that inside the `.Blue-DialogButton` selector there are rules for `.DialogButton--disabled` and
-`.DialogButton__Label`. Since we are already in the scope of the themed button, there is no reason to introduce 
+`.DialogButton__Label`. Since we are already in the scope of the themed button, there is no reason to introduce
 new names for these selectors.
 
 Note also that we've moved the `select-none` class from the .scss file to the JSX code. This is a pragmatic way to ensure
 that all buttons have `select-none` and removes the need to add this class to every theme.
 
-# Using themeClassname instead of componentClassName
+# Using themeClassName instead of componentClassName
 
-A variation on the above approach is to have a `themeClassName` that can be `Blue` or `Teal`. This approach is useful when 
+A variation on the above approach is to have a `themeClassName` that can be `Blue` or `Teal`. This approach is useful when
 a component and its sub-components (in this case: `Icon`) should all use the same theme:
 
 export const code5 = `
@@ -197,7 +197,7 @@ export const DialogButton = (props: PropsT) => {
         [
           'select-none',
           DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '', 
+          hasIcon ? 'flex flex-row items-stretch' : '',
           className
         ]
       )}
@@ -280,7 +280,7 @@ export const code9 = `
 
 .UserProfileCard .DialogButton {
   @apply font-bold;
-  
+
   .DialogButton--disabled {
     @apply text-gray-300;
   }
