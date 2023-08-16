@@ -1,11 +1,12 @@
 # Storing UI state in containers
 
-For storing the UI state of an application we have two choices: inside the UI component, or externally.
-I prefer to store UI state in so-called containers that are separate from the UI component functions, for three reasons:
+In a React application, the render components are responsible for receiving user input and displaying the UI state.
+When it comes to storing the UI state there are two options: we can do this inside the component as well, or we can store
+it externally. I prefer to store UI state in so-called containers that are external to the component, for three reasons:
 
-- it helps to keep the code of the UI components simple;
-- it allows to share the UI state between several UI components (this usually turns out to be necessary);
-- it makes it easier to program interactions between behaviours such as selection, filtering, addition, etc.
+- It helps to keep the code of the render components simple;
+- It allows to share the UI state between several render components;
+- It makes it easier to program interactions between behaviours (such as selection, filtering, addition, etc).
 
 In the remainder of this article I will elaborate on these points. To explain my approach for storing the UI state,
 I will use the example of Vidlito (video-list-tool): an application that allows people to store collections of playlists that contain video clips.
@@ -13,8 +14,8 @@ Broadly speaking, my approach is the following:
 
 - I store UI state in containers (e.g. `playlistsCtr`, and `clipsCtr`).
 - Each container contains facets. A facet is an object that stores a particular type of UI state such as selection, filtering, drag-and-drop, etc.
-- You can map data between facets. For example, the output of the filtering facet is used as the input of the selection facet, so that you can
-  only select clips that were not filtered out.
+- You can map data between facets. For example, the output of the filtering facet is used as the input of the selection facet. By making this
+  connection, we ensure that you can only select clips that were not filtered out.
 - Facets have operations that accept callback functions. These callback functions assist in implementing the operation, but they also allow us
   to create interactions between behaviours. For example, the `applyFilter` callback of the filtering facet can automatically correct the
   highlight, so that the highlighted clip is not hidden by the filter.
@@ -78,11 +79,11 @@ Each facet has its own API that contains data fields and operations. For example
 in the next section). You can think of the `Selection` facet class as an abstraction: a very general description of what
 selections look like and how they are used. Like all abstractions, this helps with promoting code consistency and reuse:
 regardless of how selection is implemented, it will look the same everywhere in the application.
-It also means we can create reusable helper functions that take a selection as their argument.
+It also means we can create generic helper functions that take a selection as their argument.
 
 ## Using mapDataToProps to connect facets
 
 In many cases, the output of one facet is used as the input of another facet. Therefore, we can use the `mapDataToProps`
 function to map data between facets. This function patches a facet by
-replacing a data field by a `get` property. For example, the `ctr.selection.selectableIds` field is replaced by a
-property that returns `getIds(ctr.display.items)`.
+replacing a data field by a `get` property. In the example code above, we want to select from the displayed items. Therefore,
+`mapDataToProps` is used to replace the `ctr.selection.selectableIds` field by a property that returns `getIds(ctr.display.items)`.

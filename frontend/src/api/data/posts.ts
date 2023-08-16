@@ -1,85 +1,5 @@
 export const posts = [
   {
-    slug: 'state-providers',
-    title: 'Separating state from presentation using state providers',
-    shortTitle: 'State providers',
-    date: 'August 2023, by Maarten Nieber',
-    chapters: [
-      {
-        slug: 'chapter-1',
-        title: 'Introduction',
-      },
-      {
-        slug: 'chapter-2',
-        title: 'Managing resource states',
-      },
-      {
-        slug: 'chapter-3',
-        title: 'Observing queries and mutations',
-      },
-      {
-        slug: 'chapter-4',
-        title: 'State providers',
-      },
-      {
-        slug: 'chapter-5',
-        title: 'Conclusion',
-      },
-    ],
-  },
-  {
-    slug: 'styling-system-inline-styles-scss',
-    title: 'A styling system based on inline styles and SCSS',
-    shortTitle: 'Inline styles and SCSS',
-    date: 'May 2023, by Maarten Nieber',
-    chapters: [
-      {
-        slug: 'chapter-1',
-        title: 'Introduction',
-      },
-      {
-        slug: 'chapter-2',
-        title: 'Thoughts on TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI',
-      },
-      {
-        slug: 'chapter-3',
-        title: 'Style objects',
-      },
-      {
-        slug: 'chapter-4',
-        title: 'Combining style objects with custom components',
-      },
-      {
-        slug: 'chapter-5',
-        title: 'Conclusion',
-      },
-    ],
-  },
-  {
-    slug: 'compile-env-for-managing-environment-variables',
-    title: 'Using compile-env to manage environment variables',
-    shortTitle: 'DRY environment variables',
-    date: 'January 2023, by Maarten Nieber',
-    chapters: [
-      {
-        slug: 'chapter-1',
-        title: 'Introduction',
-      },
-      {
-        slug: 'chapter-2',
-        title: 'The dev, prod and deploy environment',
-      },
-      {
-        slug: 'chapter-3',
-        title: 'Using compile-env to manage environment variables',
-      },
-      {
-        slug: 'chapter-4',
-        title: 'Conclusion',
-      },
-    ],
-  },
-  {
     slug: 'technical-product-roadmap',
     title: 'Using a Technical Product Roadmap to create team alignment',
     shortTitle: 'Backlogs vs Roadmaps',
@@ -144,10 +64,10 @@ export const posts = [
     ],
   },
   {
-    slug: 'skandha',
-    title: 'Skandha: reusable interacting behaviours',
-    shortTitle: 'Reusable behaviours',
-    date: 'May 2020, by Maarten Nieber',
+    slug: 'compile-env-for-managing-environment-variables',
+    title: 'Using compile-env to manage environment variables',
+    shortTitle: 'DRY environment variables',
+    date: 'January 2023, by Maarten Nieber',
     chapters: [
       {
         slug: 'chapter-1',
@@ -155,15 +75,43 @@ export const posts = [
       },
       {
         slug: 'chapter-2',
-        title: 'Containers and facets',
+        title: 'The dev, prod and deploy environment',
       },
       {
         slug: 'chapter-3',
-        title: 'Installing callback functions',
+        title: 'Using compile-env to manage environment variables',
       },
       {
         slug: 'chapter-4',
-        title: 'Discussion and conclusion',
+        title: 'Conclusion',
+      },
+    ],
+  },
+  {
+    slug: 'styling-system-inline-styles-scss',
+    title: 'A styling system based on inline styles and SCSS',
+    shortTitle: 'Inline styles and SCSS',
+    date: 'May 2023, by Maarten Nieber',
+    chapters: [
+      {
+        slug: 'chapter-1',
+        title: 'Introduction',
+      },
+      {
+        slug: 'chapter-2',
+        title: 'Thoughts on TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI',
+      },
+      {
+        slug: 'chapter-3',
+        title: 'Style objects',
+      },
+      {
+        slug: 'chapter-4',
+        title: 'Combining style objects with custom components',
+      },
+      {
+        slug: 'chapter-5',
+        title: 'Conclusion',
       },
     ],
   },
@@ -188,6 +136,58 @@ export const posts = [
       {
         slug: 'chapter-4',
         title: 'Url synchronization effects',
+      },
+      {
+        slug: 'chapter-5',
+        title: 'Conclusion',
+      },
+    ],
+  },
+  {
+    slug: 'skandha',
+    title: 'Skandha: generic interacting behaviours',
+    shortTitle: 'Generic behaviours in React',
+    date: 'May 2020, by Maarten Nieber',
+    chapters: [
+      {
+        slug: 'chapter-1',
+        title: 'Introduction',
+      },
+      {
+        slug: 'chapter-2',
+        title: 'Containers and facets',
+      },
+      {
+        slug: 'chapter-3',
+        title: 'Installing callback functions',
+      },
+      {
+        slug: 'chapter-4',
+        title: 'Discussion and conclusion',
+      },
+    ],
+  },
+  {
+    slug: 'state-providers',
+    title: 'Separating state from presentation using state providers',
+    shortTitle: 'State providers in React',
+    date: 'August 2023, by Maarten Nieber',
+    chapters: [
+      {
+        slug: 'chapter-1',
+        title: 'Introduction',
+      },
+      {
+        slug: 'chapter-2',
+        title: 'Managing resource states',
+      },
+      {
+        slug: 'chapter-3',
+        title: 'Observing queries and mutations',
+      },
+      {
+        slug: 'chapter-4',
+        title: 'State providers',
       },
       {
         slug: 'chapter-5',

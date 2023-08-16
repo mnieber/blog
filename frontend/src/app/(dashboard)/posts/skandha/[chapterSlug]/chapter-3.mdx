@@ -24,13 +24,12 @@ export class Selection<T = any> {
   }
 };
 
-type Cbs<T> = {
+export type SelectionCbs<T = any> = DefineCbs<
+  Selection<T>,
   select: {
     selectItem(): void;
   };
-};
-
-export type SelectionCbs<T = any> = DefineCbs<Selection<T>, Cbs<T>>;
+>;
 `;
 
 <CodeSnippet
@@ -43,10 +42,13 @@ This `Selection` facet is part of the `skandha-facets` library that you can inst
 write your own facet classes.
 
 As you can see, the `Selection` class has almost no logic. It describes how a selection is stored, and shows the signature
-for selecting items, but doesn't specify how selection is implemented. This is by design, because it means that we can
+for selecting items, but doesn't specify how selection is implemented. This is by design, so that we can
 reuse `Selection` in different scenarios that require different types of selection.
 
-# Callback objects
+Of course, we do have to implement the `select` operation. This is achieved by implementing the callbacks that are
+described in the `SelectionCbs` type.
+
+# The callbacks object
 
 In the body of the `select` operation, we use `getCallbacks` to obtain a so-called callbacks object. This object
 (`cbs`) contains:
@@ -54,8 +56,8 @@ In the body of the `select` operation, we use `getCallbacks` to obtain a so-call
 - all callbacks that the operation requires;
 - a copy of the input argument of the operation.
 
-The `cbs` object is of type `SelectionCbs`, which depends on `Cbs`. To be able to use the `Selection.select` operation,
-we must implement all callbacks in `Cbs`. We'll do this in the `initClips` function, that installs all callbacks for all
+To be able to use the `Selection.select` operation, we must implement all callbacks in `SelectionCbs`.
+We'll do this in the `initClips` function, that installs all callbacks for all
 facets of `clipsCtr`.
 
 export const code2 = `
@@ -90,16 +92,21 @@ export const initClips = (clipsCtr: any) => {
   code={code2}
 />
 
-As was mentioned above, the `cbs` object contains a copy of the input arguments of the operation. That is
-why we can use `this.args` inside the call to `setCallbackMap` to access the selection arguments.
-The callback we installed also takes care of highlighting the selected element. This shows how we can
-use a callback to add interactions between behaviours.
+The example code shows how the `selectItem` callback is implemented. Remember that `selectItem` is called
+when we execute `cbs.selectItem()` in the `select` operation of the `Selection` facet. Inside of `selectItem`,
+the `this` variable points to the callbacks object (`cbs`), which contains a copy of the input arguments of the
+operation. That is why we can use `this.args` inside `selectItem` to access the selection arguments.
+
+Our callback also takes care of highlighting the selected element. This demonstrates how we can
+use a callback to add interactions between behaviours. To get a better impression, I recommend to look at the
+sample code mentioned at the beginning of this article.
 
 # Using MobX
 
-I'm a big fan of using MobX for making the UI respond to changes in the UI state. Therefore, there is a
-separate library called `skandha-mobx` that offers a `registerCtr` function that applies `observable` to all
-facet data fields, and `computed` to all operations.
+I'm a big fan of using MobX for making the UI respond to changes in the UI state. However, I didn't want a
+tight coupling between Skandha and MobX. Therefore, there is a separate library called `skandha-mobx` that makes a Skandha
+container observable with MobX. It offers a `registerCtr` function that applies `observable` to all
+facet data fields, and `computed` to all facet operations.
 
 export const code3 = `
 import { registerCtr } from 'skandha-mobx';
@@ -125,7 +132,7 @@ registerCtr({
 So far, we haven't discussed how user interactions such as mouse clicks and key-presses are handled. This is the
 responsibility of the UI components. When the component receives an event, it should call the correct facet operation.
 For example, when the user clicks on an item in a ListBox component, then the component must call the `selection.select()` operation.
-I have written reusable code to make this happen, but I see an opportunity to use a headless ui such as
+I have written generic (reusable) code to make this happen, but I see an opportunity to use a headless UI such as
 Adobe Aria:
 
 - the `useListBox()` hook function from Aria creates the event handlers for the ListBox component;
@@ -133,5 +140,5 @@ Adobe Aria:
   to update the shared UI state;
 - when the shared UI state (i.e. `selection.ids`) changes then we update the local Aria state.
 
-In other words: we synchronize the shared UI state with the local Aria state. This allows us to get the benefits that
+In other words: we can synchronize the shared UI state with the local Aria state. This allows us to get the benefits that
 Adobe Aria provides.

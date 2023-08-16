@@ -1,17 +1,17 @@
 # Goals
 
-In this article I will explain how we can add reusable behaviours (such as selection,
-filtering, drag-and-drop) to a user interface (UI). These behaviours can have interactions that the UI
+In this article I will explain how we can add generic behaviours (such as selection,
+filtering, drag-and-drop) to a user interface. These behaviours can have interactions that the UI
 components are agnostic about.
 
 ## Source code
 
 The source code that this approach is based on is found in the following npm packages:
 
-- `aspiration`
-- `skandha`
-- `skandha-facets`
-- `skandha-mobx`
+- [aspiration](https://github.com/mnieber/aspiration)
+- [skandha](https://github.com/mnieber/skandha)
+- [skandha-facets](https://github.com/mnieber/skandha-facets)
+- [skandha-mobx](https://github.com/mnieber/skandha-mobx)
 
 ## Sample code
 
@@ -51,10 +51,9 @@ it forces the developer to "fight the framework".
 
 To avoid the risks that come with choosing a framework, you can choose:
 
-- a UI kit for rendering (such as DaisyUI, TailwindUI, Flowbite), and a headless UI solution
-  (such as Adobe Aria, Radix, HeadlessUI) for behaviour.
-- a headless UI for storing the state of a user-interaction, such as choosing an item from a list. The headless UI
-  takes care of processing the related events, such as the mouse-click on a list item.
+- a UI kit for rendering (such as DaisyUI, TailwindUI, Flowbite), and
+- a headless UI solution (such as Adobe Aria, Radix, HeadlessUI) for storing the state of a user-interaction. The headless UI
+  takes care of processing mouse- and keyboard-events, such as the mouse-click on a list item.
 
 This article shows how to take this one step further by also considering the interactions between
 behaviours. The first section introduces the concepts of containers and facets. Each facet represents a behaviour, and we can connect
