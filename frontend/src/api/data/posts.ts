@@ -107,7 +107,7 @@ export const posts = [
       },
       {
         slug: 'chapter-4',
-        title: 'Styling custom components with trim objects',
+        title: 'Using style objects and trim objects in custom components',
       },
       {
         slug: 'chapter-5',

@@ -191,15 +191,15 @@ as shown in `Teal-DialogButton.scss`.
 As was mentioned above, the `danger` and `disabled` modes are layered on top of the `base` mode. We can do this with the
 `getMode` function. In the case of a disabled `DialogButton`, it executes a `mergeDeepRight(trim.base, trim.disabled)`.
 
-The `createTrim` function is used to create new trims based on existing trims. It also a `mergeDeepRight` to do this.
-In the example, `createTrim` was used to create the `TealDialogButtonTrim` trim by setting the `color` to `DialogButtonS.color.teal()`
+The `createTrim` function is used to create new trims based on existing trims. It also uses a `mergeDeepRight` to do this.
+In the example, we created `TealDialogButtonTrim` by setting the `color` to `DialogButtonS.color.teal()`
 in the `base` mode of `TealDialogButtonTrim`.
 
-Finally, since the contents of a `mode` are dictionaries, we need a way to convert them to class names. This is done using the
+Finally, since the contents of a `mode` are dictionaries, we need a way to convert these to class names. This is done using the
 `getModeCn` function. For example, the result of calling `getModeCn(mode.root)` is the concatenation of all the values in
-the `mode.root` dictionary (excluding the special `componentName` key).
+the `mode.root` dictionary (where the special `componentName` key is excluded).
 
 ## Caching in `getMode` and `getModeCn`
 
-Since `getMode` and `getModeCn` are performed inside the render function, we should cache the results of these functions.
-The cache can be stored in the trim object itself.
+Since `getMode` and `getModeCn` are performed inside the render function, the results of these functions are cached.
+The cache is stored in the trim object itself.
