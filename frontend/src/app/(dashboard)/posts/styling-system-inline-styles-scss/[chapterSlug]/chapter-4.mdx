@@ -1,298 +1,205 @@
-# Introduction
+# A short aside on the example code
 
-In the previous chapter we've introduced style objects. We extended these style objects first by adding choices, and then by
-adding intrinsic styles (that are defined in an .scss file). These changes move the use of a style objects more towards that
-of custom components. The logical next step is to introduce a custom component that makes use of a style object.
-In this chapter I will illustrate this scenario, and explain how we can also add theming.
+So far, we've looked at the example of a `FormField`, which resembles a component since
+most `FormFields` have similar features (some of which we captured in a style object).
+However, capturing `FormField` in a custom component that can support all use-cases is hard, and probably
+not a good idea. Since this chapter deals with styling custom components, I will switch to the example
+of a `DialogButton`.
 
-# Combining a custom component with a style object
+# Trim objects
 
-Style objects are loosely defined components that we can mix into concrete components. However, when we always mix the style component
-into the same JSX structure then it can make sense to use a full-blown custom component that contains JSX.
-So far, we've looked at the example of a `FormField` but this is a case where you would probably not introduce a custom component.
-Therefore, I will instead show the example of a `DialogButton`.
+A trim object is a type of style schema that solves two problems:
+
+- It checks that you are not forgetting to use some relevant part of the style object;
+- It allows you to capture certain combinations of styles (that are picked from the style object)
+  in a reusable preset.
+
+Here is an example of a trim object for a DialogButton:
 
 export const code1 = `
-import { classnames as cn } from 'classnames';
-
-import "./DialogButton.scss";
-
-export type PropsT = {
-  className?: any;
-  disabled?: boolean;
-  fontSize?: 'medium' | 'big';
-  iconName?: string;
-  label: string;
-  // Some other props omitted...
-};
-
-export const DialogButton = (props: PropsT) => {
-  const { className, fontSize, iconName, label, ...rest } = props;
-  const hasIcon = !!iconName;
-
-  return (
-    <button
-      className={cn(
-        'DialogButton',
-        { 'DialogButton--disabled': disabled },
-        [
-          DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '',
-          className
-        ]
-      )}
-      {...rest}
-    >
-      {hasIcon && (
-        <div className={cn(DialogButtonS.Icon())}>
-          {icons[props.iconName]}
-        </div>
-      }
-      {label}
-    </button>
-  );
-};
-
-export const DialogButtonS = {
-  fontSize: {
-    medium: () => 'text-base',
-    big: () => 'text-lg',
+type DialogButtonTrimT = {
+  base: {
+    root: {
+      componentClassName: string,
+      border: any;
+      color: any;
+      fontSize: any;
+      padding: any;
+    }
+    Icon: {
+      margin: any;
+      size: any;
+      color: any;
+    };
   },
-  Icon: () => cn('DialogButton__Icon', 'mr-2'),
-};
+  danger?: ModeT<FormFieldTrimT>,
+  disabled?: ModeT<FormFieldTrimT>
+}
 `;
 
 export const code2 = `
-.DialogButton {
-  @apply select-none;
-
-  .DialogButton--disabled {
-    @apply text-gray-400;
-  }
-
-  .DialogButton__Icon {
-    // All dialog buttons have the same icon size
-    @apply h-[20px] w-[20px] min-w-[20px];
-  }
-}
-`;
-
-<TabView titles={['DialogButton.tsx', 'DialogButton.scss']}>
-  <CodeSnippet code={code1} />
-  <CodeSnippet lang="sass" code={code2} />
-</TabView>
-
-In this example we've introduced a `DialogButton` custom component that uses a style object. The button will have an icon
-if the `iconName` property is provided. Note that the `fontSize` parameter is used to pick a style from the style object.
-Also note that client code can use the style object even when it doesn't need the custom component.
-
-# Theming a custom component using a componentClassName property
-
-Theming our `DialogButton` component implies selecting a new set of intrinsic styles. The ad-hoc styles can
-already be chosen in a context-dependent way so there is no reason to include them in the theme. Here is an example of a
-`DialogButton` that can be styled with the `Blue` theme or `Teal` theme (we'll show the `Blue` theme and omit most of the
-`Teal` theme):
-
-export const code3 = `
-import { classnames as cn } from 'classnames';
-
-import "./DialogButton.scss";
-import "./Blue-DialogButton.scss";
-import "./Teal-DialogButton.scss";
-
-export type PropsT = {
-  className?: any;
-  componentClassName?: 'Blue-DialogButton' | 'Teal-DialogButton',
-  disabled?: boolean;
-  fontSize?: 'medium' | 'big';
-  iconName?: string;
-  label: string;
-  // Some other props omitted...
-};
-
-export const DialogButton = (props: PropsT) => {
-  const { className, fontSize, iconName, label, ...rest } = props;
-  const hasIcon = !!iconName;
-
-  const name = props.componentClassName ?? 'DialogButton';
-
-  return (
-    <button
-      className={cn(
-        name,
-        { [name + '--disabled']: props.disabled },
-        [
-          'select-none',
-          DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '',
-          className
-        ]
-      )}
-      {...rest}
-    >
-      {hasIcon && (
-        <div className={cn(DialogButtonS.Icon())}>
-          {icons[props.iconName]}
-        </div>
-      }
-      {label}
-    </button>
-  );
-};
-
 export const DialogButtonS = {
+  color: {
+    disabled: () => 'text-gray-400 hover:text-gray-400 border-gray-400',
+    blueWithDarkText: () => 'bg-blue-400 text-blue-darkest hover:bg-blue-600',
+    tealWithDarkText: () => 'bg-teal-400 text-teal-darkest hover:bg-teal-600',
+    red: () => 'bg-grey-800 text-red',
+  },
   fontSize: {
     medium: () => 'text-base',
     big: () => 'text-lg',
   },
-  Icon: () => cn('DialogButton__Icon', 'mr-2'),
+  padding: {
+    medium: () => 'px-4 py-2',
+    big: () => 'px-6 py-4',
+  },
+  Icon: {
+    margin: {
+      medium: () => 'mr-2',
+      none: () => '',
+    },
+  },
 };
 `;
 
-export const code4 = `
-.Blue-DialogButton {
-  @apply text-blue-400;
-
-  .DialogButton--disabled {
-    @apply text-gray-400;
-  }
-
-  .DialogButton__Icon {
-    @apply h-[20px] w-[20px] min-w-[20px];
-  }
-}
+export const code3 = `
+export const DefaultDialogButtonTrim = {
+  base: {
+    root: {
+      componentName: 'Default',
+      border: '',
+      color: DialogButtonS.color.blue(),
+      fontSize: DialogButtonS.fontSize.medium(),
+      padding: DialogButtonS.padding.medium(),
+    },
+    Icon: {
+      margin: DialogButtonS.Icon.margin.medium(),
+      // Some style are picked from the IconS style object
+      size: IconS.size.s20(),
+      color: IconS.color.gray(),
+    },
+  },
+  danger: { root: { color: DialogButtonS.color.red() } },
+  disabled: { root: { color: DialogButtonS.color.disabled() } },
+} as DialogButtonTrimT;
 `;
 
-<TabView titles={['DialogButton.tsx', 'Blue-DialogButton.scss']}>
+<TabView titles={['DialogButton/trim.ts', 'DialogButton/styles.ts', 'DefaultDialogButtonTrim.ts']}>
+  <CodeSnippet code={code1} />
+  <CodeSnippet code={code2} />
   <CodeSnippet code={code3} />
-  <CodeSnippet lang="sass" code={code4} />
 </TabView>
 
-Note that inside the `.Blue-DialogButton` selector there are rules for `.DialogButton--disabled` and
-`.DialogButton__Label`. Since we are already in the scope of the themed button, there is no reason to introduce
-new names for these selectors.
+Every trim object has a `base` key that defines the normal styles that are applied to the component.
+In the example, the root element of a `DialogButton` has a border, a color,
+a font size and a padding. Moreover, the Icon element has a margin, a size and a color.
+As shown in `DefaultDialogButtonTrim.ts`, you will normally pick these styles from style objects, but you don't have to.
 
-Note also that we've moved the `select-none` class from the .scss file to the JSX code. This is a pragmatic way to ensure
-that all buttons have `select-none` and removes the need to add this class to every theme.
+Apart from the `base` key, the trim object has optional keys that correspond to the different modes of the component.
+Since our `DialogButton` can be in a `danger` mode or in a `disabled` mode, we have two optional keys in the trim object.
+The style for a disabled `DialogButton` is created by layering the `disabled` mode on top of the `base` mode (using the
+`getMode` function that we will see shortly).
 
-# Using themeClassName instead of componentClassName
+The `componentName` in the `root` element of the `base` mode is a special key that is used to determine the class name
+of the root element. This class name can be used in SCSS to add intrinsic styles to the component.
 
-A variation on the above approach is to have a `themeClassName` that can be `Blue` or `Teal`. This approach is useful when
-a component and its sub-components (in this case: `Icon`) should all use the same theme:
+# Using trim objects in a custom component
 
-export const code5 = `
+As the next example shows, we can now change the button style by passing in the appropriate trim object:
+
+export const code4 = `
+export type PropsT = {
+  className?: any;
+  danger?: boolean;
+  disabled?: boolean;
+  iconName: string;
+  label: string;
+  trim?: DialogButtonTrimT;
+  // some other props omitted
+};
+
 export const DialogButton = (props: PropsT) => {
-  const { className, fontSize, iconName, label, ...rest } = props;
-  const hasIcon = !!iconName;
-
-  const name = props.themeClassName
-    ? (props.themeClassName + '-DialogButton')
-    : 'DialogButton';
+  const { trim: propsTrim, className, danger, disabled, iconName, label, ...rest } = props;
+  const trim = propsTrim ?? DefaultDialogButtonTrim;
+  const mode = getMode(trim, { danger, disabled });
 
   return (
     <button
       className={cn(
-        name,
-        { [name + '--disabled']: props.disabled },
+        trim.base.root.componentName,
+        getModeCn(mode.root),
         [
           'select-none',
-          DialogButtonS.fontSize[fontSize](),
-          hasIcon ? 'flex flex-row items-stretch' : '',
-          className
-        ]
+          'DialogButton',
+          {
+            'DialogButton--disabled': disabled,
+            'DialogButton--danger': danger,
+          },
+        ],
+        ['flex flex-row items-center', className]
       )}
       {...rest}
     >
-      {hasIcon && <Icon themeClassName={props.themeClassName} name={props.iconName} />}
+      <Icon className={getModeCn(mode.Icon)} name={iconName} />
       {label}
     </button>
   );
 };
 `;
 
-export const code6 = `
-import "./Icon.scss";
-import "./Blue-Icon.scss";
-import "./Teal-Icon.scss";
-
-export const Icon = (props: PropsT) => {
-  const name = props.themeClassName ? (props.themeClassName + '-Icon') : 'Icon';
-
-  return (
-    <div className={cn(name)}>
-        {icons[props.iconName]}
-    </div>
-  );
-};
+export const code5 = `
+export const TealDialogButtonTrim = createTrim(
+  DefaultDialogButtonTrim,
+  {
+    base: {
+      root: {
+        componentName: 'Teal-DialogButton',
+        color: DialogButtonS.color.teal(),
+      },
+    }
+  }
+);
 `;
 
-<TabView titles={['DialogButton.tsx', 'Icon.tsx']}>
+export const code6 = `
+# Note: you should probably apply these special styles using the trim object,
+# but this is just an example that shows how SCSS can be used for this purpose.
+
+.Teal-DialogButton {
+  .DialogButton--danger {
+    @apply text-3xl;
+  }
+}
+`;
+
+<TabView titles={['DialogButton/DialogButton.tsx', 'DialogButton/trims.ts', `Teal-DialogButton.scss`]}>
+  <CodeSnippet code={code4} />
   <CodeSnippet code={code5} />
   <CodeSnippet code={code6} />
 </TabView>
 
-# Theming custom components using an SCSS scope
+In this example we see that the `DialogButton` component takes a `trim` prop. If this prop is not provided then
+the `DefaultDialogButtonTrim` is used. The `trims.ts` file defines a `TealDialogButtonTrim` that we can use instead
+of the default trim.
 
-We've seen above that we can use CSS classes such as `DialogButton` and `DialogButton__Icon` to apply intrinsic styles.
-An interesting possibility is to make the intrinsic styles context-dependent. For example, a dialog button on an
-authentication page might look different from a button on a user-preferences page. We have to be very careful
-though that we don't introduce a lot of complexity to make this happen. Ideally, one of the following should be the case:
+Note that `DialogButton` still adds the `DialogButton` class name to the root element, as well `DialogButton--danger`
+and `DialogButton--disabled` (depending on the mode that the button is in). This allows you to add extra intrinsic styles,
+as shown in `Teal-DialogButton.scss`.
 
-- The intrinsic style is defined in only one place.
-- The intrinsic style is defined for different contexts. For every context, it is defined in only one place.
+## The getMode, getModeCn and createTrim functions
 
-In addition, we want to ensure that it's easy to find the intrinsic style rule for any occurrence of its associated CSS class
-in the DOM. Here is an example that illustrates how this can be achieved:
+As was mentioned above, the `danger` and `disabled` modes are layered on top of the `base` mode. We can do this with the
+`getMode` function. In the case of a disabled `DialogButton`, it executes a `mergeDeepRight(trim.base, trim.disabled)`.
 
-export const code7 = `
-// We'll import all themed variations on DialogButton in
-// the DialogButton.tsx file itself
+The `createTrim` function is used to create new trims based on existing trims. It also a `mergeDeepRight` to do this.
+In the example, `createTrim` was used to create the `TealDialogButtonTrim` trim by setting the `color` to `DialogButtonS.color.teal()`
+in the `base` mode of `TealDialogButtonTrim`.
 
-import "./DialogButton.AuthCard.scss";
-import "./DialogButton.UserProfileCard.scss";
+Finally, since the contents of a `mode` are dictionaries, we need a way to convert them to class names. This is done using the
+`getModeCn` function. For example, the result of calling `getModeCn(mode.root)` is the concatenation of all the values in
+the `mode.root` dictionary (excluding the special `componentName` key).
 
-export const DialogButton = (props: PropsT) => {
-  // This code is still the same
-};
-`;
+## Caching in `getMode` and `getModeCn`
 
-export const code8 = `
-// Note that we've put .AuthCard .DialogButton on one line.
-// This will make it easier to find this code when we copy
-// a selector in the browser's debugger.
-
-.AuthCard .DialogButton {
-
-  .DialogButton--disabled {
-    @apply text-gray-400;
-  }
-
-  .DialogButton\_\_Icon {
-    @apply fill-blue-400;
-  }
-}
-`;
-
-export const code9 = `
-// Note that we've put .UserProfileCard .DialogButton on one line.
-// This will make it easier to find this code when we copy
-// a selector in the browser's debugger.
-
-.UserProfileCard .DialogButton {
-  @apply font-bold;
-
-  .DialogButton--disabled {
-    @apply text-gray-300;
-  }
-
-  .DialogButton\_\_Icon {
-    @apply fill-teal-400;
-  }
-}
-`;
-
-<TabView titles={['DialogButton.tsx', 'DialogButton.AuthCard.scss', 'DialogButton.UserProfileCard.scss']}>
-  <CodeSnippet code={code7} />
-  <CodeSnippet lang="sass" code={code8} />
-  <CodeSnippet lang="sass" code={code9} />
-</TabView>
+Since `getMode` and `getModeCn` are performed inside the render function, we should cache the results of these functions.
+The cache can be stored in the trim object itself.

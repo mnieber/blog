@@ -107,7 +107,7 @@ export const posts = [
       },
       {
         slug: 'chapter-4',
-        title: 'Combining style objects with custom components',
+        title: 'Styling custom components with trim objects',
       },
       {
         slug: 'chapter-5',
