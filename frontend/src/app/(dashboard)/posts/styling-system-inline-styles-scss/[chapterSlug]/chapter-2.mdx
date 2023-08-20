@@ -6,7 +6,7 @@ custom component library for your application.
 
 # TailwindUI
 
-TailwindUI offers a collection of UI components, not in the traditional sense (as software components) but as a set of HTML code snippets.
+TailwindUI offers a collection of UI components, not in the traditional sense - as software components - but as a set of HTML code snippets.
 To utilize a component, simply copy the snippet to your source file and modify it as required. Note that the same snippet can appear
 in different places in your code, but that's considered to be okay. Here's an example of a snippet for an email form field:
 
@@ -44,7 +44,7 @@ There are many advantages to this approach:
 
 When it comes to the drawbacks, I would include:
 
-- **Consistency**: maintaining consistency when locally changing inline styles requires discipline from the developer.
+- **Consistency**: maintaining consistency between components when locally changing inline styles requires discipline from the developer.
 - **Maintenance**: when you update a component's appearance throughout the application, you may need to modify inline styles in multiple locations.
 - **Readability**: inline styles can appear cluttered and may not convey an intended purpose to the code reader. This can make it hard to spot mistakes.
 - **Naming**: because names are absent from the HTML code, it's hard to find the related code when you inspect the DOM in the browser.
@@ -71,8 +71,8 @@ UIkit is a Javascript framework that offers a collection of UI components. It ta
 
 - you can create a custom style by setting SCSS variables. UIkit comes with a very large set of variables,
   so you can tweak almost every aspect of the style.
-- you can add both style and behaviour to your JSX elements by adding CSS class names and attributes. Instead of attributes, you can also use
-  small snippets of Typescript.
+- you can add both style and behaviour to your JSX elements by adding class names and JSX attributes. Instead of using attributes, you can also add behaviour by adding
+small snippets of Typescript.
 
 Here is an example of creating a drop-down. Note that the button is followed by a div that has the `uk-dropdown` attribute.
 This tells UIkit that the button must be converted into a drop-down button.
@@ -91,9 +91,9 @@ export const code2 = `
 />
 
 Interestingly, there is no separate drop-down component in this code snippet. Instead, you turn the button into a drop-down by
-mixing in the `uk-dropdown` attribute. This is somewhat analogous to using inline styles, so I will call it an "inline components" approach.
+mixing in the `uk-dropdown` attribute. Since this is somewhat analogous to using inline styles, you could call it an "inline components" approach.
 It suggests a more loose concept of what a component is. Instead of an object or function, it can also be a collection of utilities
-that add styles and behaviours to some JSX structure.
+that add styles and behaviours to a JSX structure.
 
 This is a very flexible approach. For example, if you want to add an icon to
 the drop-down button, then instead of having to extend a DropDownButton component function you can just add the icon
@@ -102,7 +102,7 @@ directly to the inlined code. In my hybrid approach, I will build on this idea.
 Advantages of UIkit:
 
 - **Consistency**: different JSX elements are all styled by the same global SCSS variables;
-- **Flexibility**: there is no need to break into components, as behaviour is added to the JSX elements inline using CSS classes and attributes.
+- **Flexibility**: there is no need to break into components, as behaviour is added to the JSX elements inline using CSS classes and JSX attributes.
 
 Disadvantages are:
 
@@ -132,7 +132,7 @@ Disadvantages are:
 - **Explicitness**: if multiple SCSS rules are responsible for styling an element, then it can be hard to figure out which rules apply;
 - **Explicitness**: even when you co-locate JSX and SCSS, you still need to jump between these files to understand how elements are styled.
 
-I think SCSS offers a very powerful approach, that is also risky. For my own style system, I would like to use the power of SCSS, but put some
+I think SCSS offers a very powerful approach, that is also risky. For my own styling system, I would like to use the power of SCSS, but put some
 restrictions in place to limit the risk.
 
 # CSS-in-JS

@@ -3,18 +3,22 @@
 I will explain a hybrid approach - based on inline styles and SCSS - for writing style-related code that is compact,
 flexible and maintainable.
 
+## Why do we need a styling system?
+
+A large fraction of the code is related to styling the application. To make this code maintainable, it needs to be
+well structured and predictable. A styling system can help us to achieve that. It tells us how styles are defined,
+how styles are applied to elements, and how they are adapted to different contexts (e.g. the current theme). Without a system,
+it's very likely that different solutions will be used in different places, which will make it harder
+to understand and maintain the code.
+
 ## Assumptions
 
 You are familiar with the basics of SCSS and inline styles.
 
 ## Caveats
 
-I've used this approach in my Vidlito application, and got good results, but this approach is nonetheless
+I've used this approach in my Vidlito application (that I will soon post more about), and got good results, but this approach is nonetheless
 still experimental.
-
-Although I've used CSS a lot, it's a big and complex topic that I'm still learning about. Therefore, though I will
-discuss some of my experiences with inline styles, SCSS and CSS-in-JS, I can't make a strong case for which
-approaches should be preferred.
 
 ## Sample code
 
@@ -23,7 +27,7 @@ There is a sample application, annotated with comments, that explains the approa
 export const code1 = `
 git clone git@github.com:mnieber/blog-sample-apps.git
 cd blog-sample-apps
-yarn styleSystem-sample
+yarn stylingSystem-sample
 # Open the browser at http://localhost:3000
 `;
 
@@ -37,18 +41,10 @@ yarn styleSystem-sample
 
 I will sometimes use the terms HTML and JSX interchangeably (since JSX is a way to write HTML inside Typescript).
 
-# Why do we need a style system?
-
-A large fraction of the code is related to styling the application. To make this code maintainable, it needs to be
-well structured and predictable. A style system can help us to achieve that. It tells us how styles are defined,
-how styles are applied to elements, and how they are adapted to different contexts (e.g. the current theme). Without a system,
-it's very likely that different solutions will be used in different places, which will make it harder
-to understand and maintain the code.
-
 # Outlook
 
 In this article I will share my thoughts on writing style code. I will start by discussing various approaches for creating
 UIs: TailwindUI, SCSS, UIkit, CSS-in-JS and MaterialUI. I will discuss what I like and dislike about these approaches,
-and explain what qualities I aim for in a style system. Then, I will discuss style objects; these are a type of loosely defined component
+and explain what qualities I aim for in a styling system. Then, I will discuss style objects; these are a type of loosely defined component
 that we can mix into our concrete components. Finally, I will introduce a hybrid approach for implementing styles that is based on
 custom components, style objects, inline styles and SCSS.

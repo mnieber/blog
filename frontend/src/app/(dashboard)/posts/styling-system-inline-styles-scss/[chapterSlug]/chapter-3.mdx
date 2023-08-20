@@ -23,7 +23,7 @@ We'll try to improve this by moving some of the styles (the least interesting on
 
 For the purpose of understanding the code, the styles that are most important are those that affect the layout.
 We can verify that a particular margin or padding is correct by relating it to the margins and paddings of neighouring components.
-I will use the term "ad-hoc styles" for these context-dependent and "intrinsic styles" for the context-independent ones.
+I will use the term "ad-hoc styles" for these context-dependent styles and "intrinsic styles" for the context-independent ones.
 To reduce code clutter, intrinsic styles can be moved to an .scss file.
 
 There is no formal rule for deciding which styles are intrinsic. From a design perspective, most styles - including
@@ -94,18 +94,28 @@ import { classnames as cn } from 'classnames';
 export const SignInForm = () => {
   return (
     ...
-    <div className={cn(FormFieldS.root(), "SignInForm__EmailField")}
+    <div
+      className={cn(
+        "SignInForm__EmailField",
+        FormFieldS.root.margin()
+      )}
     >
       <label
         for="email"
-        className={cn(FormFieldS.Label(), "SignInForm__EmailFieldLabel")}
+        className={cn(
+          "SignInForm__EmailFieldLabel",
+          FormFieldS.Label.margin()
+        )}
       >
         Email address
       </label>
       <div>
         <input
           id="email" name="email" type="email"
-          className={cn(FormFieldS.Input(), "SignInForm__EmailFieldInput")}
+          className={cn(
+            "SignInForm__EmailFieldInput",
+            FormFieldS.Input()
+          )}
         />
       </div>
     </div>
@@ -116,11 +126,17 @@ export const SignInForm = () => {
 export const code4 = `
 export const FormFieldS = {
   // The "root" style adds the styles for the FormField container
-  root: () => 'mb-6',
+  root: {
+    margin: () => 'mb-6',
+  },
   // Use this style if the form-field contains a label
-  Label: () => 'mb-2',
+  Label: {
+    margin: () => 'mb-2',
+  },
   // Use this style if the form-field contains an input
-  Input: () => 'py-1.5',
+  Input: {
+    padding: () => 'py-1.5',
+  }
 };
 `;
 
@@ -130,7 +146,7 @@ export const FormFieldS = {
 </TabView>
 
 I think of a style object as a loosely defined custom component that I can mix into my concrete components.
-For example, when we add the `SignInForm__EmailFieldLabel` to our code, we can declare that it's a `FormField.Label`
+For example, we can add a `SignInForm__EmailFieldLabel` with the `FormFieldS.Label` style
 by mixing in this part of the style object. As indicated by the comments, it's not mandatory to use all the keys in the layout object.
 For example, the `Label` key is only utilized if the form-field includes a label.
 
@@ -138,7 +154,10 @@ We can achieve the same result by mixing in CSS classes, but in my opinion that 
 
 - since a CSS mixin class can be used in any CSS selector, it opens the door to more complex code;
 - we can easily jump to the style object in our IDE, but not so easily to a CSS mixin;
-- we can create hierarchies within a style object (as we shall see below), but not in SCSS.
+- we can create hierarchies within a style object (as we shall see below), but not in SCSS;
+
+In general, I find myself moving away from SCSS (though I still use it for intrinsic styles, where it's proving to be very useful)
+and towards styling with TailwindCSS and Typescript. The use of styling objects instead of SCSS fits in that trend.
 
 # Adding choices to a style object
 
@@ -153,16 +172,16 @@ export const SignInForm = () => {
   return (
     <div className="SignInForm">
       <div className={cn(
+        "SignInForm__EmailField",
         FormFieldS.root(),
-        FormFieldS.gap.big(),
-        "SignInForm__EmailField"
+        FormFieldS.margin.big()
       )}>
         <label
           for="email"
           className={cn(
-            FormFieldS.Label.root(),
-            FormFieldS.Label.color.blue(),
-            "SignInForm__EmailFieldLabel"
+            "SignInForm__EmailFieldLabel",
+            FormFieldS.Label.margin(),
+            FormFieldS.Label.color.blue()
           )}
         >
           Email address
@@ -171,8 +190,8 @@ export const SignInForm = () => {
           <input
             id="email" name="email" type="email"
             className={cn(
-              FormFieldS.Input(),
-              "SignInForm__EmailFieldInput"
+              "SignInForm__EmailFieldInput",
+              FormFieldS.Input.padding()
             )}
           />
         </div>
@@ -186,21 +205,24 @@ export const code6 = `
 import "./FormField.scss";
 
 export const FormFieldS = {
-  root: () => '',
-  // Use one of the gap styles to create space below the form-field
-  gap: {
-    big: () => 'mb-6',
-    small: () => 'mb-2',
-  },
+  root: {
+    // Use one of the gap styles to create space below the form-field
+    margin: {
+      big: () => 'mb-6',
+      small: () => 'mb-2',
+    },
+  }
   Label: {
-    root: () => 'mb-2',
+    margin: () => 'mb-2',
     // Pick one color for the label
     color: {
       blue: () => 'text-blue-500',
       green: () => 'text-green-400',
     }
   }
-  Input: () => 'py-1.5',
+  Input: {
+    padding: () => 'py-1.5',
+  }
 };
 `;
 
@@ -222,7 +244,7 @@ import { classnames as cn } from 'classnames';
 export const SignInForm = () => {
   return (
     <div className="SignInForm">
-      <div className={cn(FormFieldS.root(), FormFieldS.gap.big())}>
+      <div className={cn(FormFieldS.root(), FormFieldS.margin.big())}>
         <label
           for="email"
           className={cn(FormFieldS.Label.root(), FormFieldS.Label.color.blue())}
@@ -232,7 +254,7 @@ export const SignInForm = () => {
         <div>
           <input
             id="email" name="email" type="email"
-            className={cn(FormFieldS.Input())}
+            className={cn(FormFieldS.Input.padding())}
           />
         </div>
       </div>
@@ -246,18 +268,22 @@ import "./FormField.scss";
 
 export const FormFieldS = {
   root: () => 'FormField',
-  gap: {
+  margin: {
     big: () => 'mb-6',
     small: () => 'mb-2',
   },
   Label: {
-    root: () => cn('FormField__Label', 'mb-2'),
+    root: () => cn('FormField__Label'),
+    margin: () => 'mb-2',
     color: {
       blue: () => 'text-blue-500',
       green: () => 'text-green-400',
     }
   }
-  Input: () => cn('FormField__Input', 'py-1.5'),
+  Input: {
+    root: () => cn('FormField__Input'),
+    padding: () => cn('py-1.5'),
+  }
 };
 `;
 
