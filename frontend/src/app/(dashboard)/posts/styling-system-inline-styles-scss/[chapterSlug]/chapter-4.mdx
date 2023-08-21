@@ -65,8 +65,8 @@ export const DialogButtonS = {
 export const code3 = `
 export const DefaultDialogButtonTrim = {
   base: {
+    componentName: 'Default',
     root: {
-      componentName: 'Default',
       border: '',
       color: DialogButtonS.color.blue(),
       fontSize: DialogButtonS.fontSize.medium(),
@@ -100,7 +100,7 @@ Since our `DialogButton` can be in a `danger` mode or in a `disabled` mode, we h
 The style for a disabled `DialogButton` is created by layering the `disabled` mode on top of the `base` mode (using the
 `getMode` function that we will see shortly).
 
-The `componentName` in the `root` element of the `base` mode is a special key that is used to determine the class name
+The `componentName` in the `base` mode is a special key that is used to determine the class name
 of the root element. This class name can be used in SCSS to add intrinsic styles to the component.
 
 # Using trim objects in a custom component
@@ -126,7 +126,7 @@ export const DialogButton = (props: PropsT) => {
   return (
     <button
       className={cn(
-        trim.base.root.componentName,
+        trim.base.componentName,
         getModeCn(mode.root),
         [
           'select-none',
@@ -152,8 +152,8 @@ export const TealDialogButtonTrim = createTrim(
   DefaultDialogButtonTrim,
   {
     base: {
+      componentName: 'Teal-DialogButton',
       root: {
-        componentName: 'Teal-DialogButton',
         color: DialogButtonS.color.teal(),
       },
     }
@@ -197,7 +197,7 @@ in the `base` mode of `TealDialogButtonTrim`.
 
 Finally, since the contents of a `mode` are dictionaries, we need a way to convert these to class names. This is done using the
 `getModeCn` function. For example, the result of calling `getModeCn(mode.root)` is the concatenation of all the values in
-the `mode.root` dictionary (where the special `componentName` key is excluded).
+the `mode.root` dictionary.
 
 ## Caching in `getMode` and `getModeCn`
 
