@@ -1,7 +1,10 @@
-In this article I've explained a hybrid approach for writing style related code. It tries to retain the advantages
-of using inline styles, but using more reusable and DRY code. I've used this approach succesfully in my Vidlito application,
-but it is still experimental, and I will continue to use it to better understand its pros and cons.
+In this article I've explained a hybrid approach for writing style related code. This approach relies on
+style objects to capture the styles that are commonly used for a group of components, such as dialog buttons.
+Trim objects are type-checked, which ensures that we don't forget to apply some of these styles. By
+setting the `trim` property of a component, we can easily change its appearance. I still find it useful
+to place the intrinsic styles in a .scss file, but you don't have to.
 
-If you want a more proven approach, then I would go with inline styles using a library like TailwindUI, DaisyUI, HyperUI 
-or FlowBite. However, also in this case, you will probably move code to custom components, and then the ideas I've outlined
-here may prove to be useful.
+I've used this approach succesfully in my Vidlito application, and I like it a lot. However, it is still experimental,
+and I will continue to use it to better understand its pros and cons. If you want a more proven approach, then I would go
+with inline styles using a library like TailwindUI, DaisyUI, HyperUI or FlowBite. However, also in this case,
+you will probably move code to custom components, and then the ideas I've outlined here may prove to be useful.
