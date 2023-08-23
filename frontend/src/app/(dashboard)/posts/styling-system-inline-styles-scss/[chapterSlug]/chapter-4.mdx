@@ -65,10 +65,7 @@ export const DialogButtonS = {
 export const code3 = `
 export const DefaultDialogButtonTrim = {
   base: {
-    componentName: 'Default',
     root: {
-      border: '',
-      color: DialogButtonS.color.blue(),
       fontSize: DialogButtonS.fontSize.medium(),
       padding: DialogButtonS.padding.medium(),
     },
@@ -114,13 +111,12 @@ export type PropsT = {
   disabled?: boolean;
   iconName: string;
   label: string;
-  trim?: DialogButtonTrimT;
+  trim: DialogButtonTrimT;
   // some other props omitted
 };
 
 export const DialogButton = (props: PropsT) => {
-  const { trim: propsTrim, className, danger, disabled, iconName, label, ...rest } = props;
-  const trim = propsTrim ?? DefaultDialogButtonTrim;
+  const { trim, className, danger, disabled, iconName, label, ...rest } = props;
   const mode = getMode(trim, { danger, disabled });
 
   return (
@@ -178,11 +174,10 @@ export const code6 = `
   <CodeSnippet code={code6} />
 </TabView>
 
-In this example we see that the `DialogButton` component takes a `trim` prop. If this prop is not provided then
-the `DefaultDialogButtonTrim` is used. The `trims.ts` file defines a `TealDialogButtonTrim` that we can use instead
-of the default trim. It's a good idea to declare `TealDialogButtonTrim` to be of type `DialogButtonTrimT` so that
-Typescript immediately catches missing keys in the trim object, rather than reporting errors when you try to
-use it in `DialogButton`.
+In this example we see that the `DialogButton` component takes a `trim` prop. The `trims.ts` file defines a
+`TealDialogButtonTrim` that we can use for this property. It's a good idea to declare `TealDialogButtonTrim` to be
+of type `DialogButtonTrimT` so that Typescript immediately catches missing keys in the trim object, rather than
+reporting errors when you try to use it in `DialogButton`.
 
 Note that `DialogButton` still adds the `DialogButton` class name to the root element, as well `DialogButton--danger`
 and `DialogButton--disabled` (depending on the mode that the button is in). This allows you to add extra intrinsic styles,
