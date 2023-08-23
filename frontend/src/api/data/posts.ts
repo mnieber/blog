@@ -88,9 +88,9 @@ export const posts = [
     ],
   },
   {
-    slug: 'styling-system-inline-styles-scss',
-    title: 'A styling system based on inline styles and SCSS',
-    shortTitle: 'Inline styles and SCSS',
+    slug: 'styling-system-style-objects-scss',
+    title: 'A styling system based on style objects and SCSS',
+    shortTitle: 'Style objects',
     date: 'May 2023, by Maarten Nieber',
     chapters: [
       {
