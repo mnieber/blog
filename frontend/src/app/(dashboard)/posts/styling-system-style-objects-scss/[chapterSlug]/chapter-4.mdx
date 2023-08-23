@@ -89,7 +89,7 @@ export const DefaultDialogButtonTrim = {
 
 Every trim object has a `base` key that defines the normal styles that are applied to the component.
 In the example, the root element of a `DialogButton` has a border, a color,
-a font size and a padding. Moreover, the Icon element has a margin, a size and a color.
+a font size and a padding. We also have an `Icon` element that has a margin, a size and a color.
 As shown in `DefaultDialogButtonTrim.ts`, you will normally pick these styles from style objects, but you don't have to.
 
 Apart from the `base` key, the trim object has optional keys that correspond to the different modes of the component.
@@ -181,7 +181,7 @@ reporting errors when you try to use it in `DialogButton`.
 
 Note that `DialogButton` still adds the `DialogButton` class name to the root element, as well `DialogButton--danger`
 and `DialogButton--disabled` (depending on the mode that the button is in). This allows you to add extra intrinsic styles,
-as shown in `Teal-DialogButton.scss`.
+as shown in `Teal-DialogButton.scss`. However, in your code, you could leave out these extra classes.
 
 ## The getMode, getModeCn and createTrim functions
 
