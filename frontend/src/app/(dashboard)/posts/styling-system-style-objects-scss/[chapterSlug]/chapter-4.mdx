@@ -158,8 +158,8 @@ export const TealDialogButtonTrim: DialogButtonTrimT = createTrim(
 `;
 
 export const code6 = `
-# Note: you should probably apply these special styles using the trim object,
-# but this is just an example that shows how SCSS can be used for this purpose.
+// Note: you should probably apply these special styles using the trim object,
+// but this is just an example that shows how SCSS can be used for this purpose.
 
 .Teal-DialogButton {
   .DialogButton--danger {
@@ -174,13 +174,15 @@ export const code6 = `
   <CodeSnippet code={code6} />
 </TabView>
 
-In this example we see that the `DialogButton` component takes a `trim` prop. The `trims.ts` file defines a
-`TealDialogButtonTrim` that we can use for this property. It's a good idea to declare `TealDialogButtonTrim` to be
-of type `DialogButtonTrimT` so that Typescript immediately catches missing keys in the trim object, rather than
-reporting errors when you try to use it in `DialogButton`.
+In this example we see that the `DialogButton` component takes a `trim` prop. We can set this property to the
+`TealDialogButtonTrim` object that is defined in `trims.ts`. Note that `TealDialogButtonTrim` is based on
+`DefaultDialogButtonTrim`. This shows how you can easily create new trims based on existing ones.
+
+It's a good idea to declare `TealDialogButtonTrim` to be of type `DialogButtonTrimT` so that Typescript
+immediately catches missing keys in the trim object, rather than reporting errors when you try to use it in `DialogButton`.
 
 Note that `DialogButton` still adds the `DialogButton` class name to the root element, as well `DialogButton--danger`
-and `DialogButton--disabled` (depending on the mode that the button is in). This allows you to add extra intrinsic styles,
+and `DialogButton--disabled` (depending on the mode that the button is in). This allows you to add more intrinsic styles,
 as shown in `Teal-DialogButton.scss`. However, in your code, you could leave out these extra classes.
 
 ## The getMode, getModeCn and createTrim functions
@@ -189,8 +191,8 @@ As was mentioned above, the `danger` and `disabled` modes are layered on top of 
 `getMode` function. In the case of a disabled `DialogButton`, it executes a `mergeDeepRight(trim.base, trim.disabled)`.
 
 The `createTrim` function is used to create new trims based on existing trims. It also uses a `mergeDeepRight` to do this.
-In the example, we created `TealDialogButtonTrim` by setting the `color` to `DialogButtonS.color.teal()`
-in the `base` mode of `TealDialogButtonTrim`.
+In the example, we created `TealDialogButtonTrim` from `DefaultDialogButtonTrim` by setting the `color` in the `base` mode
+to `DialogButtonS.color.teal()`.
 
 Finally, since the contents of a `mode` are dictionaries, we need a way to convert these to class names. This is done using the
 `getModeCn` function. For example, the result of calling `getModeCn(mode.root)` is the concatenation of all the values in
@@ -199,4 +201,4 @@ the `mode.root` dictionary.
 ## Caching in `getMode` and `getModeCn`
 
 Since `getMode` and `getModeCn` are performed inside the render function, the results of these functions are cached.
-The cache is stored in the trim object itself.
+The cache is stored in the trim object itself. Please check out the sample code to see how this is done.
