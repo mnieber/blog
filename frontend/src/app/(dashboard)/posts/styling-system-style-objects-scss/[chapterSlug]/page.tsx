@@ -13,7 +13,7 @@ export default function Page({ params }: any) {
 
   return (
     <ChapterLayout
-      postSlug="styling-system-inline-styles-scss"
+      postSlug="styling-system-style-objects-scss"
       chapterSlug={chapterSlug}
     >
       {chapterSlug === 'chapter-1' && <Chapter1 />}
