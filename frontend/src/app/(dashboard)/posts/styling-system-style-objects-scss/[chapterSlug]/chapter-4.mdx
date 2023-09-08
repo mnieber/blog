@@ -32,8 +32,8 @@ type DialogButtonTrimT = {
       color: any;
     };
   },
-  danger?: ModeT<FormFieldTrimT>,
-  disabled?: ModeT<FormFieldTrimT>
+  danger?: ModeOverlayT<FormFieldTrimT>,
+  disabled?: ModeOverlayT<FormFieldTrimT>
 }
 `;
 
@@ -94,8 +94,8 @@ As shown in `DefaultDialogButtonTrim.ts`, you will normally pick these styles fr
 
 Apart from the `base` key, the trim object has optional keys that correspond to the different modes of the component.
 Since our `DialogButton` can be in a `danger` mode or in a `disabled` mode, we have two optional keys in the trim object.
-The style for a disabled `DialogButton` is created by layering the `disabled` mode on top of the `base` mode (using the
-`getMode` function that we will see shortly).
+The style for a disabled `DialogButton` is created by layering the `disabled` mode-overlay on top of the `base` mode
+(using the `getMode` function that we will see shortly).
 
 The `componentName` in the `base` mode is a special key that is used to determine the class name
 of the root element. This class name can be used in SCSS to add intrinsic styles to the component.
