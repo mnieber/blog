@@ -20,13 +20,13 @@ import { RouteTable } from '/src/routes/utils/RouteTable';
 
 export const getRouteTable = () => {
   const routeTable = new RouteTable();
-
-  routeTable.addRoutes({
-    post: () => '/posts/:postSlug',
-    posts: () => '/posts',
-  });
-
+  routeTable.addRoutes(routes);
   return routeTable;
+};
+
+export const routes = {
+  post: () => '/posts/:postSlug',
+  posts: () => '/posts',
 };
 
 export type RoutesT = {
@@ -48,31 +48,30 @@ const routeInterpolated = routes.post({ postSlug: 'foo' });
 `;
 
 export const code3 = `
-// In /src/routes/components/RouteTableProvider.tsx we add the route tables
+// In /src/routes/routeTable.ts we add the route tables
 // from each module into a single table.
 
-import React from 'react';
 import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
 import { getRouteTable as getFramesRouteTable } from '/src/frames/routeTable';
-import { RouteTable } from '/src/routes/utils/RouteTable';
+import { RouteFnByNameT, RouteTable, RouteUfnByNameT } from '/src/routes/utils/RouteTable';
 
-export const RouteTableContext = React.createContext<RouteTable>(
-  new RouteTable()
-);
-
-type PropsT = React.PropsWithChildren<{}>;
-
-export const RouteTableProvider = (props: PropsT) => {
+export const createRouteTable = () => {
   const routeTable = new RouteTable();
   routeTable.addTable(getPostsRouteTable());
   routeTable.addTable(getFramesRouteTable());
+  return routeTable;
+};
 
-return (
+export const routeTable = createRouteTable();
 
-<RouteTableContext.Provider value={routeTable}>
-  {props.children}
-</RouteTableContext.Provider>
-); }; `;
+export const getRoutes = <T>() => {
+  return routeTable.routeFnByName as RouteFnByNameT<T>;
+};
+
+export const getRouteUfns = <T>() => {
+  return routeTable.routeUfnByName as RouteUfnByNameT<T>;
+};
+`;
 
 <TabView titles={['/src/posts/RouteTable.ts', 'example.ts', 'RouteTableProvider.tsx']}>
   <CodeSnippet code={code1} />
@@ -141,7 +140,7 @@ import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
 import { RoutesT as FramesRoutesT } from '/src/frames/routeTable';
 
 export const UrlRouter = observer(() => {
-  const routes = useRoutes<PostsRoutesT & FramesRoutesT>();
+  const routes = getRoutes<PostsRoutesT & FramesRoutesT>();
 
   return (
     <Route path={routes.posts()}>
@@ -160,6 +159,6 @@ export const UrlRouter = observer(() => {
   <CodeSnippet code={code5} />
 </TabView>
 
-In `useRoutes` we specify the types of the routes that we want to use:
+In `getRoutes` we specify the types of the routes that we want to use:
 `PostsRoutesT & FramesRoutesT`. This isn't perfectly safe as we need to trust that `RouteTableProvider` in fact
 provides these routes, but in practice this works well enough.
