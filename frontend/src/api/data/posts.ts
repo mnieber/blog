@@ -135,7 +135,7 @@ export const posts = [
       },
       {
         slug: 'chapter-4',
-        title: 'Url synchronization effects',
+        title: 'Url effects',
       },
       {
         slug: 'chapter-5',

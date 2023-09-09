@@ -7,13 +7,15 @@ on a navigation handler and navigation pages.
 To illustrate why this decoupling is useful, consider an application that shows blog-posts. The application
 has a page with current blog-posts, and a page with archived blog-posts. Both pages use a `BlogPostList`
 component. When `BlogPostList` wants to change the url, it can send a `navToPost` request to the
-navigation handler while remaining agnostic of how the url must be changed.
+navigation handler. The navigation handler will update the url in a context-dependent way. For example,
+if the navigation requests happened on the archive page then we can navigate to `/archived-posts/:post-d`.
+What's important is that `BlogPostList` can remain agnostic of how the url must be changed.
 
 The corresponding work-flow is as follows:
 
 1. The component calls `navToPost(post)` to trigger a url change.
 2. The `navToPost` function calls `navHander.getNavFn('navToPost')`.
-3. The navigation handler finds the navigation page (`page`) for the current url that implements `navToPost`.
+3. The navigation handler finds the navigation page for the current url that implements `navToPost`.
    It returns `page.navToPost`.
 4. Finally, in the body of `page.navToPost`, we call the appropriate route update function to update the url.
 
@@ -122,21 +124,21 @@ export const code5 = `
 export const UrlRouter = observer((props: PropsT) => {
   const routes = useRoutes();
 
-  return (
-    <Switch>
-      <DashboardNavPage>
-        <Route path={routes.dashboard()}>
-          <DashboardView />
-        </Route>
-      </DashboardNavPage>
-      <ArchiveNavPage>
-        <Route path={routes.archive()}>
-          <ArchiveView />
-        </Route>
-      </ArchiveNavPage>
-    </Switch>
-  );
-});`;
+return (
+
+<Switch>
+  <DashboardNavPage>
+    <Route path={routes.dashboard()}>
+      <DashboardView />
+    </Route>
+  </DashboardNavPage>
+  <ArchiveNavPage>
+    <Route path={routes.archive()}>
+      <ArchiveView />
+    </Route>
+  </ArchiveNavPage>
+</Switch>
+); });`;
 
 <TabView titles={['ArchiveNavPage.ts', 'DashboardNavPage.ts', 'UrlRouter.tsx']}>
   <CodeSnippet code={code3} />

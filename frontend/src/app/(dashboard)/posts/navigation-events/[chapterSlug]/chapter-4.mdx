@@ -1,18 +1,22 @@
 import { aphorisms } from '/src/api/data/aphorisms';
 
-# The sync-url-effect
+# The url-effect
 
-The need for synchronizing the application state with the url is most obvious when
-the application is loaded. The url will point to some application page that requires
-a certain state that includes data (e.g. the blog-posts) and meta-data (e.g. the id of
-the highlighted blog-post). In this chapter, I will not discuss data fetching, which is the
-topic of [this post](/posts/state-providers/chapter-1). Instead, I will show
-a `SyncPostWithUrlEffect` that:
+Though the application state and the url state are obviously connected, it's not immediately
+obvious what their relationship should be. In my applications, I consider the url to be the
+single source of truth for **initializing** the application. In other words, when the application
+initializes then the application state is derived from the url, However, once the application is
+initialized, then the url is derived from the application state.
 
-- Ensures that the correct post is highlighted, based on the current url;
-- Updates the url when the highlighted post changes.
+Let's consider the case where the application is loaded. The url will point to some application page that
+requires a certain state that includes data (e.g. the blog-posts) and meta-data (e.g. the id of
+the highlighted blog-post). Based on the current url:
 
-Here is the code:
+- certain data needs to be fetched (I discuss this in [this post](/posts/state-providers/chapter-1));
+- we must ensure that the correct post is highlighted.
+
+Once the application is initialized then we must updates the url when the highlighted post changes.
+I will use a so-called url-effect to achieve these aims:
 
 export const code1 = `
 type PropsT = {};
@@ -63,7 +67,7 @@ export const SyncPostWithUrlEffect = observer(
   code={code1}
 />
 
-Note that the example code depends on some of other libraries that are discussed in
+Note that the example code depends on some of my other libraries that are discussed in
 this [post about Skandha](/posts/skandha/chapter-1) and this
 [post about default properties](/posts/default-props/chapter-1). Here I will briefly
 explain what these libraries do, so that you can understand the example:
@@ -76,13 +80,15 @@ explain what these libraries do, so that you can understand the example:
   code, we're assuming that a `Highlight` object is used to track the highlighted post.
 
 
-# Inserting the sync-url-effect in the router
+# Inserting the url-effect in the router
 
 The `SyncPostWithUrlEffect` must be inserted in the appropriate place in the component tree.
-Specifically, it must be inserted at a location where there is a `postSlug` url parameter,
-and where `posts` and `postsHighlight` are available as default properties. In the example below,
-the default properties are provided by the `PostsStateProvider` component. The `SyncPostWithUrlEffect`
-is inserted inside of the `Route` element that adds the `postSlug` url parameter.
+What we want to achieve is that the correct post is highlighted when the `PostsView` is shown.
+Therefore, we will insert the `SyncPostWithUrlEffect` right above the `PostsView`.
+
+Note that we cannot insert `SyncPostWithUrlEffect` just anywhere. It must be inserted at a
+location where there is a `postSlug` url parameter, and where `posts` and `postsHighlight` are
+available as default properties. Our chosen location meets these criteria.
 
 export const code2 = `
 export const UrlRouter = observer((props: PropsT) => {

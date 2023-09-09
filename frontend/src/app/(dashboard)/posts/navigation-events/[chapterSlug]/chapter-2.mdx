@@ -35,19 +35,7 @@ export type RoutesT = {
 };
 `;
 
-export const code2 = `;
-import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
-
-const routeTable = getPostsRouteTable();
-
-const routes = routeTable.routeFnByName;
-// route = "/posts/:postSlug"
-const route = routes.post();
-// routeInterpolated = "/posts/foo"
-const routeInterpolated = routes.post({ postSlug: 'foo' });
-`;
-
-export const code3 = `
+export const code2 = `
 // In /src/routes/routeTable.ts we add the route tables
 // from each module into a single table.
 
@@ -73,7 +61,20 @@ export const getRouteUfns = <T>() => {
 };
 `;
 
-<TabView titles={['/src/posts/RouteTable.ts', 'example.ts', 'RouteTableProvider.tsx']}>
+export const code3 = `;
+import { getRoutes } from '/src/posts/routeTable';
+import type { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
+
+const routeTable = getPostsRouteTable();
+
+const routes = getRoutes<PostsRoutesT>;
+// route = "/posts/:postSlug"
+const route = routes.post();
+// routeInterpolated = "/posts/foo"
+const routeInterpolated = routes.post({ postSlug: 'foo' });
+`;
+
+<TabView titles={['/src/posts/RouteTable.ts', '/src/routes/routeTable.ts', 'example.ts']}>
   <CodeSnippet code={code1} />
   <CodeSnippet code={code2} />
   <CodeSnippet code={code3} />
@@ -82,64 +83,48 @@ export const getRouteUfns = <T>() => {
 As you can see in `/src/posts/RouteTable.ts`, the information about each route is specified twice.
 This is unfortunate, but necessary to get type safety.
 
+In `/src/routes/routeTable.ts` we see how the route tables for all modules are combined into a single
+route table. This single route table is stored in a context and provided to all components that need it.
+
 Now that the routes are declared we can use `routeTable.routeFnByName` to access the so-called route
 functions, as shown in `example.ts`. A route function returns the route as a string. When we pass parameters
 to the route function then value interpolation is performed. When we add the route to the router (we will
 discuss this below) then we don't pass parameters, so that we obtain a route string that contains the
 parameter-names.
 
-Finally, in `RouteTableProvider.tsx` we see how the route tables for all modules are combined into a single
-route table. This single route table is stored in a context and provided to all components that need it.
+When we call `getRoutes` or `getRouteUfns` we have specify the types of the routes that we want to use.
+This isn't perfectly type safe as we need to trust that the global route-table in fact
+provides these routes, but in practice this works well enough.
 
 # Route update functions
 
 A route update function is similar to a route function, but instead of returning a route, it updates the url.
 We will use these functions in the next chapter when we discuss navigation events.
 
-export const code6 = `
-import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
+export const code4 = `
+import { getRouteUfns } from '/src/routes/routeTable';
+import type { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
 
-const routeTable = getPostsRouteTable();
-
-const routeUfn = routeTable.routeUfnByName.post;
+const routeUfn = getRouteUfns<PostsRoutesT>().post;
 routeUfn({ postSlug: 'foo' }); // updates the url to "/posts/foo"
 `;
 
 <CodeSnippet
   title="example.ts"
   addMb
-  code={code6}
+  code={code4}
 />
 
-# Declaring the router
+# Declaring the routes in the router
 
-The example code below shows how to declare a router. The `UrlRouter` component is wrapped in a
-`RouteTableProvider` so that it can access the route table. The `UrlRouter` component uses the `useRoutes`
-hook to access these routes.
-
-export const code4 = `
-// In /src/app/components/App.tsx the App component wraps the UrlRouter
-// in a RouteTableProvider.
-
-import React from 'react';
-import { RouteTableProvider, UrlRouter } from '/src/routes/components";
-
-export const App = () => {
-  return (
-    <RouteTableProvider>
-      <UrlRouter />
-    </RouteTableProvider>
-  );
-};
-`;
+The example code below shows how to declare a router. The `PostsSwitch` component uses the `getRoutes`
+function to access the routes.
 
 export const code5 = `
-// In /src/routes/components/UrlRouter.tsx we add Routes using the useRoutes hook.
-
 import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
 import { RoutesT as FramesRoutesT } from '/src/frames/routeTable';
 
-export const UrlRouter = observer(() => {
+export const PostsSwitch = () => {
   const routes = getRoutes<PostsRoutesT & FramesRoutesT>();
 
   return (
@@ -152,13 +137,8 @@ export const UrlRouter = observer(() => {
       </Route>
     </Route>
   );
-});`;
+};`;
 
-<TabView titles={['App.tsx', 'UrlRouter.ts']}>
-  <CodeSnippet code={code4} />
+<TabView titles={['/src/posts/components/PostsSwitch.tsx']}>
   <CodeSnippet code={code5} />
 </TabView>
-
-In `getRoutes` we specify the types of the routes that we want to use:
-`PostsRoutesT & FramesRoutesT`. This isn't perfectly safe as we need to trust that `RouteTableProvider` in fact
-provides these routes, but in practice this works well enough.
