@@ -3,19 +3,19 @@ import { aphorisms } from '/src/api/data/aphorisms';
 # The url-effect
 
 Though the application state and the url state are obviously connected, it's not immediately
-obvious what their relationship should be. In my applications, I consider the url to be the
-single source of truth for **initializing** the application. In other words, when the application
+clear what their relationship should be. In my applications, I consider the url to be the
+single source of truth for *initializing* the application. When the application
 initializes then the application state is derived from the url, However, once the application is
 initialized, then the url is derived from the application state.
 
-Let's consider the case where the application is loaded. The url will point to some application page that
-requires a certain state that includes data (e.g. the blog-posts) and meta-data (e.g. the id of
+Let's consider the case where the application is loaded. The url will point to a page (e.g. /blog-posts)
+that requires a certain state. This state includes data and meta-data (e.g. the id of
 the highlighted blog-post). Based on the current url:
 
-- certain data needs to be fetched (I discuss this in [this post](/posts/state-providers/chapter-1));
+- data needs to be fetched (I discuss this in [this post](/posts/state-providers/chapter-1));
 - we must ensure that the correct post is highlighted.
 
-Once the application is initialized then we must updates the url when the highlighted post changes.
+Once the application is initialized then we must update the url when the highlighted post changes.
 I will use a so-called url-effect to achieve these aims:
 
 export const code1 = `
