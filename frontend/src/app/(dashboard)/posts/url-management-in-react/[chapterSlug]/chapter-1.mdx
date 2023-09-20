@@ -33,12 +33,13 @@ To achieve this our application must do some kind of url management:
 - we must update the url when the application state changes, and vice versa. For example, when
   the user renames a folder, then we need to update the url accordingly.
 
-I tackle these challenges using two techniques: the navigation handler and the url effect.
+I tackle these challenges using two techniques: the navigation context and the url effect.
 
-A **navigation handler** is used to decouple components from url changes. In the given example, a `MapTreeView`
+A **navigation context** is used to decouple components from url changes. In the given example, a `MapTreeView`
 can detect the mouse-click on a folder, but it cannot decide the url-change that must happen (because the
-same `MapTreeView` could be used on different pages). Instead, it will send a `navToFolder` request to the
-navigation handler, that takes care of the url update in a context-dependent way.
+same `MapTreeView` could be used on different pages). Instead, it will call a `toFolder` navigation function,
+that will handle the navigation request in a context-dependent way (this means that the url update will depend
+on where the requester component is located in the rendering tree, and on who is making the request).
 
 A **url effect** is a render component that is inserted into the routing schema. Since a url effect is only
 rendered if it matches the current url, it knows which page the user is on. Therefore, it can synchronize the
@@ -49,6 +50,6 @@ In both cases, "context-dependent" is the key term, and we will come back to it.
 # Outlook
 
 In the next section I will first explain how I do (ordinary) routing in my application. This is a preparation
-for the subsequent section in which I explain how url management is tackled using a navigation handler and
+for the subsequent section in which I explain how url management is tackled using a navigation context and
 url effects. Then I will discuss how so-called url-effects can be used to synchronize the application state
 with the url and vice versa. In the final section I will discuss the pros and cons of my approach.

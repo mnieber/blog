@@ -4,10 +4,10 @@ By route management, I mean the following:
 
 - declaring a schema that defines routes and their parameters;
 - declaring a router component that displays a React view based on the current url;
-- exposing route update functions that convert a route name and associated route parameters into a url.
+- exposing route functions that convert a route name and associated route parameters into a url.
 
 In this chapter we'll look at these three aspects in detail. In the next chapter, we'll see how components
-can fire navigation events that cause url changes.
+can make navigation requests that result in url changes.
 
 # Declaring routes
 
@@ -18,12 +18,6 @@ other function, as we shall see later. I declare my routes in a `RouteTable` ins
 export const code1 = `
 import { RouteTable } from '/src/routes/utils/RouteTable';
 
-export const getRouteTable = () => {
-  const routeTable = new RouteTable();
-  routeTable.addRoutes(routes);
-  return routeTable;
-};
-
 export const routes = {
   post: () => '/posts/:postSlug',
   posts: () => '/posts',
@@ -33,6 +27,12 @@ export type RoutesT = {
   post: (args: { postSlug: string }) => void,
   posts: () => void,
 };
+
+export const getRouteTable = () => {
+  const routeTable = new RouteTable();
+  routeTable.addRoutes(routes);
+  return routeTable;
+};
 `;
 
 export const code2 = `
@@ -41,7 +41,7 @@ export const code2 = `
 
 import { getRouteTable as getPostsRouteTable } from '/src/posts/routeTable';
 import { getRouteTable as getFramesRouteTable } from '/src/frames/routeTable';
-import { RouteFnByNameT, RouteTable, RouteUfnByNameT } from '/src/routes/utils/RouteTable';
+import { RouteFnByNameT, RouteTable } from '/src/routes/utils/RouteTable';
 
 export const createRouteTable = () => {
   const routeTable = new RouteTable();
@@ -52,26 +52,22 @@ export const createRouteTable = () => {
 
 export const routeTable = createRouteTable();
 
-export const getRoutes = <T>() => {
+export const getRouteFns = <T>() => {
   return routeTable.routeFnByName as RouteFnByNameT<T>;
-};
-
-export const getRouteUfns = <T>() => {
-  return routeTable.routeUfnByName as RouteUfnByNameT<T>;
 };
 `;
 
 export const code3 = `;
-import { getRoutes } from '/src/posts/routeTable';
+import { getRouteFns } from '/src/posts/routeTable';
 import type { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
 
 const routeTable = getPostsRouteTable();
 
-const routes = getRoutes<PostsRoutesT>;
+const routeFns = getRouteFns<PostsRoutesT>;
 // route = "/posts/:postSlug"
-const route = routes.post();
+const route = routeFns.post();
 // routeInterpolated = "/posts/foo"
-const routeInterpolated = routes.post({ postSlug: 'foo' });
+const routeInterpolated = routeFns.post({ postSlug: 'foo' });
 `;
 
 <TabView titles={['/src/posts/RouteTable.ts', '/src/routes/routeTable.ts', 'example.ts']}>
@@ -86,38 +82,19 @@ This is unfortunate, but necessary to get type safety.
 In `/src/routes/routeTable.ts` we see how the route tables for all modules are combined into a single
 route table. This single route table is stored in a context and provided to all components that need it.
 
-Now that the routes are declared we can use `routeTable.routeFnByName` to access the so-called route
+Now that the routes are declared we can use `getRouteFns` to access the so-called route
 functions, as shown in `example.ts`. A route function returns the route as a string. When we pass parameters
 to the route function then value interpolation is performed. When we add the route to the router (we will
 discuss this below) then we don't pass parameters, so that we obtain a route string that contains the
 parameter-names.
 
-When we call `getRoutes` or `getRouteUfns` we have specify the types of the routes that we want to use.
+When we call `getRouteFns` we have specify the types of the routes that we want to use.
 This isn't perfectly type safe as we need to trust that the global route-table in fact
 provides these routes, but in practice this works well enough.
 
-# Route update functions
-
-A route update function is similar to a route function, but instead of returning a route, it updates the url.
-We will use these functions in the next chapter when we discuss navigation events.
-
-export const code4 = `
-import { getRouteUfns } from '/src/routes/routeTable';
-import type { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
-
-const routeUfn = getRouteUfns<PostsRoutesT>().post;
-routeUfn({ postSlug: 'foo' }); // updates the url to "/posts/foo"
-`;
-
-<CodeSnippet
-  title="example.ts"
-  addMb
-  code={code4}
-/>
-
 # Declaring the routes in the router
 
-The example code below shows how to declare a router. The `PostsSwitch` component uses the `getRoutes`
+The example code below shows how to declare a router. The `PostsSwitch` component uses the `getRouteFns`
 function to access the routes.
 
 export const code5 = `
@@ -125,7 +102,7 @@ import { RoutesT as PostsRoutesT } from '/src/posts/routeTable';
 import { RoutesT as FramesRoutesT } from '/src/frames/routeTable';
 
 export const PostsSwitch = () => {
-  const routes = getRoutes<PostsRoutesT & FramesRoutesT>();
+  const routes = getRouteFns<PostsRoutesT & FramesRoutesT>();
 
   return (
     <Route path={routes.posts()}>

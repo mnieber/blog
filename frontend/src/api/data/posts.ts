@@ -116,8 +116,8 @@ export const posts = [
     ],
   },
   {
-    slug: 'navigation-events',
-    title: 'Decoupled navigation event handling',
+    slug: 'url-management-in-react',
+    title: 'Decoupled navigation request handling',
     shortTitle: 'Url management in React',
     date: 'May 2023, by Maarten Nieber',
     chapters: [
@@ -131,7 +131,7 @@ export const posts = [
       },
       {
         slug: 'chapter-3',
-        title: 'Processing navigation events',
+        title: 'Processing navigation requests',
       },
       {
         slug: 'chapter-4',

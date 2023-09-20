@@ -1,0 +1,204 @@
+# Introduction
+
+In the last section we saw how we can define routes using route functions. Let's now consider
+url updates. I will first describe the standard way of triggering url changes, and then describe a more
+decoupled approach that is based on a navigation context and navigation functions.
+
+## How url changes are usually triggered
+
+The easiest way to trigger url changes in components is to call `history.push` inside of the component.
+However, this limits reuse. A better way is to pass a property into the component that takes
+care of the navigation. This allows us to decide the desired navigation on a higher level (usually
+a parent component). However, this might not be the best way to achieve decoupling, since it requires
+(potentially multiple levels of) prop drilling.
+
+Using prop drilling is annoying, but doable. However, it also bothers me to delegate the
+responsibility for setting up the navigation handling to components. Intuitively, I would rather use the
+exception handling model for navigation, where navigation requests are like exceptions that bubble up until some handler processes them.
+
+## A decoupled approach for triggering url changes
+
+To illustrate the approach I outlined above, consider an application that shows blog-posts. The application
+has a `/posts/:postSlug` page that contains a `BlogPostlist`. The application uses navigation handlers (implemented by React contexts) to provide navigation functions to the rendering components. The `BlogPostList` can make a navigation request as follows:
+
+1. It calls `const navContext = useNavContext("BlogPostList")` to obtain a navigation context that contains all surrounding navigation handlers.
+2. It calls `navContext.nav(toPost)(postSlug)`;
+3. The navigation context loops over its navigation handlers. It finds the handler that can handle the request, and returns the corresponding navigation function.
+4. `BlogPostList` executes this navigation function with the `postSlug` argument to update the url to `/posts/:postSlug`.
+
+Now suppose that the application also has a page with archived blog-posts. This page uses a `BlogPostList` that is wrapped in a `ArchivedPostsNavHandler`. In this case, the navigation request from `BlogPostList` will be handled by a navigation function that updates the url to `/archived-posts/:postSlug`. Note that `BlogPostList` can remain agnostic of how the url must be changed.
+
+export const code1 = `
+import { toPost } from '/src/posts/navFunctions';
+import { useNavContext } from 'react-nav-handler';
+
+export type PropsT = { /* omitted for brevity */ };
+
+export const PostListView = observer((props: PropsT) => {
+  const navContext = useNavContext("PostListView");
+  const navToPost = navContext.nav(toPost);
+  const postDivs = props.posts.map((post, idx) => {
+    return (
+      <PostListViewItem
+        key={\`item-\$\{post.id\}\`}
+        post={post}
+        onClick={(e: any) => navToPost(post.slug)}
+      />
+    );
+  });
+  return (
+    <div className={cn('PostListView', props.className)}>
+      {postDivs}
+    </div>
+  );
+});
+`;
+
+export const code2 = `
+// This file declares the toPost navigation function signature. As we shall see,
+// we need to install one or more navigation handlers that implement this function.
+
+import { PostT } from '/src/api/types/PostT';
+import { createNavFunction, navTargetStub } from 'react-nav-handler';
+
+export const toPost = createNavFunction(
+  'toPost',
+  (postSlug: string) => navTargetStub
+);
+`;
+
+<TabView titles={['PostListView.tsx', 'posts/navFunctions.ts']}>
+  <CodeSnippet code={code1} />
+  <CodeSnippet code={code2} />
+</TabView>
+
+## Declaring and installing navigation handlers
+
+To make the above code work, we will implement a `PostsNavHandler` and a `ArchivedPostsNavHandler`. These handlers
+provide the `toPost` navigation function. Then, we will add the `PostsNavHandler` component to `UrlRouter`. It will be mounted when the user visits the `/posts` page. We also add the `ArchivedPostsNavHandler` component that will be mounted when the user visits the `/archive` page.
+
+export const code3 = `
+import { NavHandlersProvider } from '/src/navHandler';
+
+export const createNavFunctionTable = () => {
+  return {
+    toPost: ((navContext: NavContextT) => (postId: string) => {
+      const url = getRouteFns<PostsRoutesT>().post({ postId });
+      return { url, nav: () => history.push(url) };
+    }) as typeof toPost,
+  };
+};
+
+export const PostsNavHandler = (props: React.PropsWithChildren<{}>) => {
+  const handler = useBuilder(() => ({
+    id: 'PostsNavHandler',
+    navFunctionTable: createNavFunctionTable(),
+  });
+  return (
+    <NavHandlersProvider extend value={[handler]}>
+      {props.children}
+    </NavHandlersProvider>
+  );
+};
+`;
+
+export const code4 = `
+import { NavHandlersProvider } from '/src/navHandler';
+
+export const createNavFunctionTable = () => {
+  return {
+    toPost: ((navContext: NavContextT) => (postId: string) => {
+      const url = getRouteFns<PostsRoutesT>().archivedPost({ postId });
+      return { url, nav: () => history.push(url) };
+    }) as typeof toPost,
+  };
+};
+
+export const ArchivedPostsNavHandler = (props: React.PropsWithChildren<{}>) => {
+  const handler = useBuilder(() => ({
+    id: 'ArchivedPostsNavHandler',
+    navFunctionTable: createNavFunctionTable(),
+  });
+  return (
+    <NavHandlersProvider extend value={[handler]}>
+      {props.children}
+    </NavHandlersProvider>
+  );
+};
+`;
+
+export const code5 = `
+export const UrlRouter = observer((props: PropsT) => {
+  const routes = useRoutes();
+  return (
+    <Switch>
+      <Route path={routes.dashboard()}>
+        <PostsNavHandler>
+          <DashboardView />
+        </PostsNavHandler>
+      </Route>
+      <Route path={routes.archive()}>
+        <ArchivedPostsNavHandler>
+          <ArchiveView />
+        </ArchivedPostsNavHandler>
+      </Route>
+    </Switch>
+  );
+});`;
+
+<TabView
+  titles={['ArchivedPostsNavHandler.ts', 'PostsNavHandler.ts', 'UrlRouter.tsx']}
+>
+  <CodeSnippet code={code3} />
+  <CodeSnippet code={code4} />
+  <CodeSnippet code={code5} />
+</TabView>
+
+## Simple navigation functions
+
+Since context-dependent navigation functions require more boilerplate, I only use
+them when necessary. The `navFunctions.ts` file can also contain simple navigation
+functions that are not context-dependent:
+
+export const code6 = `
+// Import statements
+// ...
+
+export const toPost = createNavFunction(
+  'toPost',
+  (postSlug: string) => navTargetStub
+);
+// A simple navigation function
+export const navToPostsHelp = () => history.push(routeFns.postsHelp());
+`;
+
+<CodeSnippet lang="typescript" addMb code={code6} />
+
+If it later turns out that a context-dependent `toPostsHelp` function is needed, then a small
+refactoring can take care of that.
+
+## Fine-grained navigation
+
+The `navContext` argument in the implementation of `toPost` is currently unused. We can
+use it in case that the navigation function should only handle requests with a particular
+requesterId:
+
+export const code7 = `
+export const createNavFunctionTable = () => {
+  return {
+    toPost: ((navContext: NavContext) =>
+      navContext.requesterId === 'PostListView'
+        ? (postId: string) => {
+            const url = getRouteFns<PostsRoutesT>().post({ postId });
+            return { url, nav: () => history.push(url) };
+          }
+        : undefined) as typeof toPost,
+  };
+};
+`;
+
+<CodeSnippet lang="typescript" addMb code={code7} />
+
+Another possiblity is to only handle the navigation requests if we are on a particular url.
+These are advanced use-cases, and you probably won't need them, but in particular cases
+they may be useful.

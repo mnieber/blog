@@ -12,7 +12,7 @@ export default function Page({ params }: any) {
   console.assert(chapterSlug);
 
   return (
-    <ChapterLayout postSlug="navigation-events" chapterSlug={chapterSlug}>
+    <ChapterLayout postSlug="url-management-in-react" chapterSlug={chapterSlug}>
       {chapterSlug === 'chapter-1' && <Chapter1 />}
       {chapterSlug === 'chapter-2' && <Chapter2 />}
       {chapterSlug === 'chapter-3' && <Chapter3 />}
