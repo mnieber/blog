@@ -7,26 +7,33 @@ decoupled approach that is based on a navigation context and navigation function
 ## How url changes are usually triggered
 
 The easiest way to trigger url changes in components is to call `history.push` inside of the component.
-However, this limits reuse. A better way is to pass a property into the component that takes
-care of the navigation. This allows us to decide the desired navigation on a higher level (usually
-a parent component). However, this might not be the best way to achieve decoupling, since it requires
-(potentially multiple levels of) prop drilling.
-
-Using prop drilling is annoying, but doable. However, it also bothers me to delegate the
+However, this limits reuse. A better way is to pass a navigation function into the component (as a property)
+that takes care of the navigation. This allows us to decide the desired navigation on a higher level (usually
+a parent component). Still, this might not be the best way to achieve decoupling, since it requires
+(potentially multiple levels of) prop drilling. Moreover, it bothers me to delegate the
 responsibility for setting up the navigation handling to components. Intuitively, I would rather use the
-exception handling model for navigation, where navigation requests are like exceptions that bubble up until some handler processes them.
+exception handling model for navigation, where navigation requests are like exceptions that bubble up
+until - at some level - a navigation handler processes them.
 
 ## A decoupled approach for triggering url changes
 
-To illustrate the approach I outlined above, consider an application that shows blog-posts. The application
-has a `/posts/:postSlug` page that contains a `BlogPostlist`. The application uses navigation handlers (implemented by React contexts) to provide navigation functions to the rendering components. The `BlogPostList` can make a navigation request as follows:
+To illustrate the approach that is based on the exception model, consider an application that shows blog-posts.
+The application has a `/posts/:postSlug` page that contains a `BlogPostlist`. The application uses navigation
+handlers (implemented by React contexts) to provide navigation functions to the rendering components.
+The `BlogPostList` can make a navigation request as follows:
 
-1. It calls `const navContext = useNavContext("BlogPostList")` to obtain a navigation context that contains all surrounding navigation handlers.
+1. It calls `const navContext = useNavContext("BlogPostList")` to obtain a navigation context that contains
+   all available navigation handlers.
 2. It calls `navContext.nav(toPost)(postSlug)`;
-3. The navigation context loops over its navigation handlers. It finds the handler that can handle the request, and returns the corresponding navigation function.
-4. `BlogPostList` executes this navigation function with the `postSlug` argument to update the url to `/posts/:postSlug`.
+3. The navigation context loops over its navigation handlers. It finds the handler that can handle the request, and
+   returns the corresponding navigation function.
+4. `BlogPostList` executes this navigation function with the `postSlug` argument to update the url
+   to `/posts/:postSlug`.
 
-Now suppose that the application also has a page with archived blog-posts. This page uses a `BlogPostList` that is wrapped in a `ArchivedPostsNavHandler`. In this case, the navigation request from `BlogPostList` will be handled by a navigation function that updates the url to `/archived-posts/:postSlug`. Note that `BlogPostList` can remain agnostic of how the url must be changed.
+Now suppose that the application also has a page with archived blog-posts. This page uses a `BlogPostList` that is
+wrapped in a `ArchivedPostsNavHandler`. In this case, the same navigation request from `BlogPostList` will be handled
+by a navigation function that updates the url to `/archived-posts/:postSlug`. Note that `BlogPostList` can remain
+agnostic of how the url must be changed.
 
 export const code1 = `
 import { toPost } from '/src/posts/navFunctions';
@@ -74,8 +81,9 @@ export const toPost = createNavFunction(
 
 ## Declaring and installing navigation handlers
 
-To make the above code work, we will implement a `PostsNavHandler` and a `ArchivedPostsNavHandler`. These handlers
-provide the `toPost` navigation function. Then, we will add the `PostsNavHandler` component to `UrlRouter`. It will be mounted when the user visits the `/posts` page. We also add the `ArchivedPostsNavHandler` component that will be mounted when the user visits the `/archive` page.
+To make the above code work, we will define a `PostsNavHandler` and a `ArchivedPostsNavHandler` that both implement
+the `toPost` navigation function. Then, we will add them to the `UrlRouter`. `PostsNavHandler` will be
+mounted when the user visits the `/posts` page, and `ArchivedPostsNavHandler` when the user visits `/archive`.
 
 export const code3 = `
 import { NavHandlersProvider } from '/src/navHandler';
@@ -147,7 +155,7 @@ export const UrlRouter = observer((props: PropsT) => {
 });`;
 
 <TabView
-  titles={['ArchivedPostsNavHandler.ts', 'PostsNavHandler.ts', 'UrlRouter.tsx']}
+  titles={['PostsNavHandler.ts', 'ArchivedPostsNavHandler.ts', 'UrlRouter.tsx']}
 >
   <CodeSnippet code={code3} />
   <CodeSnippet code={code4} />
@@ -181,7 +189,7 @@ refactoring can take care of that.
 
 The `navContext` argument in the implementation of `toPost` is currently unused. We can
 use it in case that the navigation function should only handle requests with a particular
-requesterId:
+`requesterId`:
 
 export const code7 = `
 export const createNavFunctionTable = () => {
@@ -200,5 +208,5 @@ export const createNavFunctionTable = () => {
 <CodeSnippet lang="typescript" addMb code={code7} />
 
 Another possiblity is to only handle the navigation requests if we are on a particular url.
-These are advanced use-cases, and you probably won't need them, but in particular cases
+These are advanced use-cases, and you probably won't need them, but in rare cases
 they may be useful.

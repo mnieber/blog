@@ -1,32 +1,56 @@
-import { aphorisms } from '/src/api/data/aphorisms';
-
-# The url-effect
+# The relation between application state and the url
 
 Though the application state and the url state are obviously connected, it's not immediately
-clear what their relationship should be. In my applications, I consider the url to be the
-single source of truth for *initializing* the application. When the application
-initializes then the application state is derived from the url, However, once the application is
-initialized, then the url is derived from the application state.
+clear what their relationship should be. In my applications, I currently apply the following rules:
 
-Let's consider the case where the application is loaded. The url will point to a page (e.g. /blog-posts)
-that requires a certain state. This state includes data and meta-data (e.g. the id of
-the highlighted blog-post). Based on the current url:
+- the url belongs to the "view" part of the application. The application state (which can exist
+  independently of any views) is agnostic about the url;
+- whenever a part of the state is reflected in the url, then any component that causes a state change must
+  call a navigation function (as discussed in the previous chapter) to update the url;
+- when the url changes, then a so-called url effect must be used to update the state accordingly.
 
-- data needs to be fetched (I discuss this in [this post](/posts/state-providers/chapter-1));
-- we must ensure that the correct post is highlighted.
+I used the word "currently" because my thinking on this topic is still evolving. Below, I will elaborate
+on these rules.
 
-Once the application is initialized then we must update the url when the highlighted post changes.
-I will use a so-called url-effect to achieve these aims:
+## Navigation functions
+
+The first two rules imply that components are responsible for ensuring that the url remains synchronized
+with the state. This is quite a big responsibility, that seems to go against the idea of keeping components as simple
+as possible. Ideally, we'd like components to do just two things:
+
+- render information and controls, such as buttons;
+- respond to user actions by calling a function that updates the state.
+
+We've just added a third responsibility: call a navigation function to update the url. To keep components simple,
+we will have to make this step as simple as possible. This means that components should be agnostic about
+(possibly context dependent) url changes. The previous chapter described how this can be achieved. The component
+only has to call the navigation function, the rest is taken care of.
+
+In my opinion, this approach actually makes the code easier to understand. Typically, in a click handler, you will
+first see the state changes that are triggered (e.g. a call to `clipsHighlight.set`) followed by a url change
+(e.g. `navToClip(clip)`). We could try to automatically derive the url change from the state change, but this would
+be less concrete. I expect such an approach to also be more challenging and complex.
+
+## Url effects
+
+The third rules states that a so-called url effect must update the state when the url changes. A url effect is a
+special type of React component. When this component mounts, or whenever the url changes, it inspects the url and
+updates the state accordingly.
+
+To illustrate this, let's consider the case where the application is loaded from the `/blog-posts/:post-slug` url.
+First of all, the data about blog-posts needs to be fetched from the server. I've discussed this in
+[this post](/posts/state-providers/chapter-1). Second, we must highlight the correct post in the
+application state, based on the `:post-slug` parameter. The following url-effect can take care of this.
 
 export const code1 = `
 type PropsT = {};
 
 const DefaultProps = {
-  ...dps.posts,              // of type PostT[]
-  ...dps.postsHighlight,     // of type Highlight<PostT>
+...dps.posts, // of type PostT[]
+...dps.postsHighlight, // of type Highlight<PostT>
 };
 
-export const SyncPostWithUrlEffect = observer(
+export const HighlightPostEffect = observer(
   withDefaultProps((props: PropsT & typeof DefaultProps) => {
     const { postsHighlight, posts } = props;
 
@@ -47,25 +71,16 @@ export const SyncPostWithUrlEffect = observer(
             postsHighlight.highlightItem({ id: postForCurrentUrl?.id });
           }
         }
-      } else {
-        // Check if we must update the current url based on the highlighted post.
-        const post = postsHighlight.item;
-        if (post && postSlug !== post.slug) {
-          navToPost(post.ownerUsername, post.slug);
-        }
       }
     }, [postSlug, post, posts, postsHighlight]);
 
     return null;
-  }, DefaultProps)
+
+}, DefaultProps)
 );
 `;
 
-<CodeSnippet
-  title="SyncPostWithUrlEffect.tsx"
-  addMb
-  code={code1}
-/>
+<CodeSnippet title="HighlightPostEffect.tsx" addMb code={code1} />
 
 Note that the example code depends on some of my other libraries that are discussed in
 this [post about Skandha](/posts/skandha/chapter-1) and this
@@ -79,16 +94,12 @@ explain what these libraries do, so that you can understand the example:
 - the `skandha` library provides generic behaviours, such as `Highlight`. In the example
   code, we're assuming that a `Highlight` object is used to track the highlighted post.
 
-
 # Inserting the url-effect in the router
 
-The `SyncPostWithUrlEffect` must be inserted in the appropriate place in the component tree.
-What we want to achieve is that the correct post is highlighted when the `PostsView` is shown.
-Therefore, we will insert the `SyncPostWithUrlEffect` right above the `PostsView`.
-
-Note that we cannot insert `SyncPostWithUrlEffect` just anywhere. It must be inserted at a
-location where there is a `postSlug` url parameter, and where `posts` and `postsHighlight` are
-available as default properties. Our chosen location meets these criteria.
+The `HighlightPostEffect` must be inserted in the appropriate place in the component tree.
+At this location, there should be a `postSlug` url, and both `posts` and `postsHighlight`
+should be available as default properties. Therefore, we will insert `HighlightPostEffect`
+right above the `PostsView`.
 
 export const code2 = `
 export const UrlRouter = observer((props: PropsT) => {
@@ -98,17 +109,14 @@ export const UrlRouter = observer((props: PropsT) => {
         <PostsView />
 
         <Route path="/posts/:postSlug">
-          <SyncPostWithUrlEffect />
+          <HighlightPostEffect />
           <PostsView />
         </Route>
 
       </Route>
     </PostsStateProvider>
-  );
+
+);
 });`;
 
-<CodeSnippet
-  title="UrlRouter.tsx"
-  addMb
-  code={code2}
-/>
+<CodeSnippet title="UrlRouter.tsx" addMb code={code2} />
