@@ -4,32 +4,33 @@ We will now examine the Selection facet API more closely, and explain how callba
 facet operations.
 
 export const code1 = `
-import { DefineCbs, getCallbacks, stub, withCbs } from 'skandha-facets';
+import { DefineCbs, withCbs } from 'aspiration';
+import { stub } from 'skandha';
 
 export class Selection<T = any> {
   static className = () => 'Selection';
+
+  callbackMap_ = {} as DefineCbs<{
+    selectItem: {
+      selectItem: () => void;
+    };
+  }>;
 
   @input selectableIds: Array<string> = stub;
   @data ids: Array<string> = [];
   @data anchorId?: string;
   @output items: Array<T> = stub;
 
-  @operation @withCbs() select(args: {
+  @operation select(args: {
     itemId: string | undefined;
     isShift?: boolean;
     isCtrl?: boolean;
   }) {
-    const cbs = getCallbacks(this) as SelectionCbs['select'];
-    cbs.selectItem();
+    return withCbs(this.callbackMap, 'selectItem', args, (cbs) => {
+      cbs.selectItem();
+    });
   }
 };
-
-export type SelectionCbs<T = any> = DefineCbs<
-  Selection<T>,
-  select: {
-    selectItem(): void;
-  };
->;
 `;
 
 <CodeSnippet
@@ -46,34 +47,35 @@ for selecting items, but doesn't specify how selection is implemented. This is b
 reuse `Selection` in different scenarios that require different types of selection.
 
 Of course, we do have to implement the `select` operation. This is achieved by implementing the callbacks that are
-described in the `SelectionCbs` type.
+described in the `callbackMap` member of the `Selection` type.
 
 # The callbacks object
 
-In the body of the `select` operation, we use `getCallbacks` to obtain a so-called callbacks object. This object
+In the body of the `select` operation, we use `withCbs` to obtain a so-called callbacks object. This object
 (`cbs`) contains:
 
 - all callbacks that the operation requires;
 - a copy of the input argument of the operation.
 
-To be able to use the `Selection.select` operation, we must implement all callbacks in `SelectionCbs`.
+To be able to use the `Selection.select` operation, we must implement these callbacks.
 We'll do this in the `initClips` function, that installs all callbacks for all
 facets of `clipsCtr`.
 
 export const code2 = `
+import { Cbs } from 'aspiration';
+
 export const initClips = (clipsCtr: any) => {
   const ctr = clipsCtr;
 
-  setCallbackMap(ctr.addition, {/* omitted for brevity */} as AdditionCbs<ClipT>);
-  setCallbackMap(ctr.deletion, {/* omitted for brevity */} as DeletionCbs);
-  setCallbackMap(ctr.edit, {/* omitted for brevity */} as EditCbs);
-  setCallbackMap(ctr.highlight, {/* omitted for brevity */} as HighlightCbs);
-  setCallbackMap(ctr.insertion, {/* omitted for brevity */} as InsertionCbs);
-  setCallbackMap(ctr.move, {/* omitted for brevity */} as MoveCbs);
-
-  setCallbackMap(ctr.selection, {
+  ctr.addition.callbackMap = ...; {/* omitted for brevity */};
+  ctr.deletion.callbackMap = ...; {/* omitted for brevity */};
+  ctr.edit.callbackMap = ...; {/* omitted for brevity */};
+  ctr.highlight.callbackMap = ...; {/* omitted for brevity */};
+  ctr.insertion.callbackMap = ...; {/* omitted for brevity */};
+  ctr.move.callbackMap = ...; {/* omitted for brevity */};
+  ctr.selection.callbackMap = {
     select: {
-      selectItem(this: SelectionCbs['select']) {
+      selectItem(this: Cbs<Selection['select']>) {
         handleSelectItem(ctr.selection, this.args);
 
         // Highlight follows selection
@@ -82,7 +84,7 @@ export const initClips = (clipsCtr: any) => {
         }
       },
     },
-  } as SelectionCbs);
+  };
 };
 `;
 
