@@ -12,7 +12,7 @@ clear what their relationship should be. In my applications, I currently apply t
 I used the word "currently" because my thinking on this topic is still evolving. Below, I will elaborate
 on these rules.
 
-## Navigation functions
+# Components synchronize the url with the state
 
 The first two rules imply that components are responsible for ensuring that the url remains synchronized
 with the state. This is quite a big responsibility, that seems to go against the idea of keeping components as simple
@@ -31,7 +31,7 @@ first see the state changes that are triggered (e.g. a call to `clipsHighlight.s
 (e.g. `navToClip(clip)`). We could try to automatically derive the url change from the state change, but this would
 be less concrete. I expect such an approach to also be more challenging and complex.
 
-## Url effects
+# Url effects synchronize the state with the url
 
 The third rules states that a so-called url effect must update the state when the url changes. A url effect is a
 special type of React component. When this component mounts, or whenever the url changes, it inspects the url and
@@ -52,29 +52,30 @@ const DefaultProps = {
 
 export const HighlightPostEffect = observer(
   withDefaultProps((props: PropsT & typeof DefaultProps) => {
-    const { postsHighlight, posts } = props;
-
     const location = useLocation();
     const { postSlug } = useParams() as ObjT;
     const refUrl = React.useRef<string>('');
 
+    // Define local variables
+    const { postsHighlight, posts } = props;
+    const postFromUrl = R.find((x: PostT) => x.slug === postSlug)(posts);
+    const isPostInSyncWithUrl = postsHighlight.id === postFromUrl?.id;
+
     React.useEffect(() => {
       // If there is a new url
       if (refUrl.current !== location.pathname) {
-        const postForCurrentUrl = R.find(
-          (x: PostT) => x.slug === postSlug
-        )(posts);
-
-        if (postForCurrentUrl) {
+        if (postFromUrl) {
           refUrl.current = location.pathname;
-          if (postsHighlight.id !== postForCurrentUrl.id) {
-            postsHighlight.highlightItem({ id: postForCurrentUrl?.id });
+          if (!isPostInSyncWithUrl) {
+            postsHighlight.set({ id: postFromUrl?.id });
           }
         }
       }
-    }, [postSlug, post, posts, postsHighlight]);
+    });
 
-    return null;
+    return (
+      <UrlEffectView resourceName="post" isInSync={isPostInSyncWithUrl}/>
+    );
 
 }, DefaultProps)
 );
@@ -94,7 +95,15 @@ explain what these libraries do, so that you can understand the example:
 - the `skandha` library provides generic behaviours, such as `Highlight`. In the example
   code, we're assuming that a `Highlight` object is used to track the highlighted post.
 
-# Inserting the url-effect in the router
+## The `UrlEffectView`
+
+The url-effect uses a `UrlEffectView` to alert the programmer when a component
+forgot to update the url. `UrlEffectView` is a utility component that checks the `isInSync`
+flag and prints an error to the console if this flag has been false for longer than a
+certain threshold (the default is one second). If the app is running in development mode,
+then it shows the same warning as a div, to make it more noticeable.
+
+## Inserting the url-effect in the router
 
 The `HighlightPostEffect` must be inserted in the appropriate place in the component tree.
 At this location, there should be a `postSlug` url, and both `posts` and `postsHighlight`
