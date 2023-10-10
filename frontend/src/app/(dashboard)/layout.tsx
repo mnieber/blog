@@ -8,13 +8,16 @@ import './layout.scss';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <div className={cn('DashboardLayout', L.col.banner(), 'p-8')}>
+    <div
+      className={cn('DashboardLayout', L.row.skewer(), 'justify-center', 'p-8')}
+    >
       <div
         className={cn(
           'DashboardLayout__Body',
           //
           //
-          'max-w-[800px] mx-auto'
+          'flex-grow max-w-[800px]',
+          L.col.banner()
         )}
       >
         <Banner />

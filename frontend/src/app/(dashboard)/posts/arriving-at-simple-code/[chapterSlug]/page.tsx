@@ -1,7 +1,7 @@
 'use client';
 
 import Chapter1 from './chapter-1.mdx';
-import { ChapterLayout } from '/src/chapter/components/ChapterLayout';
+import { ChapterLayout } from '/src/chapters/components/ChapterLayout';
 
 export default function Page({ params }: any) {
   const chapterSlug = params.chapterSlug;

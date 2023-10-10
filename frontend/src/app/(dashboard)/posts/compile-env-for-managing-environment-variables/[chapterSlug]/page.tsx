@@ -4,7 +4,7 @@ import Chapter1 from './chapter-1.mdx';
 import Chapter2 from './chapter-2.mdx';
 import Chapter3 from './chapter-3.mdx';
 import Chapter4 from './chapter-4.mdx';
-import { ChapterLayout } from '/src/chapter/components/ChapterLayout';
+import { ChapterLayout } from '/src/chapters/components/ChapterLayout';
 
 export default function Page({ params }: any) {
   const chapterSlug = params.chapterSlug;

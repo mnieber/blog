@@ -29,7 +29,7 @@ export const Banner = (props: PropsT) => {
           //
           'my-2',
           'self-stretch',
-          'max-w-[400px]',
+          'max-w-[500px]',
           'w-full',
           'mx-auto'
         )}

@@ -3,6 +3,7 @@ import { ChapterT } from '/src/api/types/ChapterT';
 import { PostT } from '/src/api/types/PostT';
 import { ChapterNav } from '/src/chapters/components/ChapterNav';
 import { Comments } from '/src/chapters/components/Comments';
+import { Markdown } from '/src/chapters/components/Markdown';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
 
@@ -45,7 +46,7 @@ export const ChapterView = (props: PropsT) => {
           {props.chapter.title}
         </div>
       )}
-      {props.children}
+      <Markdown>{props.children}</Markdown>
       {props.post.chapters.length > 1 && (
         <ChapterNav
           post={props.post}

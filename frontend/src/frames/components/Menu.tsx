@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { L } from '/src/frames/layout';
 import { cn } from '/src/utils/classnames';
 
-type MenuItemT = 'posts' | 'aphorisms' | 'about-me';
+type MenuItemT = 'posts' | 'projects' | 'aphorisms' | 'about-me';
 
 // Import styles
 import './Menu.scss';
@@ -36,6 +36,14 @@ export const Menu = (props: PropsT) => {
         })}
       >
         posts
+      </Link>
+      <Link
+        href="/projects"
+        className={cn('Menu__Item', 'ml-6', {
+          'Menu__Item--active': segment === 'projects',
+        })}
+      >
+        projects
       </Link>
       <Link
         href="/aphorisms"
