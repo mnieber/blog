@@ -40,30 +40,6 @@ export const posts = [
     ],
   },
   {
-    slug: 'default-props',
-    title: 'Default props: a cross between prop drilling and contexts',
-    shortTitle: 'Default props',
-    date: 'May 2020, by Maarten Nieber',
-    chapters: [
-      {
-        slug: 'chapter-1',
-        title: 'Introduction',
-      },
-      {
-        slug: 'chapter-2',
-        title: 'DefaultPropsProvider and withDefaultProps',
-      },
-      {
-        slug: 'chapter-3',
-        title: 'Advanced topics',
-      },
-      {
-        slug: 'chapter-4',
-        title: 'Discussion and conclusion',
-      },
-    ],
-  },
-  {
     slug: 'compile-env-for-managing-environment-variables',
     title: 'Using compile-env to manage environment variables',
     shortTitle: 'DRY environment variables',

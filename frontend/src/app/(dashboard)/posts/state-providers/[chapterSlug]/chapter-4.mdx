@@ -90,9 +90,8 @@ export const TodolistsStateProvider = observer((props: PropsT) => {
     })
   );
 
-  const getDefaultPropsContext = () => {
-    const result: any = {
-      defaultProps: {
+  const getTodosContext = () => {
+    return createGetProps({
         todolistsState: () => todolistsState,
         todolists: () => cache.todolists,
         todolist: () => cache.todolist,
@@ -100,14 +99,13 @@ export const TodolistsStateProvider = observer((props: PropsT) => {
         todolistsHighlight: () => todolistsState.todolistsCtr.highlight,
         todolistsSelection: () => todolistsState.todolistsCtr.selection,
       },
-    };
-    return result;
+    });
   };
 
   return (
-    <DefaultPropsProvider extend value={getDefaultPropsContext()}>
+    <TodosContext.Provider value={getTodosContext()}>
       {props.children}
-    </DefaultPropsProvider>
+    </TodosContext.Provider>
   );
 });
 `;
@@ -190,12 +188,12 @@ export class TodolistsState {
   <CodeSnippet code={code4} />
 </TabView>
 
-In this example, several parts that are discussed on my blog come together:
+The `createGetProps` helper function takes an object with functions as values, and returns an object
+with get properties. In this example, several parts that are discussed on my blog come together:
 
 - The `updateSources` function is used to return a resource that has a resource state;
 - An `ObservableQuery` is used to track the loading state of the `getTodolists` query;
 - The `trackPromise` function is used to track the state of the `deleteTodolists` mutation, and to reflect
   this in the resource state of the todolists that are being deleted;
-- The `TodolistsState` is provided to the React components using a [DefaultPropsProvider](/posts/default-props/chapter-1);
 - Different parts of the `TodolistsState`, such as `Selection`, `Highlight` and `Deletion` are captured in [facets](/posts/skandha/chapter-1).
   To keep the example relatively simple, I've included `Deletion` but not `Addition`.

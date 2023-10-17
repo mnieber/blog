@@ -43,57 +43,44 @@ First of all, the data about blog-posts needs to be fetched from the server. I'v
 application state, based on the `:post-slug` parameter. The following url-effect can take care of this.
 
 export const code1 = `
-type PropsT = {};
-
-const DefaultProps = {
-...dps.posts, // of type PostT[]
-...dps.postsHighlight, // of type Highlight<PostT>
+type PropsT = {
+  posts: PostT[],
+  postsHighlight: Highlight<PostT>
 };
 
-export const HighlightPostEffect = observer(
-  withDefaultProps((props: PropsT & typeof DefaultProps) => {
-    const location = useLocation();
-    const { postSlug } = useParams() as ObjT;
-    const refUrl = React.useRef<string>('');
+export const HighlightPostEffect = observer((props: PropsT) => {
+  const location = useLocation();
+  const { postSlug } = useParams() as ObjT;
+  const refUrl = React.useRef<string>('');
 
-    // Define local variables
-    const { postsHighlight, posts } = props;
-    const postFromUrl = R.find((x: PostT) => x.slug === postSlug)(posts);
-    const isPostInSyncWithUrl = postsHighlight.id === postFromUrl?.id;
+  // Define local variables
+  const { postsHighlight, posts } = props;
+  const postFromUrl = R.find((x: PostT) => x.slug === postSlug)(posts);
+  const isPostInSyncWithUrl = postsHighlight.id === postFromUrl?.id;
 
-    React.useEffect(() => {
-      // If there is a new url
-      if (refUrl.current !== location.pathname) {
-        if (postFromUrl) {
-          refUrl.current = location.pathname;
-          if (!isPostInSyncWithUrl) {
-            postsHighlight.set({ id: postFromUrl?.id });
-          }
+  React.useEffect(() => {
+    // If there is a new url
+    if (refUrl.current !== location.pathname) {
+      if (postFromUrl) {
+        refUrl.current = location.pathname;
+        if (!isPostInSyncWithUrl) {
+          postsHighlight.set({ id: postFromUrl?.id });
         }
       }
-    });
+    }
+  });
 
-    return (
-      <UrlEffectView resourceName="post" isInSync={isPostInSyncWithUrl}/>
-    );
-
-}, DefaultProps)
-);
+  return (
+    <UrlEffectView resourceName="post" isInSync={isPostInSyncWithUrl}/>
+  );
+});
 `;
 
 <CodeSnippet title="HighlightPostEffect.tsx" addMb code={code1} />
 
-Note that the example code depends on some of my other libraries that are discussed in
-this [post about Skandha](/posts/skandha/chapter-1) and this
-[post about default properties](/posts/default-props/chapter-1). Here I will briefly
-explain what these libraries do, so that you can understand the example:
-
-- the `react-default-props-context` library provides a `withDefaultProps` function that
-  can be used to define default properties for a component. The `DefaultProps` constant
-  declares which default properties are used (in our case: `posts` and `postsHighlight`).
-  These default properties are provided (using a React context) by a `DefaultPropsProvider`.
-- the `skandha` library provides generic behaviours, such as `Highlight`. In the example
-  code, we're assuming that a `Highlight` object is used to track the highlighted post.
+Note that the example code depends on the [Skandha](/posts/skandha/chapter-1) library.
+This library provides generic behaviours, such as `Highlight`. In the example
+code, we're assuming that a `Highlight` object is used to track the highlighted post.
 
 ## The `UrlEffectView`
 
