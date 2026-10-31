@@ -1,0 +1,70 @@
+Below, I will explain my process for creating scenarios and workflow-tests, and provide examples. The steps in
+the process lead to a spec (that includes automated tests) that allows the AI to produce high quality code.
+
+## The (throw-away) design document
+
+The [design document](https://www.example.com/) is a temporary document that contains a brain-dump of our
+ideas for new features. I prefer to organize it in milestones that each describe a workflow in which a user
+(or application sub-system) achieves a goal, e.g. “a user authenticates with the backend console”. The
+milestone describes both the typical use-case and edge-cases.
+
+An important element of the design document is a glossary that briefly describes the main concepts. This lays
+the conceptual groundwork for the application code, and it allows the milestones to be brief and dry.
+Especially in the initial stages of the code-base, the usefulness of a glossary cannot be overstated, don’t
+skip it!
+
+When you are done with the design document then you should ask your AI to review it. I always use the phrase
+“don’t focus too much on details, but catch weaknesses and gaps in the main features and workflows”.
+
+## The (throw-away) test plan
+
+When the design document is ready, ask your AI to translate it into a [test plan](https://www.example.com/)
+that describes how the features will be tested. The AI is instructed to divide the test plan into batches. For
+each batch it should tell you what will be tested, and which application code units will be exercised by these
+tests.
+
+Asking about the code units allows you to get a rough idea of the implementation direction. E.g. if the test
+plan mentions the add_job_to_queue function, then you already know that the AI will introduce a job queue. In
+my experience these implementation choices are usually correct (they are logical consequences of the design
+doc), but it’s still important to know about them early on so that you can steer the AI in the right
+direction.
+
+The test-plan can propose both regular tests (in /tests) and e2e-tests (in /e2e_tests). The e2e_tests can
+either use fakes at the boundaries (e.g. a fake git, docker compose, etc) or test against the real
+dependencies.
+
+## AI-generating workflow-tests
+
+### What is a workflow-test?
+
+I use the term [workflow-test](http://www.example.com) for an automated test that simulates a particular path
+through the application code, e.g. a*user_logs_in_and_is_authenticated. This test is powered by a TestEnv
+class that is a custom fixture that is tailor-made to execute a particular workflow. The test \_never calls the
+application code directly*, it only calls the test-env.
+
+In turn, the test-env calls the application code and stores the results. Finally, the workflow test makes
+assertions on the contents of the test-env.
+
+### The test-env makes workflow-tests read like a script
+
+Workflow-tests are highly readable because they call TestEnv methods that read like the elements of a script.
+E.g. the workflow-test may call `env.create_a_session_in_which_the_user_is_not_registered()` followed by
+`env.try_to_log_in_the_user()`. Then, the workflow-test may assert that `env.logged_in_users == [ ]`. If the
+developer wants to understand how the application code is called, then they can jump into the functions of the
+TestEnv class.
+
+### Organization of the test files
+
+I divide my workflow-tests into “regular” and “impl” categories, and tell the AI to put tests for details and
+edge-cases into the “impl” directory. This way, a user who wants to get a basic understanding of the system
+can focus on the regular tests and skip the impl tests.
+
+Note that AI is incredibly good at writing workflow-tests. I won’t try to explain, just try it out. The
+tendency of AI to write lots and lots of tests works in our favour, as long as we tell the AI to put every
+test in its own file. A workflow-test usually tests several things within the same test-function, so that the
+number of test files stays reasonable. Moreover, since the test filename tells us roughly what is tested, it’s
+easy to navigate them.
+
+### Testing frontend applications
+
+You can write workflow-tests for the frontend (I use React) using Playwright. AI does a great job there too.

@@ -10,6 +10,22 @@ export const posts = [
         slug: "chapter-1",
         title: "Introduction",
       },
+      {
+        slug: "chapter-2",
+        title: "Success factors for code-generation",
+      },
+      {
+        slug: "chapter-3",
+        title: "Writing the specs",
+      },
+      {
+        slug: "chapter-4",
+        title: "Generating the code",
+      },
+      {
+        slug: "chapter-5",
+        title: "Resources and conclusion",
+      },
     ],
   },
   {

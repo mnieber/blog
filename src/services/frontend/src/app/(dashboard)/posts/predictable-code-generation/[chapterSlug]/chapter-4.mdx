@@ -1,0 +1,44 @@
+Next, we ask the AI to split the tests in batches, enable these batches one by one, and generate the code so
+that it passes the tests for that batch. The AI will base the code on the building blocks - and their related
+instructions - that are contained in the composable solutions.
+
+Among these instructions, the most important one is to create (what I call) focussed feature-packages that
+contain focussed files. A feature-package encapsulates one particular functionality or concept of the
+code-base, such as “hotel_rooms” or “bookings”. When you read out the list of feature-packages, then it should
+sound like a high-level description of your application. Within a feature-package, the code is split into
+models (plain data-structures, almost no logic), actions (functions that change the application state), rules
+(functions that query the application state), utils, and a few other (optional) categories. By insisting that
+the code is split up in this way, we counter the tendency of the AI agent to keep adding more features to the
+same files (which leads to slop code).
+
+# AI-refactoring the code (optional)
+
+In my experience, the AI agent does a great job at creating focussed feature-packages and files, but it will
+sometimes create a large action file that does the work of an entire feature-package. When this happens, it’s
+because a feature-package was missing. I identify these cases by listing the n biggest python files in the
+code base, and ask the agent to split up the big file by introducing a new feature-package (with a name
+suggested by me).
+
+# AI-generating high-level scenarios
+
+At this point, our application requirements are encoded in the test-suite, but it would still be nice to have
+a user-friendly high-level description of the features. Neither the design doc nor the workflow-tests serve
+that purpose very well. Therefore, I ask my AI to create [scenario documents](http://www.example.com) (that
+follow a known template) that explain the main features and workflows, while leaving out the edge-cases and
+details (an interested user can consult the workflow-tests for those). As the scenarios are created, the
+related parts are deleted from the design doc (until eventually the design doc is empty).
+
+For capturing scenarios I use a special tool called [sunya](http://www.example.com), but you can of course
+create your own format. My scenarios start with a `run_scenario` function that explains a workflow by walking
+through pseudo-code. Next, there is a Markdown description of the scenario steps, followed by a sequence
+diagram. All these three components overlap, but they also complement each other in nice ways.
+
+Once the scenarios are generated, we can delete the design doc (which should be empty) and test plan.
+
+# Updating the code-base using fast-tracking
+
+If the requirements change, then we repeat the entire process. We ask the AI to write and/or update
+workflow-tests, to update the scenarios, and finally to update the code so that all tests are green again.
+When an update is easy (it fits perfectly in the existing structure) you can ask the agent to fast-track the
+changes, which means that you review all the work (the design, the tests and the code) afterwards. This speeds
+up the process.
