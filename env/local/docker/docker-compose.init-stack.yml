@@ -1,0 +1,11 @@
+# Init mode (jaz compose.init): the frontend runs init-dev and then its server, and
+# becomes healthy when its check target passes.
+services:
+  frontend:
+    command: sh -c "jaz init-dev && exec jaz run-server"
+    healthcheck:
+      test: ["CMD", "jaz", "check"]
+      interval: 10s
+      # The first init-dev installs the node modules
+      start_period: 300s
+      start_interval: 2s

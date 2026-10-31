@@ -1,0 +1,12 @@
+services:
+  frontend:
+    container_name: gatsblog_frontend
+    build:
+      context: ${ROOT_DIR}/src
+      dockerfile: services/frontend/Dockerfile
+    command: sleep infinity
+    env_file:
+      - ./env_files/frontend.env
+    image: gatsblog_frontend
+    ports:
+      - 3001:3001 # Next.js

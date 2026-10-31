@@ -1,0 +1,6 @@
+services:
+  frontend:
+    build:
+      context: ${ROOT_DIR}/src
+      dockerfile: services/frontend/Dockerfile.local
+    image: gatsblog_frontend_local

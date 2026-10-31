@@ -1,0 +1,5 @@
+services:
+  frontend:
+    volumes:
+      - ${ROOT_DIR}/src/services/frontend:/app/src
+      - ${ROOT_DIR}/src/libs/jazzoo:/app/libs/jazzoo

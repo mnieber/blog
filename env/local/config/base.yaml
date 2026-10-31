@@ -1,0 +1,35 @@
+tmux:
+  session: gatsblog
+  menu:
+    serve:
+      - jaz fe.run-server
+edit_config:
+  editor: gedit
+  files:
+    - env/local/config/*.yaml
+docker:
+  compose_project: gatsblog
+  shell: sh
+fe:
+  container: gatsblog_frontend
+  shell: ${/docker/shell}
+compose:
+  use_dockerfile_local: false
+  init:
+    homepage: http://localhost:3001/
+python:
+  services: []
+  pypi:
+    username: __token__
+    publish_url: https://upload.pypi.org/legacy/
+dial:
+  default:
+    1: zoo docker.exec frontend
+    2: "zoo fe."
+  shift:
+    1: .
+    2: src/services/frontend
+  ctrl:
+    1: env/local
+    2: env/local/config
+    3: "~"

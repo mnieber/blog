@@ -4,7 +4,7 @@
  * https://github.com/ericbiewener/vscode-vandelay#configuration
  */
 
-const baseDir = '/home/maarten/projects/gatsblog/src/frontend/';
+const baseDir = '/home/maarten/projects/gatsblog/src/src/services/frontend/';
 
 module.exports = {
   // This is the only required property. At least one path must be included.
