@@ -36,11 +36,11 @@ together in a way that makes it hard for AI to identify and maintain the separat
 OOP, it can be great, but I advise to use classes (when you need them) as glue code that delegate to functions
 to do the heavy lifting.
 
-# Combining composable solutions with verifiable specs
+## Combining composable solutions with verifiable specs
 
 The combination of verifiable specs with optimized composable solutions is a powerful one. It offers a high
-degree of confidence in *what* the application will do (this is both instructed and verified by the tests) and
-*how* the application will do it (this is instructed by the known solutions that the requirements are mapped
+degree of confidence in _what_ the application will do (this is both instructed and verified by the tests) and
+_how_ the application will do it (this is instructed by the known solutions that the requirements are mapped
 onto).
 
 # A process for creating scenarios and workflow-tests
@@ -86,8 +86,8 @@ dependencies.
 
 I use the term [workflow-test](http://www.example.com) for an automated test that simulates a particular path
 through the application code, e.g. a_user_logs_in_and_is_authenticated. This test is powered by a TestEnv
-class that is a custom fixture that is tailor-made to execute a particular workflow. The test *never calls the
-application code directly*, it only calls the test-env.
+class that is a custom fixture that is tailor-made to execute a particular workflow. The test _never calls the
+application code directly_, it only calls the test-env.
 
 In turn, the test-env calls the application code and stores the results. Finally, the workflow test makes
 assertions on the contents of the test-env.
@@ -176,6 +176,6 @@ can adapt this resource so that it uses your own favourite solutions and pattern
 I’m excited that AI code generation will take care of most problems that have been troubling software
 development. We will have fewer bugs, security issues, and code smells. Our attention will shift to
 formulating our requirements and (for now, though maybe not too much longer) to the high-level architectural
-ideas that will support the implementation of those requirements. Sadly, the art of tackling *implementation*
+ideas that will support the implementation of those requirements. Sadly, the art of tackling _implementation_
 challenges will become a thing of the past, but as problem solvers, I’m sure we will find other types of
 problems to work on.
