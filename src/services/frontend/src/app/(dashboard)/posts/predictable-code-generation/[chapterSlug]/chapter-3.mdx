@@ -1,6 +1,6 @@
 Below, I will explain my process for creating scenarios and workflow-tests, and provide examples. The steps in
 the process lead to a spec (that includes automated tests) that allows the AI to produce high quality code. As a
-running example, I will use a (fictional) todo app that gets a new feature: reminders for overdue todos.
+running example, I will use a familiar todo app that gets a new feature: reminders for overdue todos.
 
 ## The (throw-away) design document
 
@@ -89,7 +89,8 @@ relative to \`src/\`.
 />
 
 Asking about the code units allows you to get a rough idea of the implementation direction. E.g. since the test
-plan mentions `reminders/models/reminder.py`, we know that the AI will store the reminders that were sent.
+plan mentions `reminders/rules/get_todos_to_remind.py`, we know that the AI is properly separating the logic
+for finding the reminders from the logic for sending them.
 In my experience these implementation choices are usually correct (they are logical consequences of the design doc),
 but it’s still important to know about them early on so that you can steer the AI in the right direction.
 
@@ -328,7 +329,7 @@ UserFactory(username="bob", email="bob@example.com")
 The test-env hides the details that would otherwise make the test hard to read: the factories that create the
 database records, the fake clock, the email outbox, and the format of the reminder email. The last tab shows the
 same test without a test-env. It does exactly the same, but the story (“Alice is reminded once, and then again
-two days later”) is buried under these details. If the developer wants to understand how the application code is
+two days later”) is buried under these details. Note that if the developer wants to understand how the application code is
 called, then they can jump into the functions of the TestEnv class.
 
 The test-env also makes it cheap to add more tests. The test for turning off reminders only needs one new
@@ -358,7 +359,7 @@ tests/reminders_tests/
 
 <CodeSnippet title="tests/reminders_tests" lang="text" addMb code={testTree} />
 
-Note that AI is incredibly good at writing workflow-tests. I won’t try to explain, just try it out. The
+I found that AI is incredibly good at writing workflow-tests. I won’t try to explain, just try it out. The
 tendency of AI to write lots and lots of tests works in our favour, as long as we tell the AI to put every
 test in its own file. A workflow-test usually tests several things within the same test-function, so that the
 number of test files stays reasonable. Moreover, since the test filename tells us roughly what is tested, it’s

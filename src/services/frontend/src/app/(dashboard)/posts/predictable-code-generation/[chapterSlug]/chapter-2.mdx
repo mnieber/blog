@@ -1,9 +1,9 @@
 ## Clear high-level specs encoded as tests
 
 It’s essential that we communicate our requirements to the AI. The best way is to combine high-level scenarios
-(you can leave out edge-cases or details, and just present the big picture of how the software achieves
-different goals) with automated tests that serve as verifiable specs. These tests will be used in a TDD
-approach in which all tests are written before the application code is generated.
+with automated tests that serve as verifiable specs. In the high-level scenarios, you can leave out edge-cases or details,
+and just present the big picture of how the software achieves different goals. The tests - which do cover all the details -
+will be used in a TDD approach. All tests are written before the application code is generated.
 
 ## Optimized composable solutions to sub-problems
 
@@ -14,11 +14,11 @@ then it’s relatively easy to build bigger systems out of them.
 
 Therefore, we need to tell the AI what our favourite solutions are and make sure that the AI understands them
 really well (by showing instructions and example code). When our application requirements map cleanly onto
-known composable solutions, then AI will produce exactly what we expect to see.
+known composable solutions, then AI will produce almost exactly what we expect to see.
 
 Our composable solutions should rely mostly on functions. Class methods that do real work tie data and logic
 together in a way that makes it hard for AI to identify and maintain the separation of concerns. I do like
-OOP, it can be great, but I advise to use classes (when you need them) as glue code that delegate to functions
+OOP, it can be great, but I advise to use classes only as glue code that delegates to functions
 to do the heavy lifting.
 
 ## Combining composable solutions with verifiable specs

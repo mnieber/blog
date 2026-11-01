@@ -13,7 +13,7 @@ same files (which leads to slop code).
 
 # AI-refactoring the code (optional)
 
-In my experience, the AI agent does a great job at creating focussed feature-packages and files, but it will
+The AI agent does a great job at creating focussed feature-packages and files, but it will
 sometimes create a large action file that does the work of an entire feature-package. When this happens, it’s
 because a feature-package was missing. I identify these cases by listing the n biggest python files in the
 code base, and ask the agent to split up the big file by introducing a new feature-package (with a name
@@ -23,7 +23,7 @@ suggested by me).
 
 At this point, our application requirements are encoded in the test-suite, but it would still be nice to have
 a user-friendly high-level description of the features. Neither the design doc nor the workflow-tests serve
-that purpose very well. Therefore, I ask my AI to create scenario documents (that follow a known template) that
+that purpose very well. Therefore, I ask my AI to create scenario documents that
 explain the main features and workflows, while leaving out the edge-cases and details (an interested user can
 consult the workflow-tests for those). As the scenarios are created, the related parts are deleted from the
 design doc (until eventually the design doc is empty).
@@ -42,14 +42,13 @@ from sunya import goal, it, the
 
 scenario = sunya.add_scenario("s03_a_user_is_reminded_of_overdue_todos")
 
-
 def run_scenario():
-    r.user = c.External.Actors.User
-    r.scheduler = c.External.Systems.Scheduler
-    r.send_reminders_action = c.Reminders.Actions.SendReminders
-    r.get_todos_to_remind_rule = c.Reminders.Rules.GetTodosToRemind
-    r.reminder = c.Reminders.Models.Reminder
-    r.user_settings = c.Users.Models.UserSettings
+r.user = c.External.Actors.User
+r.scheduler = c.External.Systems.Scheduler
+r.send_reminders_action = c.Reminders.Actions.SendReminders
+r.get_todos_to_remind_rule = c.Reminders.Rules.GetTodosToRemind
+r.reminder = c.Reminders.Models.Reminder
+r.user_settings = c.Users.Models.UserSettings
 
     with goal().remind_the(r.user).of_their(r.overdue_todos):
 
@@ -66,7 +65,6 @@ def run_scenario():
         # The user acts on the reminder
         with the(r.user).reads_the(r.reminder):
             it().marks_a(r.todo).as_done().or_changes_its(r.due_date)
-
 
 markdown_node = sunya.add_markdown_node(
     scenario, "A user is reminded of their overdue todos"
@@ -94,10 +92,10 @@ The user marks the todo as done, or gives it a new due date.
 
 \`\`\`mermaid
 sequenceDiagram
-    participant Scheduler
-    participant SendReminders as SendReminders (action)
-    participant GetTodosToRemind as GetTodosToRemind (rule)
-    actor User
+participant Scheduler
+participant SendReminders as SendReminders (action)
+participant GetTodosToRemind as GetTodosToRemind (rule)
+actor User
 
     Scheduler->>SendReminders: send_reminders()
     loop each user with reminders enabled
@@ -106,6 +104,7 @@ sequenceDiagram
         SendReminders->>User: reminder email
     end
     User->>User: mark todo as done, or change due date
+
 \`\`\`
 """
 `;
@@ -138,14 +137,14 @@ The user marks the todo as done, or gives it a new due date.
 
 \`\`\`mermaid
 sequenceDiagram
-    ...
+...
 \`\`\`
 `;
 
 <TabView
   titles={[
-    'extra/spec_src/scenarios/s03_a_user_is_reminded_of_overdue_todos/scenario.py',
-    'doc/spec/scenarios/s03_a_user_is_reminded_of_overdue_todos.md',
+    "extra/spec_src/scenarios/s03_a_user_is_reminded_of_overdue_todos/scenario.py",
+    "doc/spec/scenarios/s03_a_user_is_reminded_of_overdue_todos.md",
   ]}
 >
   <CodeSnippet lang="python" code={scenario} />
@@ -153,7 +152,8 @@ sequenceDiagram
 </TabView>
 
 The pseudo-code in `run_scenario` refers to the code units of the application (e.g.
-`c.Reminders.Actions.SendReminders`), so that the scenario also serves as a map of the code-base.
+`c.Reminders.Actions.SendReminders`), so that the scenario also serves as a map of the code-base. But remember
+that you can create your own scenario format if you don't like mine.
 
 Once the scenarios are generated, we can delete the design doc (which should be empty) and test plan.
 
@@ -161,6 +161,6 @@ Once the scenarios are generated, we can delete the design doc (which should be 
 
 If the requirements change, then we repeat the entire process. We ask the AI to write and/or update
 workflow-tests, to update the scenarios, and finally to update the code so that all tests are green again.
-When an update is easy (it fits perfectly in the existing structure) you can ask the agent to fast-track the
+When an update is easy because it fits perfectly in the existing structure then you can ask the agent to fast-track the
 changes, which means that you review all the work (the design, the tests and the code) afterwards. This speeds
 up the process.
