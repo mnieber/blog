@@ -1,33 +1,97 @@
 Below, I will explain my process for creating scenarios and workflow-tests, and provide examples. The steps in
-the process lead to a spec (that includes automated tests) that allows the AI to produce high quality code.
+the process lead to a spec (that includes automated tests) that allows the AI to produce high quality code. As a
+running example, I will use a (fictional) todo app that gets a new feature: reminders for overdue todos.
 
 ## The (throw-away) design document
 
-The [design document](https://www.example.com/) is a temporary document that contains a brain-dump of our
-ideas for new features. I prefer to organize it in milestones that each describe a workflow in which a user
-(or application sub-system) achieves a goal, e.g. “a user authenticates with the backend console”. The
-milestone describes both the typical use-case and edge-cases.
+The design document is a temporary document that contains a brain-dump of our ideas for new features. I prefer
+to organize it in milestones that each describe a workflow in which a user (or application sub-system) achieves
+a goal, e.g. “a user is reminded of their overdue todos”. The milestone describes both the typical use-case and
+edge-cases.
 
 An important element of the design document is a glossary that briefly describes the main concepts. This lays
 the conceptual groundwork for the application code, and it allows the milestones to be brief and dry.
 Especially in the initial stages of the code-base, the usefulness of a glossary cannot be overstated, don’t
 skip it!
 
+export const designDoc = `
+# Design: the todo app
+
+## Glossary
+
+- **Todo list**: a named list of todos that is owned by a user.
+- **Todo**: an item in a todo list, with a title, an optional due date and a done flag.
+- **Overdue todo**: a todo that is not done, and whose due date has passed.
+- **Reminder**: an email that tells a user about their overdue todos.
+
+## MS-3: A user is reminded of their overdue todos
+
+A user who forgets about a todo should not have to discover this by themselves.
+
+1. Every morning, the reminder job sends a reminder to each user who has overdue todos.
+   1. The reminder lists the overdue todos of all the todo lists of the user.
+   2. A todo that is done, or that has no due date, is never overdue.
+   3. A user gets at most one reminder per day, also when the job runs twice.
+2. The user can turn off reminders in their settings.
+3. The user is reminded of the same todo at most three times. When the user changes
+   the due date of the todo, the count starts again.
+   `;
+
+<CodeSnippet
+  title="extra/spec_src/design/design.md"
+  lang="markdown"
+  addMb
+  code={designDoc}
+/>
+
 When you are done with the design document then you should ask your AI to review it. I always use the phrase
 “don’t focus too much on details, but catch weaknesses and gaps in the main features and workflows”.
 
 ## The (throw-away) test plan
 
-When the design document is ready, ask your AI to translate it into a [test plan](https://www.example.com/)
-that describes how the features will be tested. The AI is instructed to divide the test plan into batches. For
-each batch it should tell you what will be tested, and which application code units will be exercised by these
-tests.
+When the design document is ready, ask your AI to translate it into a test plan that describes how the features
+will be tested. The AI is instructed to divide the test plan into batches. For each batch it should tell you what
+will be tested, and which application code units will be exercised by these tests.
 
-Asking about the code units allows you to get a rough idea of the implementation direction. E.g. if the test
-plan mentions the add_job_to_queue function, then you already know that the AI will introduce a job queue. In
-my experience these implementation choices are usually correct (they are logical consequences of the design
-doc), but it’s still important to know about them early on so that you can steer the AI in the right
-direction.
+export const testPlan = `
+# Test plan: MS-3 (reminders)
+
+The "Exercises" lists name the code units that the tests import or run, as paths
+relative to \`src/\`.
+
+## 1. Overdue todos
+
+1. A todo whose due date has passed is overdue; a todo that is done, or that has
+   no due date, is not.
+   - Exercises: \`todos/rules/get_overdue_todos.py\`.
+
+## 2. Sending reminders
+
+1. The reminder job sends one reminder per user, that lists the overdue todos of
+   all the todo lists of the user. A user without overdue todos gets no reminder.
+   - Exercises: \`reminders/actions/send_reminders.py\`, \`reminders/models/reminder.py\`.
+2. When the job runs twice on the same day, it sends no second reminder.
+3. A user who turned off reminders gets no reminder.
+   - Exercises: \`users/models/user_settings.py\`.
+
+## 3. The reminder limit (impl)
+
+1. After three reminders about the same todo, the todo is no longer listed. When
+   the due date changes, the todo is listed again.
+   - Exercises: \`reminders/rules/get_todos_to_remind.py\`.
+     `;
+
+<CodeSnippet
+  title="extra/spec_src/design/test_plan.md"
+  lang="markdown"
+  addMb
+  code={testPlan}
+/>
+
+Asking about the code units allows you to get a rough idea of the implementation direction. E.g. since the test
+plan mentions `reminders/models/reminder.py`, we know that the AI will store the reminders that were sent.
+In my experience these implementation choices are usually correct (they are logical consequences of the design doc),
+but it’s still important to know about them early on so that you can steer the AI in the right direction.
 
 The test-plan can propose both regular tests (in /tests) and e2e-tests (in /e2e_tests). The e2e_tests can
 either use fakes at the boundaries (e.g. a fake git, docker compose, etc) or test against the real
@@ -37,10 +101,10 @@ dependencies.
 
 ### What is a workflow-test?
 
-I use the term [workflow-test](http://www.example.com) for an automated test that simulates a particular path
-through the application code, e.g. a*user_logs_in_and_is_authenticated. This test is powered by a TestEnv
-class that is a custom fixture that is tailor-made to execute a particular workflow. The test \_never calls the
-application code directly*, it only calls the test-env.
+I use the term workflow-test for an automated test that simulates a particular path through the application
+code, e.g. `test_a_user_is_reminded_of_overdue_todos`. This test is powered by a TestEnv class: a custom
+fixture that is tailor-made to execute a particular workflow. The test _never calls the application code
+directly_, it only calls the test-env.
 
 In turn, the test-env calls the application code and stores the results. Finally, the workflow test makes
 assertions on the contents of the test-env.
@@ -48,16 +112,251 @@ assertions on the contents of the test-env.
 ### The test-env makes workflow-tests read like a script
 
 Workflow-tests are highly readable because they call TestEnv methods that read like the elements of a script.
-E.g. the workflow-test may call `env.create_a_session_in_which_the_user_is_not_registered()` followed by
-`env.try_to_log_in_the_user()`. Then, the workflow-test may assert that `env.logged_in_users == [ ]`. If the
-developer wants to understand how the application code is called, then they can jump into the functions of the
-TestEnv class.
+Below you see the workflow-test for the reminders. It consists of steps. Each step starts with a comment that
+says what happens and what we expect, followed by `env.step(...)` with the calls to the test-env, and finally
+the assertions. The `env.step` function does nothing (it returns `True`), but it groups the calls of a step,
+so that each step looks the same.
+
+export const workflowTest = `
+from reminders_tests.reminders_test_env import Context, TestEnv
+
+def create_env(context: Context):
+return Env(context)
+
+def test_a_user_is_reminded_of_overdue_todos(context: Context): # Create the test environment
+env = create_env(context)
+
+    # Alice has a todo that was due yesterday, a todo that was due yesterday but
+    # is done, and a todo that is due tomorrow. Bob has no todos.
+    if env.step(
+        env.set_today("2026-03-10"),
+        env.add_user("alice"),
+        env.add_todos(
+            "alice",
+            {
+                "Pay the rent": dict(due="2026-03-09"),
+                "Buy milk": dict(due="2026-03-09", done=True),
+                "Book the flights": dict(due="2026-03-11"),
+            },
+        ),
+        env.add_user("bob"),
+    ):
+        pass
+
+    # We run the reminder job.
+    #
+    # Alice should get a reminder that lists her overdue todo. Bob should get
+    # no reminder.
+    if env.step(
+        env.run_the_reminder_job(),
+    ):
+        assert env.reminder_recipients() == ["alice"]
+        assert env.reminded_todos("alice") == ["Pay the rent"]
+
+    # We run the reminder job again on the same day.
+    #
+    # Alice should not get a second reminder.
+    if env.step(
+        env.forget_the_sent_emails(),
+        env.run_the_reminder_job(),
+    ):
+        assert env.reminder_recipients() == []
+
+    # Two days later, we run the reminder job again.
+    #
+    # Alice should be reminded of both todos that are now overdue.
+    if env.step(
+        env.forget_the_sent_emails(),
+        env.set_today("2026-03-12"),
+        env.run_the_reminder_job(),
+    ):
+        assert env.reminded_todos("alice") == ["Pay the rent", "Book the flights"]
+
+class Env(TestEnv):
+pass
+`;
+
+export const testEnv = `
+import typing as T
+from dataclasses import dataclass
+
+from django.core.mail import EmailMessage
+
+from reminders.actions.send_reminders import send_reminders
+from todos.factories import TodoFactory, TodoListFactory
+from users.factories import UserFactory
+from users.models.user import User
+
+@dataclass
+class Context:
+"""The pytest fixtures that the reminders tests need."""
+
+    mailoutbox: T.List[EmailMessage]
+    time_machine: T.Any
+
+class TestEnv: # Stops pytest from trying to collect this base class as a test class.
+**test** = False
+
+    def __init__(self, context: Context):
+        self.context = context
+        self.users: T.Dict[str, User] = {}
+
+    def step(self, *_: None) -> bool:
+        return True
+
+    # Actions
+
+    def set_today(self, date: str) -> None:
+        """Lets the application code believe that it's 9 AM on the date."""
+        self.context.time_machine.move_to(f"{date} 09:00", tick=False)
+
+    def add_user(self, name: str) -> None:
+        self.users[name] = UserFactory(username=name, email=f"{name}@example.com")
+
+    def turn_off_reminders(self, name: str) -> None:
+        settings = self.users[name].settings
+        settings.reminders_enabled = False
+        settings.save()
+
+    def add_todos(self, name: str, todos: T.Dict[str, T.Dict[str, T.Any]]) -> None:
+        """Adds a todo list with the todos to the user, where each todo is given by
+        its title and its fields (e.g. due="2026-03-09", done=True)."""
+        todo_list = TodoListFactory(owner=self.users[name])
+        for title, fields in todos.items():
+            TodoFactory(
+                todo_list=todo_list,
+                title=title,
+                due_date=fields.get("due"),
+                is_done=fields.get("done", False),
+            )
+
+    def run_the_reminder_job(self) -> None:
+        send_reminders()
+
+    def forget_the_sent_emails(self) -> None:
+        self.context.mailoutbox.clear()
+
+    # Queries (for use in asserts)
+
+    def reminder_recipients(self) -> T.List[str]:
+        return [self._user_name(email) for email in self._reminders()]
+
+    def reminded_todos(self, name: str) -> T.List[str]:
+        """Returns the titles of the todos in the reminder of the user. The reminder
+        lists each todo on a line of its own, as "- <title> (due <date>)"."""
+        [reminder] = [r for r in self._reminders() if self._user_name(r) == name]
+        lines = [line for line in reminder.body.splitlines() if line.startswith("- ")]
+        return [line[2:].rsplit(" (due ", 1)[0] for line in lines]
+
+    def _reminders(self) -> T.List[EmailMessage]:
+        return [
+            email
+            for email in self.context.mailoutbox
+            if email.subject.startswith("Reminder:")
+        ]
+
+    def _user_name(self, email: EmailMessage) -> str:
+        [address] = email.to
+        return address.split("@")[0]
+
+`;
+
+export const conftest = `
+import pytest
+from reminders_tests.reminders_test_env import Context
+
+@pytest.fixture
+def context(db, mailoutbox, time_machine): # The db fixture gives the test access to the database. The mailoutbox # fixture collects the emails that Django sends, and the time_machine # fixture lets the test set the current time.
+return Context(mailoutbox=mailoutbox, time_machine=time_machine)
+`;
+
+export const testWithoutEnv = `
+from reminders.actions.send_reminders import send_reminders
+from todos.factories import TodoFactory, TodoListFactory
+from users.factories import UserFactory
+
+def test_a_user_is_reminded_of_overdue_todos(db, mailoutbox, time_machine):
+time_machine.move_to("2026-03-10 09:00", tick=False)
+alice = UserFactory(username="alice", email="alice@example.com")
+todo_list = TodoListFactory(owner=alice)
+TodoFactory(todo_list=todo_list, title="Pay the rent", due_date="2026-03-09")
+TodoFactory(
+todo_list=todo_list, title="Buy milk", due_date="2026-03-09", is_done=True
+)
+TodoFactory(todo_list=todo_list, title="Book the flights", due_date="2026-03-11")
+UserFactory(username="bob", email="bob@example.com")
+
+    send_reminders()
+
+    reminders = [m for m in mailoutbox if m.subject.startswith("Reminder:")]
+    assert [m.to for m in reminders] == [["alice@example.com"]]
+    lines = [l for l in reminders[0].body.splitlines() if l.startswith("- ")]
+    assert [l[2:].rsplit(" (due ", 1)[0] for l in lines] == ["Pay the rent"]
+
+    mailoutbox.clear()
+    send_reminders()
+
+    assert [m for m in mailoutbox if m.subject.startswith("Reminder:")] == []
+
+    mailoutbox.clear()
+    time_machine.move_to("2026-03-12 09:00", tick=False)
+    send_reminders()
+
+    reminders = [m for m in mailoutbox if m.subject.startswith("Reminder:")]
+    lines = [l for l in reminders[0].body.splitlines() if l.startswith("- ")]
+    assert [l[2:].rsplit(" (due ", 1)[0] for l in lines] == [
+        "Pay the rent",
+        "Book the flights",
+    ]
+
+`;
+
+<TabView
+  titles={[
+    "test_a_user_is_reminded_of_overdue_todos.py",
+    "reminders_test_env.py",
+    "conftest.py",
+    "The same test without a test-env",
+  ]}
+>
+  <CodeSnippet lang="python" code={workflowTest} />
+  <CodeSnippet lang="python" code={testEnv} />
+  <CodeSnippet lang="python" code={conftest} />
+  <CodeSnippet lang="python" code={testWithoutEnv} />
+</TabView>
+
+The test-env hides the details that would otherwise make the test hard to read: the factories that create the
+database records, the fake clock, the email outbox, and the format of the reminder email. The last tab shows the
+same test without a test-env. It does exactly the same, but the story (“Alice is reminded once, and then again
+two days later”) is buried under these details. If the developer wants to understand how the application code is
+called, then they can jump into the functions of the TestEnv class.
+
+The test-env also makes it cheap to add more tests. The test for turning off reminders only needs one new
+call (`env.turn_off_reminders("alice")`), and when the format of the reminder email changes, only
+`reminded_todos` needs to be updated. Finally, note the `Env` class at the bottom of the test file. When a test
+needs a special version of a test-env function (e.g. one that simulates a failing mail server), then it can
+override it there, so that this detail stays in the test that needs it.
 
 ### Organization of the test files
 
 I divide my workflow-tests into “regular” and “impl” categories, and tell the AI to put tests for details and
 edge-cases into the “impl” directory. This way, a user who wants to get a basic understanding of the system
 can focus on the regular tests and skip the impl tests.
+
+export const testTree = `
+tests/reminders_tests/
+├── conftest.py
+├── reminders_test_env.py
+├── test_reminders/
+│   ├── test_a_user_is_reminded_of_overdue_todos.py
+│   └── test_a_user_turns_off_reminders.py
+└── test_reminders_impl/
+    ├── test_a_done_todo_is_not_overdue.py
+    ├── test_a_todo_without_a_due_date_is_not_overdue.py
+    └── test_a_user_is_reminded_of_a_todo_at_most_three_times.py
+`;
+
+<CodeSnippet title="tests/reminders_tests" lang="text" addMb code={testTree} />
 
 Note that AI is incredibly good at writing workflow-tests. I won’t try to explain, just try it out. The
 tendency of AI to write lots and lots of tests works in our favour, as long as we tell the AI to put every

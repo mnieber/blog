@@ -1,10 +1,48 @@
 ## Resources to get you started
 
-[mn-prompts](http://www.example.com): a repo with prompts and example code that explains to AI how to apply my
-favourite composable solutions. It includes instructions on creating focussed feature-packages and files. You
-can adapt this resource so that it uses your own favourite solutions and patterns.
+[mn-prompts](https://github.com/mnieber/mn-prompts): a repo with prompts and example code that explains to AI
+how to apply my favourite composable solutions. It includes instructions on creating focussed feature-packages
+and files. You can adapt this resource so that it uses your own favourite solutions and patterns.
 
-[sunya](http://www.example.com): a tool for converting Python-based scenarios into markdown documents.
+[sunya](https://github.com/mnieber/sunya): a tool for converting Python-based scenarios into markdown documents.
+
+## Real cases
+
+The todo app in this post is fictional, but the workflow was used to build two real projects:
+[groupy](https://github.com/mnieber/groupy) (a tool that refactors a Python code-base in stages, with the help
+of Claude) and [jazzoo](https://github.com/mnieber/jazzoo) (a task-runner in the spirit of `just` and `make`, whose tasks
+are real functions).
+
+A design document and the test plan that was derived from it (groupy):
+
+- [design.md](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/extra/spec_src/design/design.md):
+  milestone MS-11, in which the developer restricts the refactoring to a part of the code-base;
+- [test_plan.md](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/extra/spec_src/design/test_plan.md):
+  the test plan for MS-11, with the code units that each batch exercises.
+
+A workflow-test in which the test-env replaces Claude by fake policies that run scripted answers (groupy):
+
+- [test_groupy_next_resumes_an_interrupted_stage.py](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/tests/groupy_next_tests/test_groupy_next/test_groupy_next_resumes_an_interrupted_stage.py):
+  the workflow-test;
+- [groupy_next_test_env.py](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/tests/groupy_next_tests/groupy_next_test_env.py)
+  and [fake_policies.py](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/tests/groupy_next_tests/fake_policies.py):
+  the test-env and the fakes that it uses.
+
+A workflow-test in which the test-env puts a fake `docker` executable on the `PATH` (jazzoo):
+
+- [test_script_runs_commands_in_a_container.py](https://github.com/mnieber/jazzoo/blob/1f858e5b891a122006a6aaab11fcebf56efea51a/tests/docker_tests/test_docker/test_script_runs_commands_in_a_container.py):
+  the workflow-test;
+- [docker_test_env.py](https://github.com/mnieber/jazzoo/blob/1f858e5b891a122006a6aaab11fcebf56efea51a/tests/docker_tests/docker_test_env.py):
+  the test-env;
+- [test_docker_impl](https://github.com/mnieber/jazzoo/tree/1f858e5b891a122006a6aaab11fcebf56efea51a/tests/docker_tests/test_docker_impl):
+  the impl tests for the details and edge-cases.
+
+Scenarios, and the Markdown documents that sunya generates from them:
+
+- groupy: [scenario.py](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/extra/spec_src/scenarios/s03_a_developer_resumes_an_interrupted_stage/scenario.py)
+  and [s03_a_developer_resumes_an_interrupted_stage.md](https://github.com/mnieber/groupy/blob/cf83d3564704cda65612547e083059002c36863d/doc/spec/scenarios/s03_a_developer_resumes_an_interrupted_stage.md);
+- jazzoo: [scenario.py](https://github.com/mnieber/jazzoo/blob/1f858e5b891a122006a6aaab11fcebf56efea51a/extra/spec_src/scenarios/s60_a_script_runs_commands_in_a_container/scenario.py)
+  and [s60_a_script_runs_commands_in_a_container.md](https://github.com/mnieber/jazzoo/blob/1f858e5b891a122006a6aaab11fcebf56efea51a/doc/spec/scenarios/s60_a_script_runs_commands_in_a_container.md).
 
 ## Conclusion
 

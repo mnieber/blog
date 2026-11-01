@@ -23,15 +23,137 @@ suggested by me).
 
 At this point, our application requirements are encoded in the test-suite, but it would still be nice to have
 a user-friendly high-level description of the features. Neither the design doc nor the workflow-tests serve
-that purpose very well. Therefore, I ask my AI to create [scenario documents](http://www.example.com) (that
-follow a known template) that explain the main features and workflows, while leaving out the edge-cases and
-details (an interested user can consult the workflow-tests for those). As the scenarios are created, the
-related parts are deleted from the design doc (until eventually the design doc is empty).
+that purpose very well. Therefore, I ask my AI to create scenario documents (that follow a known template) that
+explain the main features and workflows, while leaving out the edge-cases and details (an interested user can
+consult the workflow-tests for those). As the scenarios are created, the related parts are deleted from the
+design doc (until eventually the design doc is empty).
 
-For capturing scenarios I use a special tool called [sunya](http://www.example.com), but you can of course
-create your own format. My scenarios start with a `run_scenario` function that explains a workflow by walking
-through pseudo-code. Next, there is a Markdown description of the scenario steps, followed by a sequence
-diagram. All these three components overlap, but they also complement each other in nice ways.
+For capturing scenarios I use a special tool called [sunya](https://github.com/mnieber/sunya), but you can of
+course create your own format. My scenarios start with a `run_scenario` function that explains a workflow by
+walking through pseudo-code. Next, there is a Markdown description of the scenario steps, followed by a sequence
+diagram. All these three components overlap, but they also complement each other in nice ways. Below is the
+scenario for the reminders of our todo app, and the Markdown document that sunya generates from it.
+
+export const scenario = `
+import sunya
+from sunya import C as c
+from sunya import R as r
+from sunya import goal, it, the
+
+scenario = sunya.add_scenario("s03_a_user_is_reminded_of_overdue_todos")
+
+
+def run_scenario():
+    r.user = c.External.Actors.User
+    r.scheduler = c.External.Systems.Scheduler
+    r.send_reminders_action = c.Reminders.Actions.SendReminders
+    r.get_todos_to_remind_rule = c.Reminders.Rules.GetTodosToRemind
+    r.reminder = c.Reminders.Models.Reminder
+    r.user_settings = c.Users.Models.UserSettings
+
+    with goal().remind_the(r.user).of_their(r.overdue_todos):
+
+        # The reminder job sends the reminders
+        with the(r.scheduler).runs_the(r.send_reminders_action).every(r.morning):
+            with it().visits_each(r.user).who_enabled_reminders_in_their(
+                r.user_settings
+            ):
+                it().skips_the(r.user).if_there_is_a(r.reminder).of_today()
+                it().calls(r.get_todos_to_remind_rule).to_find_the(r.overdue_todos)
+                it().sends_a(r.reminder).that_lists_the(r.overdue_todos)
+                it().stores_the(r.reminder)
+
+        # The user acts on the reminder
+        with the(r.user).reads_the(r.reminder):
+            it().marks_a(r.todo).as_done().or_changes_its(r.due_date)
+
+
+markdown_node = sunya.add_markdown_node(
+    scenario, "A user is reminded of their overdue todos"
+)
+
+markdown_node.markdown = """
+A user who forgets about a todo should not have to discover this by themselves.
+Therefore, the todo app sends a reminder email to each user who has overdue todos.
+
+### Steps
+
+#### The reminder job sends the reminders
+
+Every morning, the scheduler runs the reminder job. For each user who did not turn
+off reminders in their settings, the job finds the overdue todos (in all todo lists
+of the user), and sends one reminder that lists them. The reminder is stored, so that
+a user gets at most one reminder per day, and is reminded of the same todo at most
+three times.</br>
+
+#### The user acts on the reminder
+
+The user marks the todo as done, or gives it a new due date.
+
+### Diagram
+
+\`\`\`mermaid
+sequenceDiagram
+    participant Scheduler
+    participant SendReminders as SendReminders (action)
+    participant GetTodosToRemind as GetTodosToRemind (rule)
+    actor User
+
+    Scheduler->>SendReminders: send_reminders()
+    loop each user with reminders enabled
+        SendReminders->>GetTodosToRemind: get_todos_to_remind(user)
+        GetTodosToRemind-->>SendReminders: overdue todos
+        SendReminders->>User: reminder email
+    end
+    User->>User: mark todo as done, or change due date
+\`\`\`
+"""
+`;
+
+export const scenarioMarkdown = `
+[comment]: <> (This file is auto-generated. Do not edit directly.)
+
+# s03_a_user_is_reminded_of_overdue_todos
+
+## A user is reminded of their overdue todos
+
+A user who forgets about a todo should not have to discover this by themselves.
+Therefore, the todo app sends a reminder email to each user who has overdue todos.
+
+### Steps
+
+#### The reminder job sends the reminders
+
+Every morning, the scheduler runs the reminder job. For each user who did not turn
+off reminders in their settings, the job finds the overdue todos (in all todo lists
+of the user), and sends one reminder that lists them. The reminder is stored, so that
+a user gets at most one reminder per day, and is reminded of the same todo at most
+three times.</br>
+
+#### The user acts on the reminder
+
+The user marks the todo as done, or gives it a new due date.
+
+### Diagram
+
+\`\`\`mermaid
+sequenceDiagram
+    ...
+\`\`\`
+`;
+
+<TabView
+  titles={[
+    'extra/spec_src/scenarios/s03_a_user_is_reminded_of_overdue_todos/scenario.py',
+    'doc/spec/scenarios/s03_a_user_is_reminded_of_overdue_todos.md',
+  ]}
+>
+  <CodeSnippet lang="python" code={scenario} />
+  <CodeSnippet lang="markdown" code={scenarioMarkdown} />
+</TabView>
+
+The pseudo-code in `run_scenario` refers to the code units of the application (e.g.
+`c.Reminders.Actions.SendReminders`), so that the scenario also serves as a map of the code-base.
 
 Once the scenarios are generated, we can delete the design doc (which should be empty) and test plan.
 
